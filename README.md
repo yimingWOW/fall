@@ -8,6 +8,8 @@ Fall is a lending protocol without oracle built on the Solana.
 
 The protocol establishes lending pools for any trading pair alongside corresponding swap liquidity pools. The liquidation mechanism for lending instruments is based on the prices from these corresponding liquidity pools.
 
+Fall conducts liquidations based on on-chain liquidity pool prices, without relying on oracle feeds, significantly lowering the barrier to establishing lending pools. This allows anyone to create lending pools through the contract.
+
 The protocol serves four main participants:
 
 1. **Lender**: Users who hold tokens and maintain long-term bullish positions can deposit their tokens into lending pools to earn steady yields, regardless of short-term price fluctuations.
