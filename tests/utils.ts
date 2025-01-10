@@ -65,8 +65,8 @@ export const mintingTokens = async ({
 
 export async function transferTokens({
   connection,
-  from,  // admin
-  to,    // user
+  from,  
+  to,   
   tokenMint,
   amount,
 }: {

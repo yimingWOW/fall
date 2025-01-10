@@ -30,12 +30,26 @@ pub struct Pool {
     /// The LP fee taken on each trade, in basis points
     pub fee: u16,
 
-    /// 价格    
-    pub price: u64,
+    /// 借贷池中token a的数量
+    pub token_a_amount :u64,
+    /// 借贷池中token b的数量
+    pub token_b_amount :u64,
+
+    // lending pool
+    /// 最小抵押率 (基点表示，20000 = 200%)
+    pub min_collateral_ratio: u64,
+    /// 记录上次借贷池interest_step更新时的区块高度
+    pub borrow_interest_accumulator_block_height: u64,
+    /// 借款累计利息，随着区块高度增加而增加，但是增加幅度与资金借出量正相关
+    pub borrow_interest_accumulator: u64,
+    /// 共享借贷累加器区块高度
+    pub share_lending_block_height: u64,
+    /// 共享借贷累加器，资金借出量的时间积分
+    pub share_lending_accumulator: u64,
 }
 
 impl Pool {
-    pub const LEN: usize = 8 + 32 + 32 + 32 + 2 + 8;
+    pub const LEN: usize = 8 + 32 + 32 + 32 + 2 + 8 + 8 + 8 + 8 + 8 + 8 + 8;
 
     // 计算 token A 的价值，返回token A等价于token B的数量
     #[inline(never)]  // 强制不内联
@@ -43,9 +57,14 @@ impl Pool {
         &mut self,
         amount_a: u64,
     ) -> Result<u64> {
+        msg!("token_a_amount: {}", self.token_a_amount);
+        msg!("token_b_amount: {}", self.token_b_amount);
         // 计算价值: value = amount_b * pool_a_amount / pool_b_amount
         let token_a_value = (amount_a as u128)
-        .checked_div(self.price as u128).ok_or(StateError::CalculationError)?;
+        .checked_mul(self.token_a_amount as u128)
+        .ok_or(StateError::CalculationError)?
+        .checked_div(self.token_b_amount as u128)
+        .ok_or(StateError::CalculationError1)?;
         Ok(token_a_value as u64)
     }
 
@@ -56,44 +75,13 @@ impl Pool {
         amount_b: u64,
     ) -> Result<u64> {
         // 计算价值: value = amount_b * pool_a_amount / pool_b_amount
-        let token_a_value = (amount_b as u128)
-        .checked_mul(self.price as u128).ok_or(StateError::CalculationError)?;
-        Ok(token_a_value as u64)
+        let token_b_value = (amount_b as u128)
+        .checked_mul(self.token_a_amount as u128)
+        .ok_or(StateError::CalculationError)?
+        .checked_div(self.token_b_amount as u128)
+        .ok_or(StateError::CalculationError1)?;
+        Ok(token_b_value as u64)
     }   
-}
-
-
-#[account]
-#[derive(Default)]
-pub struct LendingPool {
-    /// 关联的 AMM 池子
-    pub pool: Pubkey,
-
-    pub mint_a: Pubkey,
-
-    pub mint_b: Pubkey,
-
-    /// 最小抵押率 (基点表示，20000 = 200%)
-    pub min_collateral_ratio: u64,
-    /// 记录上次借贷池interest_step更新时的区块高度
-    pub borrow_interest_accumulator_block_height: u64,
-    /// 借款累计利息，随着区块高度增加而增加，但是增加幅度与资金借出量正相关
-    pub borrow_interest_accumulator: u64,
-
-    /// 共享借贷累加器区块高度
-    pub share_lending_block_height: u64,
-    /// 共享借贷累加器，资金借出量的时间积分
-    pub share_lending_accumulator: u64,
-}
-
-impl LendingPool {
-    pub const LEN: usize = 8 +  // discriminator
-        32 + // pool
-        8 +  // min_collateral_ratio
-        8 +  // borrow_interest_accumulator_block_height
-        8 +  // borrow_interest_accumulator
-        8 +  // share_lending_block_height
-        8 ;  // share_lending_accumulator
 
     // 更新借贷池的累计利息 （基于区块高度和基础利率和借出资金计算lendingpool的实际累积利息）
     #[inline(never)]  // 强制不内联
@@ -183,10 +171,10 @@ impl LendingPool {
             .ok_or(StateError::CalculationError)?
             .checked_div(MIN_COLLATERAL_RATIO_BASE as u128)
             .ok_or(StateError::CalculationError)? as u64;
-        
+        msg!("required_collateral: {}", required_collateral);
+        msg!("collateral_value_in_token_a: {}", collateral_value_in_token_a);
         Ok(collateral_value_in_token_a >= required_collateral)
     }
-
 }
 
 
@@ -202,6 +190,8 @@ pub fn calculate_blocks_passed(borrow_interest_accumulator_block_height: u64,
 pub enum StateError {
     #[msg("Calculation error")]
     CalculationError,
+    #[msg("Calculation error")]
+    CalculationError1,
     #[msg("Invalid fee")]
     InvalidFee,
 }

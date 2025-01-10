@@ -2,13 +2,7 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { depositLiquidity } from '../utils/depositLiquidity';
-
-interface PoolInfo {
-  pubkey: string;
-  amm: string;
-  mintA: string;
-  mintB: string;
-}
+import { PoolInfo } from '../utils/getPoolList';
 
 interface DepositLiquidityFormProps {
   pool: PoolInfo;

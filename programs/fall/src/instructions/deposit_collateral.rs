@@ -3,8 +3,8 @@ use anchor_spl::{
     token::{self, Mint, Token, TokenAccount, Transfer},
     associated_token::AssociatedToken,
 };
-use crate::constants::{ LENDING_AUTHORITY_SEED, BORROWER_AUTHORITY_SEED, COLLATERAL_TOKEN_SEED,LENDING_SEED };
-use crate::state::{LendingPool, Pool};
+use crate::constants::{ LENDING_AUTHORITY_SEED, BORROWER_AUTHORITY_SEED, COLLATERAL_TOKEN_SEED };
+use crate::state::Pool;
 use crate::instructions::utils::mint_and_freeze_token;
 
 #[derive(Accounts)]
@@ -19,16 +19,6 @@ pub struct DepositCollateral<'info> {
     )]
     pub pool: Box<Account<'info, Pool>>,
     
-    #[account(
-        mut,
-        seeds = [
-            pool.key().as_ref(),
-            LENDING_SEED,
-        ],
-        bump
-    )]
-    pub lending_pool: Box<Account<'info, LendingPool>>,
-
     /// CHECK: Read only authority
     #[account(
         seeds = [
@@ -68,7 +58,7 @@ pub struct DepositCollateral<'info> {
     /// CHECK: Read only authority
     #[account(
         seeds = [
-            lending_pool.pool.as_ref(),
+            pool.key().as_ref(),
             borrower.key().as_ref(),
             BORROWER_AUTHORITY_SEED,
         ],
@@ -76,8 +66,9 @@ pub struct DepositCollateral<'info> {
     )]
     pub borrower_authority: AccountInfo<'info>,
 
-    /// CHECK: Read only authority
     #[account(
+        init_if_needed,
+        payer = payer,
         associated_token::mint = collateral_receipt_token_mint,
         associated_token::authority = borrower_authority,
     )]

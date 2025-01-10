@@ -13,6 +13,7 @@ use crate::{
 #[derive(Accounts)]
 pub struct DepositLiquidity<'info> {
     #[account(
+        mut,
         seeds = [
             pool.amm.as_ref(),
             pool.mint_a.key().as_ref(),
@@ -36,6 +37,9 @@ pub struct DepositLiquidity<'info> {
     )]
     pub pool_authority: AccountInfo<'info>,
 
+    pub mint_a: Box<Account<'info, Mint>>,
+    pub mint_b: Box<Account<'info, Mint>>,
+    
     /// The account paying for all rents
     pub depositor: Signer<'info>,
 
@@ -51,9 +55,6 @@ pub struct DepositLiquidity<'info> {
         mint::authority = pool_authority,
     )]
     pub liquidity_mint: Box<Account<'info, Mint>>,
-
-    pub mint_a: Box<Account<'info, Mint>>,
-    pub mint_b: Box<Account<'info, Mint>>,
 
     #[account(
         mut,
@@ -184,6 +185,13 @@ pub fn deposit_liquidity(
         ),
         amount_b,
     )?;
+
+    // 更新池子状态
+    ctx.accounts.pool.token_a_amount += amount_a;
+    ctx.accounts.pool.token_b_amount += amount_b;
+    msg!("token_a_amount: {}", ctx.accounts.pool.token_a_amount);
+    msg!("token_b_amount: {}", ctx.accounts.pool.token_b_amount);
+    
 
     // Mint the liquidity to user
     let authority_bump = ctx.bumps.pool_authority;

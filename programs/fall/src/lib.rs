@@ -5,7 +5,7 @@ mod constants;
 mod instructions;
 mod state;
 
-declare_id!("Ar3ubGqirD9CqQyhSdYiZh7cyJZEXic3W8yRpSdELRpe");
+declare_id!("3DNfsn8oRdET1qob8PsoKuWkZ78r6qTCWfMZskUmpJgL");
 
 
 #[program]
@@ -46,12 +46,16 @@ pub mod fall {
         instructions::price(ctx)    
     }
 
-    pub fn create_lending_pool(ctx: Context<CreateLendingPool>) -> Result<()> {
-        instructions::create_lending_pool(ctx)
+    pub fn init_lending_pool_1(ctx: Context<InitLendingPool1>) -> Result<()> {
+        instructions::init_lending_pool_1(ctx)
     }
 
-    pub fn init_lending_pool(ctx: Context<InitLendingPool>) -> Result<()> {
-        instructions::init_lending_pool(ctx)
+    pub fn init_lending_pool_2(ctx: Context<InitLendingPool2>) -> Result<()> {
+        instructions::init_lending_pool_2(ctx)
+    }
+
+    pub fn init_lending_pool_3(ctx: Context<InitLendingPool3>) -> Result<()> {
+        instructions::init_lending_pool_3(ctx)
     }
 
     pub fn lend(ctx: Context<Lend>, user_lending_amount: u64) -> Result<()> {

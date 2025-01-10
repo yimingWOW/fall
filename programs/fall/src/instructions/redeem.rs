@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    token::{self, Mint, Token, TokenAccount, Transfer, ThawAccount, Burn},
+    token::{self, Mint, Token, TokenAccount, Transfer, Burn},
     associated_token::AssociatedToken,
 };
 use crate::constants::*;
@@ -12,21 +12,11 @@ use crate::state::*;
 pub struct Redeem<'info> {
     #[account(
         seeds = [
-            amm.id.as_ref()
-        ],
-        bump,
-    )]
-    pub amm: Box<Account<'info, Amm>>,
-    
-    #[account(
-        seeds = [
             pool.amm.as_ref(),
             pool.mint_a.key().as_ref(),
             pool.mint_b.key().as_ref(),
         ],
         bump,
-        has_one = mint_a,
-        has_one = mint_b,
     )]
     pub pool: Box<Account<'info, Pool>>,
 
@@ -34,8 +24,8 @@ pub struct Redeem<'info> {
     #[account(
         seeds = [
             pool.amm.as_ref(),
-            mint_a.key().as_ref(),
-            mint_b.key().as_ref(),
+            pool.mint_a.key().as_ref(),
+            pool.mint_b.key().as_ref(),
             AUTHORITY_SEED,
         ],
         bump,
@@ -44,16 +34,6 @@ pub struct Redeem<'info> {
 
     pub mint_a: Box<Account<'info, Mint>>,
     pub mint_b: Box<Account<'info, Mint>>,
-
-    #[account(
-        mut,
-        seeds = [
-            pool.key().as_ref(),
-            LENDING_SEED,
-        ],
-        bump
-    )]
-    pub lending_pool: Box<Account<'info, LendingPool>>,
 
     /// CHECK: Read only authority
     #[account(
@@ -67,7 +47,7 @@ pub struct Redeem<'info> {
 
     #[account(
         mut,
-        associated_token::mint = mint_a,
+        associated_token::mint = pool.mint_a,
         associated_token::authority = lending_pool_authority,
     )]
     pub lending_pool_token_a: Box<Account<'info, TokenAccount>>,
@@ -126,17 +106,28 @@ pub struct Redeem<'info> {
     )]
     pub lender_token_b: Box<Account<'info, TokenAccount>>,
 
+    /// CHECK: Read only authority
+    #[account(
+        seeds = [
+            pool.key().as_ref(),
+            lender.key().as_ref(),
+            BORROWER_AUTHORITY_SEED,
+        ],
+        bump,
+    )]
+    pub lender_authority: AccountInfo<'info>,
+
     #[account(
         mut,
         associated_token::mint = lending_receipt_token_mint,
-        associated_token::authority = lender,
+        associated_token::authority = lender_authority,
     )]
     pub lender_lending_receipt_token: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = lender_lending_block_height_mint,
-        associated_token::authority = lender,
+        associated_token::authority = lender_authority,
     )]
     pub lender_lending_block_height_receipt_token: Box<Account<'info, TokenAccount>>,
 
@@ -161,12 +152,12 @@ pub fn redeem(ctx: Context<Redeem>) -> Result<()> {
     let lender_asset_accumulator = blocks_passed.checked_mul(lending_receipt_amount).ok_or(ProgramError::ArithmeticOverflow)?;
 
     // 计算lendingpool实际累积资金时间成本
-    let last_share_lending_accumulator = ctx.accounts.lending_pool.share_lending_accumulator;
-    let current_share_lending_accumulator =ctx.accounts.lending_pool.get_updated_share_lending_accumulator(ctx.accounts.lending_receipt_token_mint.supply)?;
+    let last_share_lending_accumulator = ctx.accounts.pool.share_lending_accumulator;
+    let current_share_lending_accumulator =ctx.accounts.pool.get_updated_share_lending_accumulator(ctx.accounts.lending_receipt_token_mint.supply)?;
     let lendingpool_asset_accumulator = current_share_lending_accumulator.checked_sub(last_share_lending_accumulator).ok_or(RedeemError::CalculationError)?;
 
     // 计算利息: lender_asset_accumulator/lendingpool_asset_accumulator*borrow_interest_accumulator
-    let borrow_interest_accumulator = ctx.accounts.lending_pool.borrow_interest_accumulator;
+    let borrow_interest_accumulator = ctx.accounts.pool.borrow_interest_accumulator;
     let mut lending_pool_token_b_amount = ctx.accounts.lending_pool_token_b.amount;
 
     if lendingpool_asset_accumulator!=0{
@@ -189,72 +180,51 @@ pub fn redeem(ctx: Context<Redeem>) -> Result<()> {
         }
     }
 
-    // 4. 解冻、销毁 lending receipt token
+    // // 4. 解冻、销毁 lending receipt token
+    let lender_authority_seeds = &[
+        &ctx.accounts.pool.key().to_bytes(),
+        &ctx.accounts.lender.key().to_bytes(),
+        BORROWER_AUTHORITY_SEED,
+        &[ctx.bumps.lender_authority],
+    ];
+    let lender_authority_signer_seeds = &[&lender_authority_seeds[..]];
+    token::burn(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Burn {
+                mint: ctx.accounts.lending_receipt_token_mint.to_account_info(),
+                from: ctx.accounts.lender_lending_receipt_token.to_account_info(),
+                authority: ctx.accounts.lender_authority.to_account_info(),
+            }, 
+            lender_authority_signer_seeds,
+        ),
+        lending_receipt_amount,
+    )?;
+
+    // 更新lendingpool资金成本，因为lender已经将他的资金和利息提走了
+    ctx.accounts.pool.reduce_share_lending_accumulator(lender_asset_accumulator)?;
+    token::burn(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Burn {
+                mint: ctx.accounts.lender_lending_block_height_mint.to_account_info(),
+                from: ctx.accounts.lender_lending_block_height_receipt_token.to_account_info(),
+                authority: ctx.accounts.lender_authority.to_account_info(),
+            }, 
+            lender_authority_signer_seeds,
+        ),
+        last_lending_block_height,
+    )?;
+
+    // 5. 提取本金
+    // 计算lender借出的token b 等价于抵押品token a的数量 todo: 取整方向
     let authority_seeds = &[
         &ctx.accounts.pool.key().to_bytes(),
         LENDING_AUTHORITY_SEED,
         &[ctx.bumps.lending_pool_authority],
     ];
     let signer_seeds = &[&authority_seeds[..]];
-    token::thaw_account(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                mint: ctx.accounts.lending_receipt_token_mint.to_account_info(),
-                account: ctx.accounts.lender_lending_receipt_token.to_account_info(),
-                authority: ctx.accounts.lending_pool_authority.to_account_info(),
-            },
-            signer_seeds,
-        ),
-    )?;
-    token::burn(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Burn {
-                mint: ctx.accounts.lending_receipt_token_mint.to_account_info(),
-                from: ctx.accounts.lender_lending_receipt_token.to_account_info(),
-                authority: ctx.accounts.lender.to_account_info(),
-            }, 
-        ),
-        lending_receipt_amount,
-    )?;
-
-    // 更新lendingpool资金成本，因为lender已经将他的资金和利息提走了
-    ctx.accounts.lending_pool.reduce_share_lending_accumulator(lender_asset_accumulator)?;
-    let pool_authority_seeds = &[
-        &ctx.accounts.pool.amm.to_bytes(),
-        &ctx.accounts.mint_a.key().to_bytes(),
-        &ctx.accounts.mint_b.key().to_bytes(),
-        AUTHORITY_SEED,
-        &[ctx.bumps.pool_authority],
-    ];
-    let pool_signer_seeds = &[&pool_authority_seeds[..]];
-    token::thaw_account(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                mint: ctx.accounts.lender_lending_block_height_mint.to_account_info(),
-                account: ctx.accounts.lender_lending_block_height_receipt_token.to_account_info(),
-                authority: ctx.accounts.pool_authority.to_account_info(),
-            },
-            pool_signer_seeds,
-        ),
-    )?;
-    token::burn(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            Burn {
-                mint: ctx.accounts.lender_lending_block_height_mint.to_account_info(),
-                from: ctx.accounts.lender_lending_block_height_receipt_token.to_account_info(),
-                authority: ctx.accounts.lender.to_account_info(),
-            }, 
-        ),
-        last_lending_block_height,
-    )?;
-
-    // 5. 提取本金
-     // 计算lender借出的token b 等价于抵押品token a的数量 todo: 取整方向
-     let token_b_value_denominated_in_token_a = ctx.accounts.pool.calculate_token_a_value(
+    let token_b_value_denominated_in_token_a = ctx.accounts.pool.calculate_token_a_value(
         lending_pool_token_b_amount)?;
     // 抵押物token b价值小于已经借出的token a价值，则lender只能赎回部份token a或者等额的usdt
     if token_b_value_denominated_in_token_a >= ctx.accounts.borrow_receipt_token_mint.supply  {

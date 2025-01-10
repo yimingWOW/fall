@@ -20,7 +20,6 @@ export const getAmmAccounts = async (
     provider
   );
 
-  // 获取所有 AMM 账户
   const accounts = await program.account.amm.all();
   for (const account of accounts) {
     console.log('AMM Account Details:', {
@@ -28,8 +27,7 @@ export const getAmmAccounts = async (
         id: account.account.id.toString(),
         admin: account.account.admin.toString()
     });
-}
-
+  }
   
   return accounts.map(account => ({
     pubkey: account.publicKey.toString(),

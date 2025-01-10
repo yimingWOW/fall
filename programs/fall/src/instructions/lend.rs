@@ -4,8 +4,8 @@ use anchor_spl::{
     token::{self, Mint, Token, TokenAccount, Transfer},
 };
 use crate::{
-    constants::{ LENDING_SEED,LENDING_AUTHORITY_SEED, LENDING_TOKEN_SEED,LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED},
-    state::LendingPool,
+    constants::{LENDING_AUTHORITY_SEED, LENDING_TOKEN_SEED,LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,BORROWER_AUTHORITY_SEED},
+    state::Pool,
 };
 use crate::instructions::utils::mint_and_freeze_token;
 
@@ -13,19 +13,19 @@ use crate::instructions::utils::mint_and_freeze_token;
 #[derive(Accounts)]
 pub struct Lend<'info> {
     #[account(
-        mut,
         seeds = [
-            lending_pool.pool.key().as_ref(),
-            LENDING_SEED,
+            pool.amm.as_ref(),
+            pool.mint_a.key().as_ref(),
+            pool.mint_b.key().as_ref(),
         ],
-        bump
+        bump,
     )]
-    pub lending_pool: Box<Account<'info, LendingPool>>,
+    pub pool: Box<Account<'info, Pool>>,
 
     /// CHECK: Read only authority
     #[account(
         seeds = [
-            lending_pool.pool.key().as_ref(),
+            pool.key().as_ref(),
             LENDING_AUTHORITY_SEED,
         ],
         bump,
@@ -34,7 +34,7 @@ pub struct Lend<'info> {
 
     #[account(
         mut,
-        associated_token::mint = lending_pool.mint_a,
+        associated_token::mint = pool.mint_a,
         associated_token::authority = lending_pool_authority,
     )]
     pub lending_pool_token_a: Box<Account<'info, TokenAccount>>,
@@ -42,7 +42,7 @@ pub struct Lend<'info> {
     #[account(
         mut,
         seeds = [
-            lending_pool.pool.key().as_ref(),
+            pool.key().as_ref(),
             LENDING_TOKEN_SEED,
         ],
         bump,
@@ -53,7 +53,7 @@ pub struct Lend<'info> {
     #[account(
         mut,
         seeds = [
-            lending_pool.pool.key().as_ref(),
+            pool.key().as_ref(),
             LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,
         ],
         bump,
@@ -64,16 +64,27 @@ pub struct Lend<'info> {
 
     #[account(
         mut,
-        associated_token::mint = lending_pool.mint_a,
+        associated_token::mint = pool.mint_a,
         associated_token::authority = lender,
     )]
     pub lender_token_a: Box<Account<'info, TokenAccount>>,
+
+    /// CHECK: Read only authority
+    #[account(
+        seeds = [
+            pool.key().as_ref(),
+            lender.key().as_ref(),
+            BORROWER_AUTHORITY_SEED,
+        ],
+        bump,
+    )]
+    pub lender_authority: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
         payer = payer,
         associated_token::mint = lending_receipt_token_mint,
-        associated_token::authority = lender,
+        associated_token::authority = lender_authority,
     )]
     pub lender_lend_receipt_token: Box<Account<'info, TokenAccount>>,
 
@@ -81,7 +92,7 @@ pub struct Lend<'info> {
         init_if_needed,
         payer = payer,
         associated_token::mint = lender_lending_block_height_mint,
-        associated_token::authority = lender,
+        associated_token::authority = lender_authority,
     )]
     pub lender_lending_block_height_receipt_token: Box<Account<'info, TokenAccount>>,
 
@@ -117,11 +128,11 @@ pub fn lend(ctx: Context<Lend>,lender_lending_amount: u64,) -> Result<()> {
 
      // 3. 获取token A 收据
      // 3.1 更新 当前lending资金时间积分 share_lending_accumulator, 编码 lending_receipt_amount
-     ctx.accounts.lending_pool.get_updated_share_lending_accumulator(ctx.accounts.lending_receipt_token_mint.supply)?;
+     ctx.accounts.pool.get_updated_share_lending_accumulator(ctx.accounts.lending_receipt_token_mint.supply)?;
 
      // 3.2 铸造 lender_lend_receipt_token
      let authority_seeds = &[
-         &ctx.accounts.lending_pool.pool.key().to_bytes(),
+         &ctx.accounts.pool.key().to_bytes(),
          LENDING_AUTHORITY_SEED,
          &[ctx.bumps.lending_pool_authority],
      ];

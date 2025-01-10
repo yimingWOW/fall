@@ -10,7 +10,6 @@ describe('Create pool', () => {
   anchor.setProvider(provider);
 
   const program = anchor.workspace.Fall as Program<Fall>;
-
   let values: TestValues;
 
   beforeEach(async () => {
@@ -53,5 +52,4 @@ describe('Create pool', () => {
         throw error;
     }
   });
-
 });

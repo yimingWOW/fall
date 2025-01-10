@@ -167,6 +167,9 @@ pub fn swap_exact_tokens_for_tokens<'info>(
         if invariant > (ctx.accounts.pool_account_a.amount+taxed_input) * (ctx.accounts.pool_account_b.amount-output) {
             return err!(SwapError::InvariantViolated);
         }
+        // 更新池子状态
+        ctx.accounts.pool.token_a_amount += taxed_input;
+        ctx.accounts.pool.token_b_amount -= output;
     } else {
         token::transfer(
             CpiContext::new_with_signer(
@@ -197,6 +200,9 @@ pub fn swap_exact_tokens_for_tokens<'info>(
         if invariant > (ctx.accounts.pool_account_a.amount-output) * (ctx.accounts.pool_account_b.amount+taxed_input) {
             return err!(SwapError::InvariantViolated);
         }
+        // 更新池子状态
+        ctx.accounts.pool.token_a_amount -= output;
+        ctx.accounts.pool.token_b_amount += taxed_input;
     }
     
     Ok(())

@@ -8,27 +8,22 @@ export async function createAmm(
   ammId: PublicKey,
 ) {
   try {
-    console.log('Step 1: Creating provider');
     const provider = new anchor.AnchorProvider(
       connection,
       wallet,
       { preflightCommitment: "confirmed" }
     );
 
-    console.log('Step 2: Creating Program instance');
-    // 根据构造函数定义修正
     const program = new anchor.Program(
       fallIdl,
       provider
     );
 
-    console.log('Step 3: Finding PDA');
     const [ammPda] = PublicKey.findProgramAddressSync(
       [ammId.toBuffer()],
       program.programId
     );
 
-    console.log('Step 4: Sending transaction');
     const tx = await program.methods
       .createAmm(ammId)
       .accounts({

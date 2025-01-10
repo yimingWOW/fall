@@ -2,13 +2,7 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { swap } from '../utils/swap';
-
-interface PoolInfo {
-  pubkey: string;
-  amm: string;
-  mintA: string;
-  mintB: string;
-}
+import { PoolInfo } from '../utils/getPoolList';
 
 interface SwapFormProps {
   pool: PoolInfo;
@@ -34,14 +28,6 @@ export const SwapForm: FC<SwapFormProps> = ({ pool, onSuccess }) => {
     try {
       const inputAmount = parseFloat(formData.inputAmount) ;
       const minOutputAmount = parseFloat(formData.minOutputAmount) ;
-
-      console.log("inputAmount", inputAmount);
-      console.log("minOutputAmount", minOutputAmount);
-      console.log("swapAtoB", swapAtoB);
-      console.log("pool.pubkey", pool.pubkey);
-      console.log("pool.amm", pool.amm);
-      console.log("pool.mintA", pool.mintA);
-      console.log("pool.mintB", pool.mintB);
       const signature = await swap(
         wallet,
         connection,

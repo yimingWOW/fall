@@ -7,6 +7,7 @@ import {
 } from '@solana/spl-token';
 import { BN } from 'bn.js';
 import fallIdl from '../idl/fall.json';
+import { AUTHORITY_SEED } from './constants';
 
 export async function swap(
   wallet: any,
@@ -31,18 +32,16 @@ export async function swap(
       provider
     );
 
-    // 获取必要的 PDA
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [
         amm.toBuffer(),
         mintA.toBuffer(),
         mintB.toBuffer(),
-        Buffer.from("authority")
+        Buffer.from(AUTHORITY_SEED)
       ],
       program.programId
     );
 
-    // 获取代币账户
     const poolAccountA = await getAssociatedTokenAddress(
       mintA,
       poolAuthority,
@@ -67,7 +66,6 @@ export async function swap(
       true
     );
 
-    // 发送交易
     const tx = await program.methods
       .swapExactTokensForTokens(
         swapAtoB,
@@ -89,8 +87,7 @@ export async function swap(
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+      }).rpc();
 
     return tx;
   } catch (error) {

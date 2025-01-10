@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { liquidate } from '../utils/liquidate';
+import { getPendingLiquidation, type PendingLiquidation } from '../utils/getPendingLiquidation';
 
 export const LiquidateForm: FC = () => {
   const wallet = useAnchorWallet();
@@ -11,6 +12,33 @@ export const LiquidateForm: FC = () => {
   const [poolAddress, setPoolAddress] = useState<string>("");
   const [borrowerAddress, setBorrowerAddress] = useState<string>("");
   const [lastTxSignature, setLastTxSignature] = useState<string>("");
+  const [pendingLiquidations, setPendingLiquidations] = useState<PendingLiquidation[]>([]);
+  const [isLoadingList, setIsLoadingList] = useState(false);
+
+
+  // 搜索待清算列表
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wallet || !poolAddress) {
+      setError("Please connect wallet and enter pool address");
+      return;
+    }
+
+    try {
+      setError("");
+      setIsLoadingList(true);
+      const poolKey = new PublicKey(poolAddress);
+      const liquidations = await getPendingLiquidation(wallet, poolKey, connection);
+      setPendingLiquidations(liquidations);
+    } catch (err) {
+      console.error("Error fetching pending liquidations:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch pending liquidations");
+      setPendingLiquidations([]);
+    } finally {
+      setIsLoadingList(false);
+    }
+  };
+
 
   const handleLiquidate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,19 +102,56 @@ export const LiquidateForm: FC = () => {
           </a>
         </div>
       )}
-      <form onSubmit={handleLiquidate} className="form">
+
+            {/* 搜索表单 */}
+            <div className="search-form">
         <div className="form-group">
           <label htmlFor="pool-address">Pool Address:</label>
-          <input
-            id="pool-address"
-            type="text"
-            value={poolAddress}
-            onChange={(e) => setPoolAddress(e.target.value)}
-            placeholder="Enter pool address"
-            className="input-field"
-          />
+          <div className="input-with-button">
+            <input
+              id="pool-address"
+              type="text"
+              value={poolAddress}
+              onChange={(e) => setPoolAddress(e.target.value)}
+              placeholder="Enter pool address"
+              className="input-field"
+            />
+            <button 
+              onClick={handleSearch}
+              disabled={isLoadingList || !wallet || !poolAddress}
+              className="search-button"
+            >
+              {isLoadingList ? 'Searching...' : 'Search'}
+            </button>
+          </div>
         </div>
 
+
+        {/* 待清算列表展示 */}
+        <div className="pending-liquidations">
+          <h3>Pending Liquidations</h3>
+          {isLoadingList ? (
+            <div className="loading">Loading pending liquidations...</div>
+          ) : pendingLiquidations.length === 0 ? (
+            <p>No pending liquidations found</p>
+          ) : (
+            <ul className="liquidation-list">
+              {pendingLiquidations.map((item, index) => (
+                <li 
+                  key={index} 
+                  className="liquidation-item"
+                  onClick={() => setBorrowerAddress(item.userAuthorityPda.toString())}
+                >
+                  <div>Borrower: {item.userAuthorityPda.toString()}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* 清算表单 */}
+      <form onSubmit={handleLiquidate} className="liquidate-form">
         <div className="form-group">
           <label htmlFor="borrower-address">Borrower Address:</label>
           <input
@@ -108,5 +173,7 @@ export const LiquidateForm: FC = () => {
         </button>
       </form>
     </div>
+
+
   );
 };

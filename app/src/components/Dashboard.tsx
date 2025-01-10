@@ -4,8 +4,6 @@ import { CreateAmmForm } from './CreateAmmForm';
 import { AmmList } from './AmmList';
 import { PoolCreateForm } from './CreatePoolForm';
 import { PoolList } from './PoolList';
-import { CreateLendingPoolForm } from './CreateLendingPoolForm';
-import { LendingPoolList } from './LendingPoolList';
 import { LiquidateForm } from './LiquidateForm';
 import { AmmProvider } from '../contexts/AmmContext';
 
@@ -37,13 +35,6 @@ const Dashboard: FC = () => {
         </button>
 
         <button 
-          className={`tab ${activeTab === 'debt' ? 'active' : ''}`}
-          onClick={() => setActiveTab('debt')}
-        >
-          Lend&Borrow
-        </button>
-
-        <button 
           className={`tab ${activeTab === 'liquidate' ? 'active' : ''}`}
           onClick={() => setActiveTab('liquidate')}
         >
@@ -65,12 +56,6 @@ const Dashboard: FC = () => {
             <PoolCreateForm />
           </div>
         ) 
-        : activeTab === 'debt' ? (
-          <div>
-            <LendingPoolList />
-            <CreateLendingPoolForm />
-          </div>
-        )
         : activeTab === 'liquidate' ? (
           <div>
             <LiquidateForm />

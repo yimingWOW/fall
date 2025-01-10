@@ -16,8 +16,8 @@ export const PoolList: FC = () => {
     
     setIsLoading(true);
     try {
-      const poolAccounts = await getPoolList(wallet, connection);
-      setPools(poolAccounts);
+      const pools = await getPoolList(wallet, connection);
+      setPools(pools);
     } catch (err) {
       console.error("Error fetching pools:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch pools");
@@ -72,6 +72,7 @@ export const PoolList: FC = () => {
           ))}
         </div>
       )}
+
     </div>
   );
 }; 

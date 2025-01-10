@@ -6,20 +6,12 @@ use anchor_spl::{
 use fixed::types::I64F64;
 use crate::{
     constants::{AUTHORITY_SEED, LIQUIDITY_SEED, MINIMUM_LIQUIDITY},
-    state::{Amm, Pool},
+    state::Pool,
 };
 
 
 #[derive(Accounts)]
 pub struct WithdrawLiquidity<'info> {
-    #[account(
-        seeds = [
-            amm.id.as_ref()
-        ],
-        bump,
-    )]
-    pub amm: Box<Account<'info, Amm>>,
-
     #[account(
         seeds = [
             pool.amm.as_ref(),

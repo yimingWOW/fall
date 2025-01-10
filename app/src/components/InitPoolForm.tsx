@@ -1,22 +1,23 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { repay } from '../utils/repay';
+import { initPool } from '../utils/initPool';
+import { useAmm } from '../contexts/AmmContext';
 import { PoolInfo } from '../utils/getPoolList';
 
-interface RepayFormProps {
+interface InitPoolFormProps {
   pool: PoolInfo;
   onSuccess: (signature: string) => void;
 }
 
-export const RepayForm: FC<RepayFormProps> = ({ pool, onSuccess }) => {
+export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
+  const { amm } = useAmm();
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleInitPool = async () => {
     setError("");
     setIsLoading(true);
 
@@ -26,50 +27,51 @@ export const RepayForm: FC<RepayFormProps> = ({ pool, onSuccess }) => {
       return;
     }
 
+    if (!amm) {
+      setError("Please select an AMM first");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const poolPubkey = new PublicKey(pool.pubkey);
       const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
-      const signature = await repay(
+
+      const signature = await initPool(
         wallet,
         connection,
         poolPubkey,
         mintAPubkey,
-        mintBPubkey,
+        mintBPubkey
       );
+      
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
-      onSuccess(signature);
+      if (onSuccess) {
+        onSuccess(signature);
+      }
     } catch (err) {
-      console.error("Error repaying:", err);
-      setError(err instanceof Error ? err.message : "Failed to repay");
+      console.error("Error initializing pool:", err);
+      setError(err instanceof Error ? err.message : "Failed to initialize pool");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="form-wrapper">
-      <h3>Repay Loan</h3>
+    <div className="init-pool-container">
       {error && (
         <div className="error-message">
           {error}
         </div>
       )}
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <div className="info-message">
-            Repaying your loan will return your collateral proportionally.
-          </div>
-        </div>
-
-        <button 
-          type="submit" 
-          className="action-button"
-          disabled={isLoading || !wallet}
-        >
-          {isLoading ? 'Processing...' : 'Confirm Repay'}
-        </button>
-      </form>
+      <button 
+        onClick={handleInitPool}
+        className="submit-button"
+        disabled={isLoading || !wallet}
+      >
+        {isLoading ? 'Initializing...' : 'Initialize Pool'}
+      </button>
     </div>
   );
 };

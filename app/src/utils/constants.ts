@@ -1,13 +1,12 @@
-// import fallIdl from '../idl/fall.json';
-import fallIdl from '/Users/zecrey/Desktop/yiming/sol/fall-on-solana/fall/target/idl/fall.json';
-
+import fallIdl from '../idl/fall.json';
 export const CONFIG = {
   fallIdl
 } as const;
 
+export const BASE_RATE = fallIdl.constants.find(constant => constant.name === "BASE_RATE")?.value;
+
 export const AUTHORITY_SEED= "a"; // authority
 export const LIQUIDITY_SEED= "b"; // liquidity
-export const LENDING_SEED= "c"; // lending
 export const LENDING_AUTHORITY_SEED= "d"; // lending_authority
 export const LENDING_TOKEN_SEED= "e"; // lending_token
 export const BORROW_TOKEN_SEED= "f"; // borrow_token
@@ -18,4 +17,4 @@ export const BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED= "j"; // borrow_height_toke
 
 // Constants
 export const MINIMUM_LIQUIDITY = 100;
-export const PRICE_SCALE = 1_000_000_000; // 10^9
+export const PRICE_SCALE = 1_000_000_000; 

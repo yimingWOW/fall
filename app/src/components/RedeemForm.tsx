@@ -2,14 +2,15 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { redeem } from '../utils/redeem';
-import { LendingPoolInfo } from './LendingPoolItem';
+import { PoolInfo } from '../utils/getPoolList';
+import { BASE_RATE } from '../utils/constants';
 
 interface RedeemFormProps {
-  lendingPool: LendingPoolInfo;
+  pool: PoolInfo;
   onSuccess: (signature: string) => void;
 }
 
-export const RedeemForm: FC<RedeemFormProps> = ({ lendingPool, onSuccess }) => {
+export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
@@ -28,7 +29,7 @@ export const RedeemForm: FC<RedeemFormProps> = ({ lendingPool, onSuccess }) => {
 
     try {
       // 从 lendingPool 对象获取必要的公钥
-      const poolPubkey = new PublicKey(lendingPool.pool);
+      const poolPubkey = new PublicKey(pool.pubkey);
 
       const signature = await redeem(
         wallet,
@@ -56,9 +57,8 @@ export const RedeemForm: FC<RedeemFormProps> = ({ lendingPool, onSuccess }) => {
       )}
       <form onSubmit={handleSubmit}>
         <div className="lending-pool-info-summary">
-          <div>Pool: {lendingPool.pool.slice(0, 4)}...{lendingPool.pool.slice(-4)}</div>
-          <div>Min Collateral Ratio: {(lendingPool.minCollateralRatio / 100).toFixed(2)}%</div>
-          <div>Base Rate: {(lendingPool.baseRate / 100).toFixed(2)}%</div>
+          <div>Min Collateral Ratio: {(pool.minCollateralRatio / 100).toFixed(2)}%</div>
+          <div>Base Rate: {BASE_RATE}%</div>
         </div>
         <div className="warning-message">
           Note: This will redeem all your lending receipt tokens.

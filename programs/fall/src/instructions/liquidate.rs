@@ -3,8 +3,6 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{self, Mint, Token, TokenAccount, ThawAccount, Burn},
 };
-use crate::constants::LENDING_SEED;
-use crate::state::*;
 use crate::constants::BORROW_TOKEN_SEED;
 use crate::constants::COLLATERAL_TOKEN_SEED;
 use crate::constants::LENDING_AUTHORITY_SEED;
@@ -16,36 +14,16 @@ use crate::{
 };
 
 pub fn liquidate(ctx: Context<Liquidate>) -> Result<()> {
-    // 1. 先获取所有需要的 AccountInfo
-    let authority_seeds = &[
-        &ctx.accounts.pool.key().to_bytes(),
-        LENDING_AUTHORITY_SEED,
-        &[ctx.bumps.lending_pool_authority],
-    ];
-    let signer_seeds = &[&authority_seeds[..]];
-
     // 1. 计算抵押品等价于token A的数量,检查抵押率,要求抵押品等价于token A的数量大于等于借出金额的min_collateral_ratio
     let collateral_value = ctx.accounts.pool.calculate_token_b_value(
         ctx.accounts.borrower_collateral_receipt_token.amount
     )?;
-    if !ctx.accounts.lending_pool.check_collateral_ratio(
+    if !ctx.accounts.pool.check_collateral_ratio(
         collateral_value,  ctx.accounts.borrower_borrow_receipt_token.amount)?{
         // 5. 执行清算：销毁 receipt tokens
         // 5.1 销毁 borrow receipt token
-        token::thaw_account(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                ThawAccount {
-                    mint: ctx.accounts.borrow_receipt_token_mint.to_account_info(),
-                    account: ctx.accounts.borrower_borrow_receipt_token.to_account_info(),
-                    authority: ctx.accounts.lending_pool_authority.to_account_info(),
-                },
-                signer_seeds,
-            ),
-        )?;
-
         let borrower_authority_seeds = &[
-            &ctx.accounts.lending_pool.pool.to_bytes(),
+            &ctx.accounts.pool.key().to_bytes(),
             &ctx.accounts.borrower.key().to_bytes(),
             BORROWER_AUTHORITY_SEED,
             &[ctx.bumps.borrower_authority],
@@ -64,17 +42,6 @@ pub fn liquidate(ctx: Context<Liquidate>) -> Result<()> {
             ctx.accounts.borrower_borrow_receipt_token.amount,          
         )?;
         // 5.2 销毁 collateral receipt token
-        token::thaw_account(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                ThawAccount {
-                    mint: ctx.accounts.collateral_receipt_token_mint.to_account_info(),
-                    account: ctx.accounts.borrower_collateral_receipt_token.to_account_info(),
-                    authority: ctx.accounts.lending_pool_authority.to_account_info(),
-                },
-                signer_seeds,
-            ),
-        )?;
         token::burn(
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
@@ -88,7 +55,7 @@ pub fn liquidate(ctx: Context<Liquidate>) -> Result<()> {
             ctx.accounts.borrower_collateral_receipt_token.amount,
         )?;
         // 5. 更新pool_interest和 
-        ctx.accounts.lending_pool.update_borrow_interest_accumulator(ctx.accounts.borrow_receipt_token_mint.supply)?;
+        ctx.accounts.pool.update_borrow_interest_accumulator(ctx.accounts.borrow_receipt_token_mint.supply)?;
     }       
     
     Ok(())
@@ -140,16 +107,6 @@ pub struct Liquidate<'info> {
     )]
     pub pool_account_b: Box<Account<'info, TokenAccount>>,
 
-    #[account(
-        seeds = [
-            pool.key().as_ref(),
-            LENDING_SEED,
-        ],
-        bump,
-        has_one = pool,
-    )]
-    pub lending_pool: Box<Account<'info, LendingPool>>,
-
     /// CHECK: Read only authority
     #[account(
         seeds = [
@@ -197,7 +154,7 @@ pub struct Liquidate<'info> {
     /// CHECK: Read only authority
     #[account(
         seeds = [
-            lending_pool.pool.as_ref(),
+            pool.key().as_ref(),
             borrower.key().as_ref(),
             BORROWER_AUTHORITY_SEED,
         ],

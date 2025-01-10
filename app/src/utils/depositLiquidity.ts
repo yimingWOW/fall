@@ -7,6 +7,7 @@ import {
 } from '@solana/spl-token';
 import { BN } from 'bn.js';
 import fallIdl from '../idl/fall.json';
+import { AUTHORITY_SEED, LIQUIDITY_SEED } from './constants';
 
 export async function depositLiquidity(
   wallet: any,
@@ -30,28 +31,24 @@ export async function depositLiquidity(
       provider
     );
 
-    // 获取必要的 PDA
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [
         amm.toBuffer(),
         mintA.toBuffer(),
         mintB.toBuffer(),
-        Buffer.from("authority")
+        Buffer.from(AUTHORITY_SEED)
       ],
       program.programId
     );
 
     const [mintLiquidity] = PublicKey.findProgramAddressSync(
       [
-        amm.toBuffer(),
-        mintA.toBuffer(),
-        mintB.toBuffer(),
-        Buffer.from("liquidity")
+        pool.toBuffer(),
+        Buffer.from(LIQUIDITY_SEED)
       ],
       program.programId
     );
 
-    // 获取代币账户地址
     const poolAccountA = await getAssociatedTokenAddress(
       mintA,
       poolAuthority,
@@ -82,7 +79,6 @@ export async function depositLiquidity(
       true
     );
 
-    // 发送交易
     const tx = await program.methods
       .depositLiquidity(
         new BN(amountA),
@@ -91,10 +87,10 @@ export async function depositLiquidity(
       .accounts({
         pool,
         poolAuthority,
-        depositor: wallet.publicKey,
-        mintLiquidity,
         mintA,
         mintB,
+        depositor: wallet.publicKey,
+        mintLiquidity,
         poolAccountA,
         poolAccountB,
         depositorAccountLiquidity,
@@ -105,8 +101,13 @@ export async function depositLiquidity(
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .rpc();
-
+      .rpc(
+        {
+          skipPreflight: false,
+          maxRetries: 3,
+          commitment: 'confirmed',
+        }
+      );
     return tx;
   } catch (error) {
     console.error('Error in depositLiquidity:', error);

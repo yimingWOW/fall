@@ -4,12 +4,12 @@ use anchor_spl::{
     token::{Mint, Token},
 };
 use crate::{
-    constants::{LENDING_TOKEN_SEED,BORROW_TOKEN_SEED,LENDING_AUTHORITY_SEED,COLLATERAL_TOKEN_SEED,LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED},
+    constants::{BORROW_TOKEN_SEED,COLLATERAL_TOKEN_SEED,LENDING_AUTHORITY_SEED,LENDING_TOKEN_SEED},
     state::Pool,
 };
 
 #[derive(Accounts)]
-pub struct InitLendingPool<'info> {
+pub struct InitLendingPool2<'info> {
     /// CHECK: Read only authority
     #[account(
         seeds = [
@@ -73,34 +73,6 @@ pub struct InitLendingPool<'info> {
     )]
     pub collateral_receipt_token_mint: Box<Account<'info, Mint>>,
 
-    #[account(
-        init,
-        payer = payer,
-        seeds = [
-            pool.key().as_ref(),
-            LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,
-        ],
-        bump,
-        mint::decimals = 6,
-        mint::authority = lending_pool_authority,
-        mint::freeze_authority = lending_pool_authority,
-    )]
-    pub lender_lending_block_height_mint: Box<Account<'info, Mint>>,
-
-    #[account(
-        init,
-        payer = payer,
-        seeds = [
-            pool.key().as_ref(),
-            BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED,
-        ],
-        bump,
-        mint::decimals = 6,
-        mint::authority = lending_pool_authority,
-        mint::freeze_authority = lending_pool_authority,
-    )]
-    pub borrower_borrow_block_height_mint: Box<Account<'info, Mint>>,
-
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -109,6 +81,6 @@ pub struct InitLendingPool<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn init_lending_pool(_ctx: Context<InitLendingPool>) -> Result<()> {
+pub fn init_lending_pool_2(_ctx: Context<InitLendingPool2>) -> Result<()> {
     Ok(())
 }

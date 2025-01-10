@@ -4,28 +4,24 @@ import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
 import { 
-  AUTHORITY_SEED,
-  LIQUIDITY_SEED,
   LENDING_AUTHORITY_SEED,
   LENDING_TOKEN_SEED,
   BORROW_TOKEN_SEED,
   COLLATERAL_TOKEN_SEED,
   LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,
   BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED,
-} from '../utils/constants';
+} from './constants';
 import { Idl } from '@coral-xyz/anchor';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 
-export async function createPool(
+export async function initPool(
   wallet: AnchorWallet,
   connection: Connection,
-  ammPda: PublicKey,
+  poolPda: PublicKey,
   mintA: PublicKey,
   mintB: PublicKey,
-  fee: number,
 ) {
   try {
-    console.log('Step 1: Creating provider');
     const provider = new anchor.AnchorProvider(
       connection,
       wallet,
@@ -40,26 +36,6 @@ export async function createPool(
       provider
     );
 
-    const [poolPda] = PublicKey.findProgramAddressSync(
-      [ammPda.toBuffer(), mintA.toBuffer(), mintB.toBuffer()],
-      program.programId
-    );
-    const [poolAuthorityPda] = PublicKey.findProgramAddressSync(
-      [ammPda.toBuffer(), mintA.toBuffer(), mintB.toBuffer(), Buffer.from(AUTHORITY_SEED)],
-      program.programId
-    );
-    const [liquidityMintPda] = PublicKey.findProgramAddressSync(
-      [ammPda.toBuffer(), mintA.toBuffer(), mintB.toBuffer(), Buffer.from(LIQUIDITY_SEED)],
-      program.programId
-    );
-    const poolAccountA = await anchor.utils.token.associatedAddress({
-      mint: mintA,
-      owner: poolAuthorityPda
-    });
-    const poolAccountB = await anchor.utils.token.associatedAddress({
-      mint: mintB,
-      owner: poolAuthorityPda
-    });
     const [lendingPoolAuthorityPda] = PublicKey.findProgramAddressSync(
       [poolPda.toBuffer(), Buffer.from(LENDING_AUTHORITY_SEED)],
       program.programId
@@ -92,35 +68,11 @@ export async function createPool(
       [poolPda.toBuffer(), Buffer.from(BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED)],
       program.programId
     );
-  const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
-    units: 1_000_000  
-  });
-  console.log('Step 1: Creating pool...');
-  if (!await accountExists(connection, poolPda)) {
-  const tx = await program.methods
-      .createPool(fee)
-      .accounts({
-        amm: ammPda,
-        mintA: mintA,
-        mintB: mintB,
-        pool: poolPda,
-        poolAuthority: poolAuthorityPda,
-        mintLiquidity: liquidityMintPda,
-        poolAccountA: poolAccountA,
-        poolAccountB: poolAccountB,
-        payer: provider.wallet.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-      }).preInstructions([modifyComputeUnits]).rpc({
-        commitment: 'confirmed',
-      });
-      await connection.confirmTransaction(tx, 'confirmed');
-    console.log('Transaction signature:', tx);
-    } else {
-      console.log('Pool already exists, skipping...');
-    }
-    console.log('Step 2: Initializing lending pool...');
+  
+    const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
+      units: 1_000_000 
+    });
+    console.log('Step 1: Initializing lending pool...');
     if (!await accountExists(connection, lendingPoolAccountA)) {
       const initTx1 = await program.methods.initLendingPool1().accounts({
           pool: poolPda,
@@ -134,13 +86,15 @@ export async function createPool(
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
           rent: web3.SYSVAR_RENT_PUBKEY,    
-        }).rpc();
+        }).preInstructions([modifyComputeUnits]).rpc({
+          commitment: 'confirmed',
+        });
         await connection.confirmTransaction(initTx1, 'confirmed');
       } else {
         console.log("Lending pool 1 already initialized, skipping...");
     }
-    console.log('Step 3: Initializing lending pool...');
-    if (!await accountExists(connection, lendingReceiptTokenMint)) {
+    console.log('Step 2: Initializing lending pool...');
+    if (!await accountExists(connection, collateralReceiptTokenMint)) {
       const initTx2 = await program.methods.initLendingPool2().accounts({
           pool: poolPda,
           lendingPoolAuthority: lendingPoolAuthorityPda,
@@ -152,12 +106,14 @@ export async function createPool(
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
           rent: web3.SYSVAR_RENT_PUBKEY,    
-      }).rpc();
+      }).preInstructions([modifyComputeUnits]).rpc({
+        commitment: 'confirmed',
+      });
       await connection.confirmTransaction(initTx2, 'confirmed');
     } else {
       console.log("Lending pool 2 already initialized, skipping...");
     }
-    console.log('Step 4: Initializing lending pool...');
+    console.log('Step 3: Initializing lending pool...');
     if (!await accountExists(connection, lenderLendingBlockHeightMint)) {
       const initTx3 = await program.methods.initLendingPool3().accounts({
         pool: poolPda,
@@ -169,7 +125,9 @@ export async function createPool(
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
         rent: web3.SYSVAR_RENT_PUBKEY,    
-      }).rpc();
+      }).preInstructions([modifyComputeUnits]).rpc({
+        commitment: 'confirmed',
+      });
       await connection.confirmTransaction(initTx3, 'confirmed');
     } else {
       console.log("Lending pool 3 already initialized, skipping...");
@@ -177,10 +135,6 @@ export async function createPool(
 
     return {
       poolPda,
-      poolAuthorityPda,
-      liquidityMintPda,
-      poolAccountA,
-      poolAccountB,
       lendingPoolAuthorityPda,
       lenderLendingBlockHeightMint,
       borrowerBorrowBlockHeightMint,
@@ -194,7 +148,6 @@ export async function createPool(
     console.error('Error', error);
   }
 }
-
 async function accountExists(connection: Connection, publicKey: PublicKey): Promise<boolean> {
   const account = await connection.getAccountInfo(publicKey);
   return account !== null;

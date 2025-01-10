@@ -5,7 +5,6 @@ import fallIdl from '../idl/fall.json';
 import BN from 'bn.js';
 import { 
   AUTHORITY_SEED,
-  LENDING_SEED,
   LENDING_AUTHORITY_SEED,
   BORROW_TOKEN_SEED,
   COLLATERAL_TOKEN_SEED,
@@ -13,21 +12,8 @@ import {
   BORROWER_AUTHORITY_SEED,
 } from '../utils/constants';
 
-
 export interface BorrowResult {
   tx: string;
-  accounts: {
-    poolPda: PublicKey;
-    poolAuthority: PublicKey;
-    lendingPool: PublicKey;
-    lendingPoolAuthority: PublicKey;
-    borrowReceiptTokenMint: PublicKey;
-    collateralReceiptTokenMint: PublicKey;
-    borrowerBorrowBlockHeightTokenMint: PublicKey;
-    borrowerBorrowReceiptToken: PublicKey;
-    borrowerCollateralReceiptToken: PublicKey;
-    borrowerBorrowBlockHeightReceiptToken: PublicKey;
-  };
 }
 
 export async function borrow(
@@ -51,7 +37,6 @@ export async function borrow(
       provider
     );
 
-    // 获取 Pool 信息
     const pool = await program.account.pool.fetch(poolPda);
     console.log('Pool info:', {
       amm: pool.amm.toString(),
@@ -59,7 +44,6 @@ export async function borrow(
       mintB: pool.mintB.toString(),
     });
 
-    // 获取 Pool Authority PDA
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [
         pool.amm.toBuffer(),
@@ -70,48 +54,27 @@ export async function borrow(
       program.programId
     );
 
-    // 获取 Lending Pool PDA
-    const [lendingPool] = PublicKey.findProgramAddressSync(
-      [
-        poolPda.toBuffer(),
-        mintA.toBuffer(),
-        mintB.toBuffer(),
-        Buffer.from(LENDING_SEED)
-      ],
-      program.programId
-    );
-
-    // 获取 Lending Pool Authority PDA
     const [lendingPoolAuthority] = PublicKey.findProgramAddressSync(
       [
         poolPda.toBuffer(),
-        mintA.toBuffer(),
-        mintB.toBuffer(),
         Buffer.from(LENDING_AUTHORITY_SEED)
       ],
       program.programId
     );
 
-    // 获取 Receipt Token Mints
     const [borrowReceiptTokenMint] = PublicKey.findProgramAddressSync(
       [
         poolPda.toBuffer(),
-        mintA.toBuffer(),
         Buffer.from(BORROW_TOKEN_SEED)
       ],
       program.programId
     );
 
     const [collateralReceiptTokenMint] = PublicKey.findProgramAddressSync(
-      [
-        poolPda.toBuffer(),
-        mintB.toBuffer(),
-        Buffer.from(COLLATERAL_TOKEN_SEED)
-      ],
+      [poolPda.toBuffer(), Buffer.from(COLLATERAL_TOKEN_SEED)],
       program.programId
     );
 
-    // 获取 Borrower Borrow Block Height Token Mint
     const [borrowerBorrowBlockHeightTokenMint] = PublicKey.findProgramAddressSync(
       [
         poolPda.toBuffer(),
@@ -120,7 +83,6 @@ export async function borrow(
       program.programId
     );
 
-    // 获取相关 Token Accounts
     const poolAccountA = await anchor.utils.token.associatedAddress({
       mint: mintA,
       owner: poolAuthority
@@ -151,7 +113,6 @@ export async function borrow(
       owner: provider.wallet.publicKey
     });
 
-    // 获取 Borrower Authority PDA
     const [borrowerAuthority] = PublicKey.findProgramAddressSync(
       [
         poolPda.toBuffer(),
@@ -160,30 +121,22 @@ export async function borrow(
       ],
       program.programId
     );
-    console.log('Borrower Authority:', borrowerAuthority.toString());
-
     const borrowerBorrowReceiptToken = await anchor.utils.token.associatedAddress({
       mint: borrowReceiptTokenMint,
       owner: borrowerAuthority
     });
-
     const borrowerCollateralReceiptToken = await anchor.utils.token.associatedAddress({
       mint: collateralReceiptTokenMint,
       owner: borrowerAuthority
     });
-
     const borrowerBorrowBlockHeightReceiptToken = await anchor.utils.token.associatedAddress({
       mint: borrowerBorrowBlockHeightTokenMint,
       owner: borrowerAuthority
     });
 
-    // const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
-    //   units: 500_000
-    // });
-
     console.log('Sending borrow transaction...');
     const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
-      units: 1_000_000  // 增加到 1M 单位
+      units: 1_000_000  
     });
     const tx = await program.methods
       .borrow(borrowAmount)
@@ -194,7 +147,6 @@ export async function borrow(
         mintB,
         poolAccountA,
         poolAccountB,
-        lendingPool,
         lendingPoolAuthority,
         lendingPoolTokenA,
         lendingPoolTokenB,
@@ -213,21 +165,7 @@ export async function borrow(
         systemProgram: SystemProgram.programId,
       }).preInstructions([modifyComputeUnits]).rpc();
 
-    return {
-      tx,
-      accounts: {
-        poolPda,
-        poolAuthority,
-        lendingPool,
-        lendingPoolAuthority,
-        borrowReceiptTokenMint,
-        collateralReceiptTokenMint,
-        borrowerBorrowBlockHeightTokenMint,
-        borrowerBorrowReceiptToken,
-        borrowerCollateralReceiptToken,
-        borrowerBorrowBlockHeightReceiptToken,
-      }
-    };
+    return {tx};
   } catch (error) {
     console.error('Error in borrow:', error);
     if (error instanceof Error) {

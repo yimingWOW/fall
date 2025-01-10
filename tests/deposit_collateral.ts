@@ -5,7 +5,7 @@ import { type TestValues, createValues } from './mock_value';
 import { transferTokens, mintingTokens } from './utils';
 import BN from 'bn.js';
 
-describe('test borrow', () => {
+describe('deposit collateral', () => {
   const provider = anchor.AnchorProvider.env();
   const connection = provider.connection;
   anchor.setProvider(provider);
@@ -117,67 +117,51 @@ describe('test borrow', () => {
       .rpc();
 
     await program.methods.lend(new BN(10000)).accounts({
-        pool: values.poolKey,
-        lendingPoolAuthority: values.lendingPoolAuthority,
-        lendingPoolTokenA: values.lendingPoolAccountA,
-        lendingReceiptTokenMint: values.lendingReceiptTokenMint,
-        lenderLendingBlockHeightTokenMint: values.lenderLendingBlockHeightTokenMint,
-        lender: values.user1Key,
-        lenderTokenA: values.user1TokenAAccount,
-        lenderLendReceiptToken: values.user1LendReceiptToken,
-        lenderLendingBlockHeightReceiptToken: values.user1LenderLendingBlockHeightReceiptToken,
+      mintA: values.mintAKeypair.publicKey,
+      mintB: values.mintBKeypair.publicKey,
+      pool: values.poolKey,
+      poolAuthority: values.poolAuthority,
+      lendingPool: values.lendingPoolKey,
+      lendingPoolAuthority: values.lendingPoolAuthority,
+      lendingPoolTokenA: values.lendingPoolAccountA,
+      lendingPoolTokenB: values.lendingPoolAccountB,
+      lendingReceiptTokenMint: values.lendingReceiptTokenMint,
+      borrowReceiptTokenMint: values.borrowReceiptTokenMint,
+      lenderLendingBlockHeightTokenMint: values.lenderLendingBlockHeightTokenMint,
+      lender: values.user1Key,
+      lenderTokenA: values.user1TokenAAccount,
+      lenderLendReceiptToken: values.user1LendReceiptToken,
+      lenderLendingBlockHeightReceiptToken: values.user1LenderLendingBlockHeightReceiptToken,
     }).signers([values.user1]).rpc();
-
-    await program.methods.depositCollateral(new BN(200)).accounts({
-        pool: values.poolKey,
-        lendingPoolAuthority: values.lendingPoolAuthority,
-        lendingPoolTokenB: values.lendingPoolAccountB,
-        collateralReceiptTokenMint: values.collateralReceiptTokenMint,
-        borrower: values.user2Key,
-        borrowerTokenB: values.user2TokenBAccount,
-        borrowerAuthority: values.user2Authority,
-        borrowerCollateralReceiptToken: values.user2CollateralReceiptToken,
-      } as any).signers([values.user2]).rpc();
-
   });
 
-  it('test borrow', async () => {
+  it('deposit collateral', async () => {
     try {
         const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
             units: 500_000 
         });
 
-        const sim = await program.methods.borrow(new BN(100)).accounts({
+        const sim = await program.methods.depositCollateral(new BN(100)).accounts({
             pool: values.poolKey,
             lendingPoolAuthority: values.lendingPoolAuthority,
-            lendingPoolTokenA: values.lendingPoolAccountA,
-            borrowReceiptTokenMint: values.borrowReceiptTokenMint,
+            lendingPoolTokenB: values.lendingPoolAccountB,
             collateralReceiptTokenMint: values.collateralReceiptTokenMint,
-            borrowerBorrowBlockHeightTokenMint: values.borrowerBorrowBlockHeightTokenMint,
             borrower: values.user2Key,
-            borrowerTokenA: values.user2TokenAAccount,
             borrowerTokenB: values.user2TokenBAccount,
             borrowerAuthority: values.user2Authority,
-            borrowerBorrowReceiptToken: values.user2BorrowReceiptToken,
             borrowerCollateralReceiptToken: values.user2CollateralReceiptToken,
-            borrowerBorrowBlockHeightReceiptToken: values.user2BorrowerBorrowBlockHeightReceiptToken,
         } as any).preInstructions([modifyComputeUnits]).simulate();
         console.log("Simulation logs:", sim);
 
-        const tx = await program.methods.borrow(new BN(100)).accounts({
-            pool: values.poolKey,
-            lendingPoolAuthority: values.lendingPoolAuthority,
-            lendingPoolTokenA: values.lendingPoolAccountA,
-            borrowReceiptTokenMint: values.borrowReceiptTokenMint,
-            collateralReceiptTokenMint: values.collateralReceiptTokenMint,
-            borrowerBorrowBlockHeightTokenMint: values.borrowerBorrowBlockHeightTokenMint,
-            borrower: values.user2Key,
-            borrowerTokenA: values.user2TokenAAccount,
-            borrowerTokenB: values.user2TokenBAccount,
-            borrowerAuthority: values.user2Authority,
-            borrowerBorrowReceiptToken: values.user2BorrowReceiptToken,
-            borrowerCollateralReceiptToken: values.user2CollateralReceiptToken,
-            borrowerBorrowBlockHeightReceiptToken: values.user2BorrowerBorrowBlockHeightReceiptToken,
+        const tx = await program.methods.depositCollateral(new BN(100)).accounts({
+          pool: values.poolKey,
+          lendingPoolAuthority: values.lendingPoolAuthority,
+          lendingPoolTokenB: values.lendingPoolAccountB,
+          collateralReceiptTokenMint: values.collateralReceiptTokenMint,
+          borrower: values.user2Key,
+          borrowerTokenB: values.user2TokenBAccount,
+          borrowerAuthority: values.user2Authority,
+          borrowerCollateralReceiptToken: values.user2CollateralReceiptToken,
         } as any).signers([values.user2]).preInstructions([modifyComputeUnits]).rpc();
         console.log("Transaction signature:", tx);
             

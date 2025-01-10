@@ -1,16 +1,16 @@
 import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { lend } from '../utils/lend';
+import { depositCollateral } from '../utils/depositCollateral';
 import BN from 'bn.js';
 import { PoolInfo } from '../utils/getPoolList';
 
-interface LendFormProps {
+interface DepositCollateralFormProps {
   pool: PoolInfo;
   onSuccess: (signature: string) => void;
 }
 
-export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
+export const DepositCollateralForm: FC<DepositCollateralFormProps> = ({ pool, onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
@@ -30,18 +30,23 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
 
     try {
       // 验证金额
-      const lendAmount = parseFloat(amount);
-      if (isNaN(lendAmount) || lendAmount <= 0) {
+      const collateralAmount = parseFloat(amount);
+      if (isNaN(collateralAmount) || collateralAmount <= 0) {
         throw new Error("Invalid amount");
       }
 
       // 从 lendingPool 对象获取必要的公钥
       const poolPubkey = new PublicKey(pool.pubkey);
-      const signature = await lend(
+      const mintAPubkey = new PublicKey(pool.mintA);
+      const mintBPubkey = new PublicKey(pool.mintB);
+
+      const signature = await depositCollateral(
         wallet,
         connection,
         poolPubkey,
-        new BN(lendAmount)
+        mintAPubkey,
+        mintBPubkey,
+        new BN(collateralAmount)
       );
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature.tx}`);
@@ -55,10 +60,9 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
     }
   };
 
-  console.log(pool);
   return (
     <div className="form-wrapper">
-      <h3>Lend Tokens</h3>
+      <h3>DepositCollateral Tokens</h3>
       {error && (
         <div className="error-message">
           {error}
@@ -66,12 +70,12 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
       )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Amount to Lend:</label>
+          <label>Amount to DepositCollateral:</label>
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            placeholder="Enter amount to lend"
+            placeholder="Enter amount of collateral to deposit"
             required
             min="0"
             step="any"
@@ -88,7 +92,7 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
           className="action-button"
           disabled={isLoading || !wallet}
         >
-          {isLoading ? 'Processing...' : 'Confirm Lend'}
+          {isLoading ? 'Processing...' : 'Confirm DepositCollateral'}
         </button>
       </form>
     </div>

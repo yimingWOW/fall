@@ -34,16 +34,6 @@ pub struct Repay<'info> {
     )]
     pub pool_authority: AccountInfo<'info>,
 
-    #[account(
-        mut,
-        seeds = [
-            pool.key().as_ref(),
-            LENDING_SEED,
-        ],
-        bump
-    )]
-    pub lending_pool: Box<Account<'info, LendingPool>>,
-
     /// CHECK: Read only authority
     #[account(
         seeds = [
@@ -116,7 +106,7 @@ pub struct Repay<'info> {
     /// CHECK: Read only authority
     #[account(
         seeds = [
-            lending_pool.pool.as_ref(),
+            pool.key().as_ref(),
             borrower.key().as_ref(),
             BORROWER_AUTHORITY_SEED,
         ],
@@ -130,7 +120,7 @@ pub struct Repay<'info> {
         associated_token::authority = borrower_authority,
     )]
     pub borrower_borrow_receipt_token: Box<Account<'info, TokenAccount>>,
-    
+
     #[account(
         mut,
         associated_token::mint = collateral_receipt_token_mint ,
@@ -158,7 +148,7 @@ pub struct Repay<'info> {
 
 pub fn repay(ctx: Context<Repay>) -> Result<()> {
     // 1. 更新利息
-    ctx.accounts.lending_pool.update_borrow_interest_accumulator(ctx.accounts.borrow_receipt_token_mint.supply)?;
+    ctx.accounts.pool.update_borrow_interest_accumulator(ctx.accounts.borrow_receipt_token_mint.supply)?;
 
     // 2 还款 token a, 销毁 borrow receipt token
     let borrowed_amount = ctx.accounts.borrower_borrow_receipt_token.amount;
@@ -180,27 +170,14 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
         &[ctx.bumps.lending_pool_authority],
     ];
     let signer_seeds = &[&authority_seeds[..]];
-    token::thaw_account(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                mint: ctx.accounts.borrow_receipt_token_mint.to_account_info(),
-                account: ctx.accounts.borrower_borrow_receipt_token.to_account_info(),
-                authority: ctx.accounts.lending_pool_authority.to_account_info(),
-            },
-            signer_seeds,
-        ),
-    )?;
-
     // borrower_authority 的 seeds (用于 burn)
     let borrower_authority_seeds = &[
-        &ctx.accounts.lending_pool.pool.to_bytes(),
+        &ctx.accounts.pool.key().to_bytes(),
         &ctx.accounts.borrower.key().to_bytes(),
         BORROWER_AUTHORITY_SEED,
         &[ctx.bumps.borrower_authority],
     ];
     let borrower_signer_seeds = &[&borrower_authority_seeds[..]];
-
     token::burn(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -216,17 +193,6 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
 
     // 3. 计算需要返还的抵押品，返还抵押品 销毁 collateral_receipt_token
     let collateral_amount = ctx.accounts.borrower_collateral_receipt_token.amount;
-    token::thaw_account(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                mint: ctx.accounts.collateral_receipt_token_mint.to_account_info(),
-                account: ctx.accounts.borrower_collateral_receipt_token.to_account_info(),
-                authority: ctx.accounts.lending_pool_authority.to_account_info(),
-            },
-            signer_seeds,
-        ),
-    )?;
     token::burn(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -242,25 +208,6 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
 
     // 4.计算应付利息 销毁 borrower_borrow_block_height_receipt_token
     let record_block_height = ctx.accounts.borrower_borrow_block_height_receipt_token.amount;
-    let pool_authority_seeds = &[
-        &ctx.accounts.pool.amm.to_bytes(),
-        &ctx.accounts.mint_a.key().to_bytes(),
-        &ctx.accounts.mint_b.key().to_bytes(),
-        AUTHORITY_SEED,
-        &[ctx.bumps.pool_authority],
-    ];
-    let pool_signer_seeds = &[&pool_authority_seeds[..]];
-    token::thaw_account(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            ThawAccount {
-                mint: ctx.accounts.borrower_borrow_block_height_mint.to_account_info(),
-                account: ctx.accounts.borrower_borrow_block_height_receipt_token.to_account_info(),
-                authority: ctx.accounts.pool_authority.to_account_info(),
-            },
-            pool_signer_seeds,
-        ),
-    )?;
     token::burn(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -275,7 +222,7 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
     )?;
 
     // 扣除利息后，将剩余抵押物转给borrower
-    let interest_pay_with_token_b = ctx.accounts.lending_pool.calculate_interest(record_block_height, borrowed_amount)?;
+    let interest_pay_with_token_b = ctx.accounts.pool.calculate_interest(record_block_height, borrowed_amount)?;
     if collateral_amount>interest_pay_with_token_b{
         let collateral_to_return: u64 = collateral_amount.checked_sub(interest_pay_with_token_b).ok_or(RepayError::CalculationError)?;
         if ctx.accounts.lending_pool_token_b.amount >= collateral_to_return{

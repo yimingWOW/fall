@@ -10,9 +10,6 @@ pub const AUTHORITY_SEED: &[u8] = b"a"; // authority
 pub const LIQUIDITY_SEED: &[u8] = b"b"; // liquidity
 
 #[constant]
-pub const LENDING_SEED: &[u8] = b"c"; // lending
-
-#[constant]
 pub const LENDING_AUTHORITY_SEED: &[u8] = b"d"; // lending_authority
 
 #[constant]

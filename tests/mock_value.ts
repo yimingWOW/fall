@@ -33,7 +33,6 @@ export interface TestValues {
   lenderLendingBlockHeightTokenMint: PublicKey;
   borrowerBorrowBlockHeightTokenMint: PublicKey;
 
-  lendingPoolKey: PublicKey;
   lendingPoolAuthority: PublicKey;
   lendingPoolAccountA: PublicKey;
   lendingPoolAccountB: PublicKey;
@@ -90,18 +89,12 @@ export function createValues(defaults?: TestValuesDefaults): TestValues {
     anchor.workspace.Fall.programId,
   )[0];
   const mintLiquidity = PublicKey.findProgramAddressSync(
-    [ammKey.toBuffer(), mintAKeypair.publicKey.toBuffer(), mintBKeypair.publicKey.toBuffer(), Buffer.from(LIQUIDITY_SEED)],
+    [poolKey.toBuffer(), Buffer.from(LIQUIDITY_SEED)],
     anchor.workspace.Fall.programId,
   )[0];
-
-
   // lending 相关账户
-  const lendingPoolKey = PublicKey.findProgramAddressSync(
-    [poolKey.toBuffer(), mintAKeypair.publicKey.toBuffer(), mintBKeypair.publicKey.toBuffer(), Buffer.from(LENDING_SEED)],
-    anchor.workspace.Fall.programId,
-  )[0];
   const lendingPoolAuthority = PublicKey.findProgramAddressSync(
-    [poolKey.toBuffer(), mintAKeypair.publicKey.toBuffer(), mintBKeypair.publicKey.toBuffer(), Buffer.from(LENDING_AUTHORITY_SEED)],
+    [poolKey.toBuffer(),  Buffer.from(LENDING_AUTHORITY_SEED)],
     anchor.workspace.Fall.programId,
   )[0];
 
@@ -156,7 +149,6 @@ export function createValues(defaults?: TestValuesDefaults): TestValues {
     lenderLendingBlockHeightTokenMint:lenderLendingBlockHeightTokenMint,
     borrowerBorrowBlockHeightTokenMint:borrowerBorrowBlockHeightTokenMint,
 
-    lendingPoolKey,
     lendingPoolAuthority,
     lendingPoolAccountA: getAssociatedTokenAddressSync(mintAKeypair.publicKey, lendingPoolAuthority, true),
     lendingPoolAccountB: getAssociatedTokenAddressSync(mintBKeypair.publicKey, lendingPoolAuthority, true),
@@ -170,8 +162,8 @@ export function createValues(defaults?: TestValuesDefaults): TestValues {
     user1TokenBAccount:getAssociatedTokenAddressSync(mintBKeypair.publicKey, user1.publicKey, true),
     user1LiquidityAccount: getAssociatedTokenAddressSync(mintLiquidity, user1.publicKey, true),
     user1Authority:user1Authority,
-    user1LendReceiptToken: getAssociatedTokenAddressSync(lendingReceiptTokenMint, user1.publicKey, true),
-    user1LenderLendingBlockHeightReceiptToken: getAssociatedTokenAddressSync(lenderLendingBlockHeightTokenMint, user1.publicKey, true),
+    user1LendReceiptToken: getAssociatedTokenAddressSync(lendingReceiptTokenMint, user1Authority, true),
+    user1LenderLendingBlockHeightReceiptToken: getAssociatedTokenAddressSync(lenderLendingBlockHeightTokenMint, user1Authority, true),
     user1BorrowReceiptToken: getAssociatedTokenAddressSync(borrowReceiptTokenMint, user1Authority, true),
     user1CollateralReceiptToken: getAssociatedTokenAddressSync(collateralReceiptTokenMint, user1Authority, true),
     user1BorrowerBorrowBlockHeightReceiptToken: getAssociatedTokenAddressSync(borrowerBorrowBlockHeightTokenMint, user1Authority, true),
@@ -182,8 +174,8 @@ export function createValues(defaults?: TestValuesDefaults): TestValues {
     user2TokenBAccount:getAssociatedTokenAddressSync(mintBKeypair.publicKey, user2.publicKey, true),
     user2LiquidityAccount: getAssociatedTokenAddressSync(mintLiquidity, user2.publicKey, true),
     user2Authority:user2Authority,
-    user2LendReceiptToken: getAssociatedTokenAddressSync(lendingReceiptTokenMint, user2.publicKey, true),
-    user2LenderLendingBlockHeightReceiptToken: getAssociatedTokenAddressSync(lenderLendingBlockHeightTokenMint, user2.publicKey, true),
+    user2LendReceiptToken: getAssociatedTokenAddressSync(lendingReceiptTokenMint, user2Authority, true),
+    user2LenderLendingBlockHeightReceiptToken: getAssociatedTokenAddressSync(lenderLendingBlockHeightTokenMint, user2Authority, true),
     user2BorrowReceiptToken: getAssociatedTokenAddressSync(borrowReceiptTokenMint, user2Authority, true),
     user2CollateralReceiptToken: getAssociatedTokenAddressSync(collateralReceiptTokenMint, user2Authority, true),
     user2BorrowerBorrowBlockHeightReceiptToken: getAssociatedTokenAddressSync(borrowerBorrowBlockHeightTokenMint, user2Authority, true),

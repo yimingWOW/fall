@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token, TokenAccount, MintTo, FreezeAccount};
+use anchor_spl::token::{self, Mint, Token, TokenAccount, MintTo};
 
 #[inline(never)]
 pub fn mint_and_freeze_token<'info>(
@@ -23,20 +23,6 @@ pub fn mint_and_freeze_token<'info>(
         ),
         amount,
     )?;
-
-    // 2. Freeze account
-    token::freeze_account(
-        CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            FreezeAccount {
-                account: recipient.to_account_info(),
-                mint: mint.to_account_info(),
-                authority: authority.to_account_info(),
-            },
-            signer_seeds,
-        ),
-    )?;
-
     Ok(())
 }
 
