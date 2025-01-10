@@ -4,7 +4,7 @@
 
 Fall is a lending protocol without oracle built on the Solana. 
 
-![Fall](https://github.com/fall-on-solana/fall/images/fall.png)
+![Fall](https://github.com/fall/images/fall.png)
 
 The protocol establishes lending pools for any trading pair alongside corresponding swap liquidity pools. The liquidation mechanism for lending instruments is based on the prices from these corresponding liquidity pools.
 
