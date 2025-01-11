@@ -16,7 +16,6 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, onSuccess }) => {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [borrowAmount, setBorrowAmount] = useState("");
-  const [collateralAmount, setCollateralAmount] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +51,6 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, onSuccess }) => {
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
       setBorrowAmount(""); // 重置表单
-      setCollateralAmount("");
       onSuccess(signature);
     } catch (err) {
       console.error("Error borrowing:", err);

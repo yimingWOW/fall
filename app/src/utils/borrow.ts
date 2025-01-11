@@ -12,10 +12,6 @@ import {
   BORROWER_AUTHORITY_SEED,
 } from '../utils/constants';
 
-export interface BorrowResult {
-  tx: string;
-}
-
 export async function borrow(
   wallet: any,
   connection: Connection,
@@ -23,7 +19,7 @@ export async function borrow(
   mintA: PublicKey,
   mintB: PublicKey,
   borrowAmount: BN,
-): Promise<BorrowResult> {
+): Promise<string> {
   try {
     console.log('Executing borrow...');
     const provider = new anchor.AnchorProvider(
@@ -165,7 +161,7 @@ export async function borrow(
         systemProgram: SystemProgram.programId,
       }).preInstructions([modifyComputeUnits]).rpc();
 
-    return {tx};
+    return tx;
   } catch (error) {
     console.error('Error in borrow:', error);
     if (error instanceof Error) {
