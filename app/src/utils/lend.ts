@@ -3,6 +3,7 @@ import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
 import BN from 'bn.js';
+import { Idl } from '@coral-xyz/anchor';
 import { AUTHORITY_SEED, LENDING_AUTHORITY_SEED, LENDING_TOKEN_SEED, BORROW_TOKEN_SEED, LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,BORROWER_AUTHORITY_SEED } from './constants';
 
 export async function lend(
@@ -20,7 +21,7 @@ export async function lend(
     );
 
     const program = new anchor.Program(
-      fallIdl ,
+      (fallIdl as any) as Idl,
       provider
     ) as any;
 

@@ -1,7 +1,7 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import fallIdl from '../idl/fall.json';
-
+import { Idl } from '@coral-xyz/anchor';
 export interface PoolInfo {
   pubkey: PublicKey;
   amm: PublicKey;
@@ -25,7 +25,7 @@ export async function getPoolList(
     );
 
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
     ) as any;
 

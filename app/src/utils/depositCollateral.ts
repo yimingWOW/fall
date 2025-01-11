@@ -2,6 +2,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID,getAssociatedTokenAddressSync } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
+import { Idl } from '@coral-xyz/anchor';
 import BN from 'bn.js';
 import { 
   LENDING_AUTHORITY_SEED,
@@ -30,7 +31,7 @@ export async function depositCollateral(
     );
 
     const program = new anchor.Program(
-      fallIdl ,
+      (fallIdl as any) as Idl,
       provider
     );
 

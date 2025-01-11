@@ -4,7 +4,7 @@ import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
 import { BORROW_TOKEN_SEED, COLLATERAL_TOKEN_SEED } from './constants';
 import { getPoolDetail } from './getPoolDetail';
-
+import { Idl } from '@coral-xyz/anchor';
 export interface PendingLiquidation {
     userAuthorityPda: PublicKey;
 }
@@ -21,7 +21,7 @@ export async function getPendingLiquidation(
       { preflightCommitment: "confirmed" }
     );
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
     ) as any;
 

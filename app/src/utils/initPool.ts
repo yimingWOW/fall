@@ -38,9 +38,9 @@ export async function initPool(
     );
 
     const program = new anchor.Program(
-      fallIdl as Idl,
+      (fallIdl as any) as Idl,
       provider
-    );
+    ) as any;
 
     const [lendingPoolAuthorityPda] = PublicKey.findProgramAddressSync(
       [poolPda.toBuffer(), Buffer.from(LENDING_AUTHORITY_SEED)],

@@ -5,6 +5,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress
 } from '@solana/spl-token';
+import { Idl } from '@coral-xyz/anchor';
 import { BN } from 'bn.js';
 import fallIdl from '../idl/fall.json';
 import { AUTHORITY_SEED, LIQUIDITY_SEED } from './constants';
@@ -27,9 +28,9 @@ export async function depositLiquidity(
     );
 
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
-    );
+    ) as any;
 
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [

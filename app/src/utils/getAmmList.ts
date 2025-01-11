@@ -16,9 +16,9 @@ export const getAmmAccounts = async (
   );
 
   const program = new anchor.Program(
-    fallIdl as Idl,
+    (fallIdl as any) as Idl,
     provider
-  );
+  ) as any;
 
   const accounts = await program.account.amm.all();
   for (const account of accounts) {
@@ -29,7 +29,7 @@ export const getAmmAccounts = async (
     });
   }
   
-  return accounts.map(account => ({
+  return accounts.map((account: any) => ({
     pubkey: account.publicKey.toString(),
     ammid: account.account.id.toString(),
   }));

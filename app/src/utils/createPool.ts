@@ -41,9 +41,9 @@ export async function createPool(
     );
 
     const program = new anchor.Program(
-      fallIdl as Idl,
+      (fallIdl as any) as Idl,
       provider
-    );
+    ) as any;
 
     const [poolPda] = PublicKey.findProgramAddressSync(
       [ammPda.toBuffer(), mintA.toBuffer(), mintB.toBuffer()],

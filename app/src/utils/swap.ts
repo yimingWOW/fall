@@ -8,6 +8,7 @@ import {
 import { BN } from 'bn.js';
 import fallIdl from '../idl/fall.json';
 import { AUTHORITY_SEED } from './constants';
+import { Idl } from '@coral-xyz/anchor';
 
 export async function swap(
   wallet: any,
@@ -28,9 +29,9 @@ export async function swap(
     );
 
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
-    );
+    ) as any;
 
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [

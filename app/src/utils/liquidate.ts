@@ -3,7 +3,7 @@ import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
 import { AUTHORITY_SEED, LENDING_AUTHORITY_SEED, BORROW_TOKEN_SEED, COLLATERAL_TOKEN_SEED, BORROWER_AUTHORITY_SEED } from './constants';
-
+import { Idl } from '@coral-xyz/anchor';
 export async function liquidate(
   wallet: any,
   connection: Connection,
@@ -19,7 +19,7 @@ export async function liquidate(
     );
 
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
     ) as any;
 

@@ -8,7 +8,7 @@ import { AUTHORITY_SEED,
   BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED, 
   BORROWER_AUTHORITY_SEED, 
   COLLATERAL_TOKEN_SEED } from './constants';
-
+import { Idl } from '@coral-xyz/anchor';
 export async function repay(
   wallet: any,
   connection: Connection,
@@ -25,7 +25,7 @@ export async function repay(
     );
 
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
     ) as any;
 
