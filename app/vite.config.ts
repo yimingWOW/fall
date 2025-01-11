@@ -24,9 +24,8 @@ export default defineConfig({
       transformMixedEsModules: true,
     },
     rollupOptions: {
-      external: [
+      input: [
         'vite-plugin-node-polyfills/shims/buffer',
-        'buffer',
         'events',
         'stream',
         'util',
@@ -41,6 +40,6 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['buffer', 'process']
+    include: [ 'process']
   }
 });
