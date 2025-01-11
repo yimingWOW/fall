@@ -7,6 +7,7 @@ import {
   LENDING_AUTHORITY_SEED,
   COLLATERAL_TOKEN_SEED,
   BORROWER_AUTHORITY_SEED,
+  BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED,
 } from './constants';
 
 export interface DepositCollateralResult {
@@ -53,6 +54,13 @@ export async function depositCollateral(
       ],
       program.programId
     );
+    const [borrowerBorrowBlockHeightTokenMint] = PublicKey.findProgramAddressSync(
+      [
+        poolPda.toBuffer(),
+        Buffer.from(BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED)
+      ],
+      program.programId
+    );
     const borrowerTokenB = getAssociatedTokenAddressSync(
       mintB,
       provider.wallet.publicKey
@@ -70,6 +78,10 @@ export async function depositCollateral(
       borrowerAuthority,
       true 
     );
+    const borrowerBorrowBlockHeightReceiptToken = await anchor.utils.token.associatedAddress({
+      mint: borrowerBorrowBlockHeightTokenMint,
+      owner: borrowerAuthority
+    });
     console.log('Sending borrow transaction...');
     const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
       units: 1_000_000  
@@ -81,10 +93,12 @@ export async function depositCollateral(
         lendingPoolAuthority,
         lendingPoolTokenB,
         collateralReceiptTokenMint,
+        borrowerBorrowBlockHeightTokenMint,
         borrower: provider.wallet.publicKey,
         borrowerTokenB,
         borrowerAuthority,
         borrowerCollateralReceiptToken,
+        borrowerBorrowBlockHeightReceiptToken,
         payer: provider.wallet.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,

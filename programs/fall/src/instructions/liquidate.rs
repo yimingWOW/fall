@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{self, Mint, Token, TokenAccount, ThawAccount, Burn},
+    token::{self, Mint, Token, TokenAccount, Burn},
 };
 use crate::constants::BORROW_TOKEN_SEED;
 use crate::constants::COLLATERAL_TOKEN_SEED;

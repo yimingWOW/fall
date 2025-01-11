@@ -102,16 +102,14 @@ pub struct Borrow<'info> {
     pub borrower_borrow_receipt_token: Box<Account<'info, TokenAccount>>,
     
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         associated_token::mint = collateral_receipt_token_mint,
         associated_token::authority = borrower_authority,
     )]
     pub borrower_collateral_receipt_token: Box<Account<'info, TokenAccount>>,
 
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         associated_token::mint = borrower_borrow_block_height_mint,
         associated_token::authority = borrower_authority,
     )]
@@ -137,18 +135,6 @@ pub fn borrow(
         collateral_value, borrow_amount)?,
         BorowError::Error10
     );
-
-    // 2. 检查借款人的抵押品余额
-    require!(
-        ctx.accounts.borrower_token_b.amount >= ctx.accounts.borrower_collateral_receipt_token.amount,
-        BorowError::Error11
-    );
-
-    // 3. 检查借贷池的可借余额
-    // require!(
-    //     ctx.accounts.lending_pool_token_a.amount >= borrow_amount,
-    //     BorowError::Error13
-    // );
 
     // 4 更新pool_interest和铸造 borrow token 铸造 borrower_borrow_block_height_mint receipt_token
     let authority_seeds = &[
@@ -197,6 +183,4 @@ pub fn borrow(
 pub enum BorowError {
     #[msg("Invalid collateral ratio")]
     Error10,
-    #[msg("Borrower collateral is not enough")]
-    Error11,
 }

@@ -3,7 +3,7 @@ use anchor_spl::{
     token::{self, Mint, Token, TokenAccount, Transfer},
     associated_token::AssociatedToken,
 };
-use crate::constants::{ LENDING_AUTHORITY_SEED, BORROWER_AUTHORITY_SEED, COLLATERAL_TOKEN_SEED };
+use crate::constants::{ LENDING_AUTHORITY_SEED, BORROWER_AUTHORITY_SEED, COLLATERAL_TOKEN_SEED,BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED};
 use crate::state::Pool;
 use crate::instructions::utils::mint_and_freeze_token;
 
@@ -46,6 +46,16 @@ pub struct DepositCollateral<'info> {
     )]
     pub collateral_receipt_token_mint: Box<Account<'info, Mint>>,
 
+    #[account(
+        mut,
+        seeds = [
+            pool.key().as_ref(),
+            BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED,
+        ],
+        bump,
+    )]
+    pub borrower_borrow_block_height_mint: Box<Account<'info, Mint>>,
+
     pub borrower: Signer<'info>,
 
     #[account(
@@ -73,6 +83,15 @@ pub struct DepositCollateral<'info> {
         associated_token::authority = borrower_authority,
     )]
     pub borrower_collateral_receipt_token: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        init_if_needed,
+        payer = payer,
+        associated_token::mint = borrower_borrow_block_height_mint,
+        associated_token::authority = borrower_authority,
+    )]
+    pub borrower_borrow_block_height_receipt_token: Box<Account<'info, TokenAccount>>,
+    
 
     #[account(mut)]
     pub payer: Signer<'info>,

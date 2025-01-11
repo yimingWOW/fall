@@ -16,7 +16,6 @@ export const LiquidateForm: FC = () => {
   const [isLoadingList, setIsLoadingList] = useState(false);
 
 
-  // 搜索待清算列表
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!wallet || !poolAddress) {
@@ -103,8 +102,7 @@ export const LiquidateForm: FC = () => {
         </div>
       )}
 
-            {/* 搜索表单 */}
-            <div className="search-form">
+        <div className="search-form">
         <div className="form-group">
           <label htmlFor="pool-address">Pool Address:</label>
           <div className="input-with-button">
@@ -127,7 +125,6 @@ export const LiquidateForm: FC = () => {
         </div>
 
 
-        {/* 待清算列表展示 */}
         <div className="pending-liquidations">
           <h3>Pending Liquidations</h3>
           {isLoadingList ? (
@@ -142,7 +139,7 @@ export const LiquidateForm: FC = () => {
                   className="liquidation-item"
                   onClick={() => setBorrowerAddress(item.userAuthorityPda.toString())}
                 >
-                  <div>Borrower: {item.userAuthorityPda.toString()}</div>
+                  <div>Borrower Authority PDA: {item.userAuthorityPda.toString()}</div>
                 </li>
               ))}
             </ul>
@@ -150,9 +147,9 @@ export const LiquidateForm: FC = () => {
         </div>
       </div>
 
-      {/* 清算表单 */}
       <form onSubmit={handleLiquidate} className="liquidate-form">
         <div className="form-group">
+          <label htmlFor="borrower-address">Note: The current demo does not yet support liquidation based on PDAs. The public key is not the same as the PDA. So the PDA above is useless now. U'd better to use another account to borrow and then liquidate that account with it's Public Key.</label>
           <label htmlFor="borrower-address">Borrower Address:</label>
           <input
             id="borrower-address"
@@ -173,7 +170,6 @@ export const LiquidateForm: FC = () => {
         </button>
       </form>
     </div>
-
 
   );
 };

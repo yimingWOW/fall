@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    token::{self, Mint, Token, TokenAccount, Transfer, Burn,ThawAccount},
+    token::{self, Mint, Token, TokenAccount, Transfer, Burn},
     associated_token::AssociatedToken,
 };
 use crate::constants::*;

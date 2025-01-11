@@ -3,11 +3,6 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getPoolDetail, PoolDetailInfo } from '../utils/getPoolDetail';
 import { SwapForm } from './SwapForm';
 import { DepositLiquidityForm } from './DepositLiquidityForm';
-import { LendForm } from './LendForm';
-import { RedeemForm } from './RedeemForm';
-import { BorrowForm } from './BorrowForm';
-import { RepayForm } from './RepayForm';
-import { DepositCollateralForm } from './DepositCollateral';
 import { InitPoolForm } from './InitPoolForm';
 import { PoolInfo } from '../utils/getPoolList';
 interface PoolItemProps {
@@ -18,7 +13,7 @@ interface PoolItemProps {
 export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   const { connection } = useConnection();
   const { publicKey: walletPublicKey } = useWallet();
-  const [activeForm, setActiveForm] = useState<'none' | 'initPool' | 'deposit' | 'swap' | 'lend' | 'redeem' | 'borrow' | 'repay' | 'depositCollateral'>('none');
+  const [activeForm, setActiveForm] = useState<'none' | 'initPool' | 'deposit' | 'swap'>('none');
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
@@ -199,178 +194,11 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
               <span className="pool-label">Lending Pool tokenBAmount:</span>
               <span className="pool-value">{details.lendingPool.tokenBAmount.toFixed(6)}</span>
             </div>
-
-            <div className="pool-details">
-              <span className="pool-label">Lending Pool lendingReceipt:</span>
-              <span className="pool-value">{details.lendingPool.addresses.lendingReceipt}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">Lending Pool borrowReceipt:</span>
-              <span className="pool-value">{details.lendingPool.addresses.borrowReceipt}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">Lending Pool collateralReceipt:</span>
-              <span className="pool-value">{details.lendingPool.addresses.collateralReceipt}</span>
-            </div>
           </>
         ) : (
           <div className="error-message">Failed to load lending pool details</div>
         )}
       </div>
-
-      <div className="user-lending-details">
-        <h4>User Lending Pool</h4>
-        {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
-        ) : details ? (
-          <>
-            <div className="pool-details">
-              <span className="pool-label">user tokenAAmount:</span>
-              <span className="pool-value">{details.userAssets.tokenAAmount}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">user tokenBAmount:</span>
-              <span className="pool-value">{details.userAssets.tokenBAmount}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">user lendingReceipt:</span>
-              <span className="pool-value">{details.userAssets.lendingReceiptAmount}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">user borrowReceipt:</span>
-              <span className="pool-value">{details.userAssets.borrowReceiptAmount}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">user collateralReceipt:</span>
-              <span className="pool-value">{details.userAssets.collateralReceiptAmount}</span>
-            </div>
-          </>
-        ) : (
-          <div className="error-message">Failed to load lending pool details</div>
-        )}
-      </div>
-
-      <div className="lending-pool-actions">
-        <div className="lending-pool-action-buttons">
-          <button   
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'lend' ? 'none' : 'lend')}
-          >
-            {activeForm === 'lend' ? 'Hide Lend' : 'Lend'}
-          </button>
-
-          <button 
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'redeem' ? 'none' : 'redeem')}
-          >
-            {activeForm === 'redeem' ? 'Hide Redeem' : 'Redeem'}
-          </button>
-
-          <button 
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'borrow' ? 'none' : 'borrow')}
-          >
-            {activeForm === 'borrow' ? 'Hide Borrow' : 'Borrow'}
-          </button>
-
-          <button 
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'repay' ? 'none' : 'repay')}
-          >
-            {activeForm === 'repay' ? 'Hide Repay' : 'Repay'}
-          </button>
-
-          <button 
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'depositCollateral' ? 'none' : 'depositCollateral')}
-          >
-            {activeForm === 'depositCollateral' ? 'Hide DepositCollateral' : 'DepositCollateral'}
-          </button>
-
-
-        </div>
-
-        <button 
-          className="lending-pool-refresh-button"
-          onClick={fetchDetails}
-          disabled={isLoadingDetails}
-        >
-          {isLoadingDetails ? 'Loading...' : '🔄 Refresh'}
-        </button>
-      </div>
-
-      {activeForm === 'lend' && (
-        <div className="form-container">
-          <LendForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
-      {activeForm === 'redeem' && (
-        <div className="form-container">
-          <RedeemForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
-      {activeForm === 'borrow' && (
-        <div className="form-container">
-          <BorrowForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
-      {activeForm === 'repay' && (
-        <div className="form-container">
-          <RepayForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
-      {activeForm === 'depositCollateral' && (
-        <div className="form-container">
-          <DepositCollateralForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
-
 
     </div>
   );

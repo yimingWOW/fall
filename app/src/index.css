@@ -9,8 +9,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-
-
 html, body {
   width: 100%;
   min-height: 100vh;
@@ -24,22 +22,6 @@ body {
   background-color: #f5f5f5;
 }
 
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  font-size: 2em;
-  line-height: 1.1;
-}
-
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -47,64 +29,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #f9f9f9;
+  background-color: #512da8;
+  color: white;
   cursor: pointer;
   transition: all 0.25s;
 }
 
-button:hover {
-  border-color: #646cff;
-  background-color: #f0f0f0;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 2px solid #646cff;
-  outline-offset: 2px;
-}
-
-/* 自定义滚动条 */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* 移除输入框的默认样式 */
-input {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 16px;
-  outline: none;
-}
-
-input:focus {
-  border-color: #646cff;
-}
-
-/* 移除数字输入框的箭头 */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
 
 .error-message {
   color: #ff4444;
@@ -114,11 +44,6 @@ input[type=number] {
   margin-bottom: 16px;
 }
 
-.create-amm-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-}
 
 .success-message {
   color: #4CAF50;
@@ -134,16 +59,6 @@ input[type=number] {
   padding: 20px;
 }
 
-
-
-
-
-
-
-.submit-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
 
 .amm-item {
   border: 1px solid #ddd;
@@ -702,13 +617,7 @@ input[type=number] {
 }
 
 
-/* 确保根元素和body占满整个视口 */
-html, body, #root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+
 
  /* 修改 #root 的样式 */
 #root {
@@ -719,11 +628,7 @@ html, body, #root {
   min-height: 100vh;
 }
 
-/* Solana 风格的 CSS */
-.solana-network-select-container {
-  position: relative;
-  display: inline-block;
-}
+
 
 .solana-network-select {
   appearance: none;
@@ -751,19 +656,7 @@ html, body, #root {
   box-shadow: 0 0 0 2px rgba(153, 69, 255, 0.1);
 }
 
-.solana-network-select-container::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid #FFFFFF;
-  pointer-events: none;
-}
+
 
 .solana-network-status {
   display: flex;
@@ -838,8 +731,127 @@ html, body, #root {
   height: 64px;
 }
 
-/* 确保 NetworkSelect 和 WalletMultiButton 垂直对齐 */
 .solana-network-select-container {
-  display: flex;
   align-items: center;
+  position: relative;
+  display: inline-block;
+}
+
+
+.solana-network-select-container::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #FFFFFF;
+  pointer-events: none;
+}
+
+
+
+/* 悬停效果 */
+.action-button:hover,
+.lending-pool-action-button:hover,
+.lending-pool-refresh-button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border-color: transparent; /* 覆盖之前的 border-color */
+}
+
+/* 按钮容器样式 */
+.pool-actions,
+.lending-pool-actions {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lending-pool-action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+/* 不同操作按钮的颜色区分 */
+.action-button[onClick*="initPool"] {
+  background-color: #9C27B0;
+}
+
+.action-button[onClick*="deposit"] {
+  background-color: #2196F3;
+}
+
+.action-button[onClick*="swap"] {
+  background-color: #FF9800;
+}
+
+.lending-pool-action-button[onClick*="lend"] {
+  background-color: #514caf;
+}
+
+.lending-pool-action-button[onClick*="borrow"] {
+  background-color: #F44336;
+}
+
+.lending-pool-action-button[onClick*="repay"] {
+  background-color: #795548;
+}
+
+.lending-pool-action-button[onClick*="depositCollateral"] {
+  background-color: #607D8B;
+}
+
+/* 刷新按钮特殊样式 */
+.lending-pool-refresh-button {
+  background-color: #6e21f3;
+}
+
+.lending-pool-refresh-button:hover {
+  background-color: #7919d2;
+}
+
+/* 基础按钮样式 */
+.action-button,
+.lending-pool-action-button,
+.lending-pool-refresh-button {
+  background-color: #512da8;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px;
+  transition: all 0.3s ease;
+  width: auto; /* 覆盖之前的 width: 100% */
+}
+
+/* 禁用状态统一样式 */
+.action-button:disabled,
+.lending-pool-action-button:disabled,
+.lending-pool-refresh-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* 表单容器样式 */
+.form-container {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }

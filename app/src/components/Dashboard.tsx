@@ -6,7 +6,8 @@ import { PoolCreateForm } from './CreatePoolForm';
 import { PoolList } from './PoolList';
 import { LiquidateForm } from './LiquidateForm';
 import { AmmProvider } from '../contexts/AmmContext';
-
+import { LenderPoolList } from './LenderPoolList';
+import { BorrowerPoolList } from './BorrowerPoolList';
 const EXCLUDED_PUBLIC_KEY = 'GUXNPX5ci1Qj76MZe2aRJ33zK48VmT6gXVyR86CsF4T5';
 
 const Dashboard: FC = () => {
@@ -31,7 +32,21 @@ const Dashboard: FC = () => {
           className={`tab ${activeTab === 'pool' ? 'active' : ''}`}
           onClick={() => setActiveTab('pool')}
         >
-          Pool&Swap
+          Swap
+        </button>
+
+        <button 
+          className={`tab ${activeTab === 'lenderPool' ? 'active' : ''}`}
+          onClick={() => setActiveTab('lenderPool')}
+        >
+          Lend
+        </button>
+
+        <button 
+          className={`tab ${activeTab === 'borrowerPool' ? 'active' : ''}`}
+          onClick={() => setActiveTab('borrowerPool')}
+        >
+          Borrow
         </button>
 
         <button 
@@ -50,10 +65,20 @@ const Dashboard: FC = () => {
             <CreateAmmForm />
           </div>
         ) 
-        : activeTab === 'pool' ? (
+          : activeTab === 'pool' ? (
+            <div>
+              <PoolList />
+              <PoolCreateForm />
+            </div>
+          ) 
+        : activeTab === 'lenderPool' ? (
           <div>
-            <PoolList />
-            <PoolCreateForm />
+            <LenderPoolList />
+          </div>
+        ) 
+        : activeTab === 'borrowerPool' ? (
+          <div>
+            <BorrowerPoolList />
           </div>
         ) 
         : activeTab === 'liquidate' ? (
