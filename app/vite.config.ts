@@ -1,18 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import inject from '@rollup/plugin-inject';
 
 export default defineConfig({
   plugins: [
-    react(),
     nodePolyfills({
       globals: {
         Buffer: true,
         global: true,
-        process: true
+        process: true,
       },
       protocolImports: true,
-    })
+    }),
+    react(),
   ],
   define: {
     'process.env': {},
@@ -20,26 +21,29 @@ export default defineConfig({
   },
   base: '/fall/',
   build: {
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
     rollupOptions: {
-      input: [
-        'vite-plugin-node-polyfills/shims/buffer',
-        'events',
-        'stream',
-        'util',
-        'crypto'
-      ]
-    }
+      plugins: [
+        inject({
+          Buffer: ['buffer', 'Buffer'],
+        }),
+      ],
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
   },
   resolve: {
     alias: {
-      'stream': 'stream-browserify',
-      'util': 'util/'
-    }
+      buffer: 'buffer', // 指向正确的 polyfill 路径
+      stream: 'stream-browserify',
+      util: 'util/',
+    },
   },
   optimizeDeps: {
-    include: [ 'process']
-  }
+    include: ['buffer', 'stream', 'process', 'util'],
+  },
 });
