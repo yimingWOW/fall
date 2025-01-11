@@ -6633,13 +6633,18 @@
   "errors": [
     {
       "code": 6000,
-      "name": "ExistingLending",
-      "msg": "Existing lending"
+      "name": "CalculationError",
+      "msg": "Calculation error"
     },
     {
       "code": 6001,
-      "name": "InsufficientBalance",
-      "msg": "Insufficient balance"
+      "name": "CalculationError1",
+      "msg": "Calculation error"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidFee",
+      "msg": "Invalid fee"
     }
   ],
   "types": [
