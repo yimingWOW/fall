@@ -29,8 +29,8 @@ jobs:
           npm install --save buffer
           npm install --save @solana/spl-token
           npm install --save @project-serum/anchor
-          npm install --save-dev @types/bn.js
-          npm install buffer vite-plugin-node-polyfills
+          npm install --save @types/bn.js
+          npm install --save vite-plugin-node-polyfills
 
       - name: Build
         run: |
