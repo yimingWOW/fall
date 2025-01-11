@@ -5,6 +5,7 @@ import { SwapForm } from './SwapForm';
 import { DepositLiquidityForm } from './DepositLiquidityForm';
 import { InitPoolForm } from './InitPoolForm';
 import { PoolInfo } from '../utils/getPoolList';
+import { PublicKey } from '@solana/web3.js';
 interface PoolItemProps {
   pool: PoolInfo;
   onTxSuccess: (signature: string) => void;
@@ -22,8 +23,13 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       setIsLoadingDetails(true);
       const poolDetail = await getPoolDetail(
         connection, 
-        pool, 
-        walletPublicKey || null
+        {
+          pubkey: pool.pubkey.toString(),
+          amm: pool.amm.toString(),
+          mintA: pool.mintA.toString(),
+          mintB: pool.mintB.toString(),
+        }, 
+        walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
     } catch (error) {

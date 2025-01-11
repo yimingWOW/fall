@@ -22,7 +22,7 @@ export async function lend(
     const program = new anchor.Program(
       fallIdl ,
       provider
-    );
+    ) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
     const mintA = pool.mintA;

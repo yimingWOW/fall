@@ -27,7 +27,7 @@ export async function repay(
     const program = new anchor.Program(
       fallIdl,
       provider
-    );
+    ) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
     const [poolAuthority] = PublicKey.findProgramAddressSync(

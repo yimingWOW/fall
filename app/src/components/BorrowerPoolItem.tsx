@@ -1,15 +1,11 @@
 import { FC, useState, useEffect } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getPoolDetail, PoolDetailInfo } from '../utils/getPoolDetail';
-import { SwapForm } from './SwapForm';
-import { DepositLiquidityForm } from './DepositLiquidityForm';
-import { LendForm } from './LendForm';
-import { RedeemForm } from './RedeemForm';
 import { BorrowForm } from './BorrowForm';
 import { RepayForm } from './RepayForm';
 import { DepositCollateralForm } from './DepositCollateral';
-import { InitPoolForm } from './InitPoolForm';
 import { PoolInfo } from '../utils/getPoolList';
+import { PublicKey } from '@solana/web3.js';
 interface PoolItemProps {
   pool: PoolInfo;
   onTxSuccess: (signature: string) => void;
@@ -27,8 +23,13 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       setIsLoadingDetails(true);
       const poolDetail = await getPoolDetail(
         connection, 
-        pool, 
-        walletPublicKey || null
+        {
+          pubkey: pool.pubkey.toString(),
+          amm: pool.amm.toString(),
+          mintA: pool.mintA.toString(),
+          mintB: pool.mintB.toString(),
+        },
+        walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
     } catch (error) {

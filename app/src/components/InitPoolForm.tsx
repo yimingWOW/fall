@@ -48,7 +48,7 @@ export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
       if (onSuccess) {
-        onSuccess(signature);
+        onSuccess(signature.toString());
       }
     } catch (err) {
       console.error("Error initializing pool:", err);

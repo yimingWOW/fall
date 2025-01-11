@@ -1,7 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { getPoolList } from '../utils/getPoolList';
-import { PoolItem, PoolInfo } from './PoolItem';
+import { PoolItem } from './PoolItem';
+import { PoolInfo } from '../utils/getPoolList';
 
 export const PoolList: FC = () => {
   const wallet = useAnchorWallet();
@@ -65,7 +66,7 @@ export const PoolList: FC = () => {
         <div className="pool-list">
           {pools.map((pool) => (
             <PoolItem 
-              key={pool.pubkey} 
+              key={pool.pubkey.toString()} 
               pool={pool} 
               onTxSuccess={handleTxSuccess}
             />

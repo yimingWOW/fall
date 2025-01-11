@@ -21,7 +21,7 @@ export async function liquidate(
     const program = new anchor.Program(
       fallIdl,
       provider
-    );
+    ) as any;
 
     const pool = await program.account.pool.fetch(poolKey);
     const mintA = pool.mintA;

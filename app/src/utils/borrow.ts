@@ -31,7 +31,7 @@ export async function borrow(
     const program = new anchor.Program(
       fallIdl ,
       provider
-    );
+    ) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
     console.log('Pool info:', {

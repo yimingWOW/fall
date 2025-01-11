@@ -5,10 +5,43 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 export default defineConfig({
   plugins: [
     react(),
-    nodePolyfills()
+    nodePolyfills({
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true
+      },
+      protocolImports: true,
+    })
   ],
   define: {
-    'process.env': {}
+    'process.env': {},
+    global: 'globalThis',
   },
   base: '/fall/',
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      external: [
+        'vite-plugin-node-polyfills/shims/buffer',
+        'buffer',
+        'events',
+        'stream',
+        'util',
+        'crypto'
+      ]
+    }
+  },
+  resolve: {
+    alias: {
+      'buffer': 'buffer/',
+      'stream': 'stream-browserify',
+      'util': 'util/'
+    }
+  },
+  optimizeDeps: {
+    include: ['buffer', 'process']
+  }
 });

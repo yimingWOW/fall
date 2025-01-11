@@ -18,7 +18,6 @@ export async function depositCollateral(
   wallet: any,
   connection: Connection,
   poolPda: PublicKey,
-  mintA: PublicKey,
   mintB: PublicKey,
   collateralAmount: BN,
 ): Promise<DepositCollateralResult> {

@@ -27,10 +27,10 @@ export async function getPoolList(
     const program = new anchor.Program(
       fallIdl,
       provider
-    );
+    ) as any;
 
     const accounts = await program.account.pool.all();
-    return accounts.map(account => ({
+    return accounts.map((account: any) => ({
       pubkey: account.publicKey.toString(),
       amm: account.account.amm.toString(),
       mintA: account.account.mintA.toString(),

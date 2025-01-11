@@ -50,7 +50,7 @@ export const PoolCreateForm: FC = () => {
       );
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
-      setLastTxSignature(signature);
+      setLastTxSignature(signature.toString());
       setFormData({ mintA: '', mintB: '', fee: '500' }); // 重置表单
     } catch (err) {
       console.error("Error creating pool:", err);

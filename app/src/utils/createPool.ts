@@ -15,7 +15,12 @@ import {
 } from '../utils/constants';
 import { Idl } from '@coral-xyz/anchor';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
-
+export interface CreatePoolResult {
+  tx: string;
+  initTx1: string;
+  initTx2: string;
+  initTx3: string;
+}
 export async function createPool(
   wallet: AnchorWallet,
   connection: Connection,
@@ -23,7 +28,7 @@ export async function createPool(
   mintA: PublicKey,
   mintB: PublicKey,
   fee: number,
-) {
+): Promise<CreatePoolResult> {
   try {
     console.log('Step 1: Creating provider');
     const provider = new anchor.AnchorProvider(
@@ -96,10 +101,10 @@ export async function createPool(
     units: 1_000_000  
   });
   console.log('Step 1: Creating pool...');
+  let tx: string='';
   if (!await accountExists(connection, poolPda)) {
-  const tx = await program.methods
-      .createPool(fee)
-      .accounts({
+    tx = await program.methods
+      .createPool(fee).accounts({
         amm: ammPda,
         mintA: mintA,
         mintB: mintB,
@@ -121,8 +126,9 @@ export async function createPool(
       console.log('Pool already exists, skipping...');
     }
     console.log('Step 2: Initializing lending pool...');
+    let initTx1: string='';
     if (!await accountExists(connection, lendingPoolAccountA)) {
-      const initTx1 = await program.methods.initLendingPool1().accounts({
+      initTx1 = await program.methods.initLendingPool1().accounts({
           pool: poolPda,
           mintA: mintA,
           mintB: mintB,
@@ -140,8 +146,9 @@ export async function createPool(
         console.log("Lending pool 1 already initialized, skipping...");
     }
     console.log('Step 3: Initializing lending pool...');
+    let initTx2: string='';
     if (!await accountExists(connection, lendingReceiptTokenMint)) {
-      const initTx2 = await program.methods.initLendingPool2().accounts({
+      initTx2 = await program.methods.initLendingPool2().accounts({
           pool: poolPda,
           lendingPoolAuthority: lendingPoolAuthorityPda,
           lendingReceiptTokenMint: lendingReceiptTokenMint,
@@ -158,8 +165,9 @@ export async function createPool(
       console.log("Lending pool 2 already initialized, skipping...");
     }
     console.log('Step 4: Initializing lending pool...');
+    let initTx3: string='';
     if (!await accountExists(connection, lenderLendingBlockHeightMint)) {
-      const initTx3 = await program.methods.initLendingPool3().accounts({
+      initTx3 = await program.methods.initLendingPool3().accounts({
         pool: poolPda,
         lendingPoolAuthority: lendingPoolAuthorityPda,
         lenderLendingBlockHeightMint: lenderLendingBlockHeightMint,
@@ -176,23 +184,20 @@ export async function createPool(
     }
 
     return {
-      poolPda,
-      poolAuthorityPda,
-      liquidityMintPda,
-      poolAccountA,
-      poolAccountB,
-      lendingPoolAuthorityPda,
-      lenderLendingBlockHeightMint,
-      borrowerBorrowBlockHeightMint,
-      lendingReceiptTokenMint,
-      borrowReceiptTokenMint,
-      collateralReceiptTokenMint,
-      lendingPoolAccountA,
-      lendingPoolAccountB
+      tx,
+      initTx1,
+      initTx2,
+      initTx3,
     };
   } catch (error) {
     console.error('Error', error);
   }
+  return {
+    tx: '',
+    initTx1: '',
+    initTx2: '',
+    initTx3: '',
+  };
 }
 
 async function accountExists(connection: Connection, publicKey: PublicKey): Promise<boolean> {

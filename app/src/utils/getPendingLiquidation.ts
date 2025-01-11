@@ -23,7 +23,7 @@ export async function getPendingLiquidation(
     const program = new anchor.Program(
       fallIdl,
       provider
-    );
+    ) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
     const mintA = pool.mintA;
@@ -53,7 +53,7 @@ export async function getPendingLiquidation(
       if (tokenAccount.amount == "0") {
         continue
       }
-      const borrowTokenAccountInfo = await getAccount(connection, tokenAccount.address);
+      const borrowTokenAccountInfo = await getAccount(connection as any, tokenAccount.address);
       const borrowerAuthority = borrowTokenAccountInfo.owner;
       const collateralReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, collateralReceiptTokenMint);
       console.log("borrowReceiptToken amount", borrowTokenAccountInfo.amount.toString());
@@ -76,7 +76,7 @@ export async function getPendingLiquidation(
 async function getUserTokenAmount (connection: Connection, walletPublicKey: PublicKey, tokenMint: PublicKey): Promise<number> {
     try{
       const userToken = await getAssociatedTokenAddress(tokenMint, walletPublicKey, true);
-      const userTokenAccount = await getAccount(connection, userToken);
+      const userTokenAccount = await getAccount(connection as any, userToken);
       return Number(userTokenAccount.amount);
     }catch(e){
       console.log("getUserTokenAmount",e);

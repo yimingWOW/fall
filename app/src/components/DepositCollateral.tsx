@@ -29,28 +29,24 @@ export const DepositCollateralForm: FC<DepositCollateralFormProps> = ({ pool, on
     }
 
     try {
-      // 验证金额
       const collateralAmount = parseFloat(amount);
       if (isNaN(collateralAmount) || collateralAmount <= 0) {
         throw new Error("Invalid amount");
       }
 
-      // 从 lendingPool 对象获取必要的公钥
       const poolPubkey = new PublicKey(pool.pubkey);
-      const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
 
       const signature = await depositCollateral(
         wallet,
         connection,
         poolPubkey,
-        mintAPubkey,
         mintBPubkey,
         new BN(collateralAmount)
       );
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature.tx}`);
-      setAmount(""); // 重置表单
+      setAmount(""); 
       onSuccess(signature.tx);
     } catch (err) {
       console.error("Error lending:", err);

@@ -73,8 +73,8 @@ export async function getPoolDetail(
       ],
       new PublicKey(fallIdl.address)
     );
-    const poolAccountAInfo = await getAccount(connection, poolAccountA);
-    const poolAccountBInfo = await getAccount(connection, poolAccountB);
+    const poolAccountAInfo = await getAccount(connection as any, poolAccountA);
+    const poolAccountBInfo = await getAccount(connection as any, poolAccountB);
     const poolTokenAAmount = Number(poolAccountAInfo.amount);
     const poolTokenBAmount = Number(poolAccountBInfo.amount);
     const aToB = poolTokenBAmount / poolTokenAAmount;
@@ -121,11 +121,11 @@ export async function getPoolDetail(
       true
     );
 
-    const lendingPoolAccountAInfo = await getAccount(connection, lendingPoolAccountA);
-    const lendingPoolAccountBInfo = await getAccount(connection, lendingPoolAccountB);
-    const lendingReceiptMintInfo = await getMint(connection, lendingReceiptMint);
-    const borrowReceiptMintInfo = await getMint(connection, borrowReceiptMint);
-    const collateralReceiptMintInfo = await getMint(connection, collateralReceiptMint);
+    const lendingPoolAccountAInfo = await getAccount(connection as any, lendingPoolAccountA);
+    const lendingPoolAccountBInfo = await getAccount(connection as any, lendingPoolAccountB);
+    const lendingReceiptMintInfo = await getMint(connection as any, lendingReceiptMint);
+    const borrowReceiptMintInfo = await getMint(connection as any, borrowReceiptMint);
+    const collateralReceiptMintInfo = await getMint(connection as any, collateralReceiptMint);
 
     console.log("walletPublicKey",walletPublicKey);
     const userTokenA = await getAssociatedTokenAddressSync(
@@ -140,11 +140,11 @@ export async function getPoolDetail(
       true
     );
 
-    const userTokenAAccount = await getAccount(connection, userTokenA);
-    const userTokenBAccount = await getAccount(connection, userTokenB);
-    const userLendingReceiptAccount = await getUserTokenAmount(connection, borrowerAuthority, lendingReceiptMint);
-    const userBorrowReceiptAccount = await getUserTokenAmount(connection, borrowerAuthority, borrowReceiptMint);
-    const userCollateralReceiptAccount = await getUserTokenAmount(connection, borrowerAuthority, collateralReceiptMint);
+    const userTokenAAccount = await getAccount(connection as any, userTokenA);
+    const userTokenBAccount = await getAccount(connection as any, userTokenB);
+    const userLendingReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, lendingReceiptMint);
+    const userBorrowReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, borrowReceiptMint);
+    const userCollateralReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, collateralReceiptMint);
 
     return {
       pool: {
@@ -182,7 +182,7 @@ export async function getPoolDetail(
 async function getUserTokenAmount (connection: Connection, walletPublicKey: PublicKey, tokenMint: PublicKey): Promise<number> {
   try{
     const userToken = await getAssociatedTokenAddress(tokenMint, walletPublicKey, true);
-    const userTokenAccount = await getAccount(connection, userToken);
+    const userTokenAccount = await getAccount(connection as any, userToken);
     return Number(userTokenAccount.amount);
   }catch(e){
     console.log("getUserTokenAmount",e);
