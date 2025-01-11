@@ -36,7 +36,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'buffer': 'buffer/',
       'stream': 'stream-browserify',
       'util': 'util/'
     }
