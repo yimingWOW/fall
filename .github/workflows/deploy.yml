@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]
 
 jobs:
   build-and-deploy:
@@ -20,6 +20,8 @@ jobs:
         run: |
           cd app
           npm install
+          npm install --save-dev @types/bn.js   
+          npm install --save-dev @project-serum/anchor  
 
       - name: Build
         run: |
