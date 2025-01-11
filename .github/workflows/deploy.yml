@@ -1,0 +1,45 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # 添加写入权限
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: |
+          cd app
+          npm install
+          npm install --save @solana/spl-token
+          npm install --save @project-serum/anchor
+          npm install --save-dev @types/bn.js
+
+      - name: Build
+        run: |
+          cd app
+          npm run build
+        env:
+          CI: false
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: app/dist
+          branch: gh-pages
+          token: ${{ secrets.ACCESS_TOKEN }}
