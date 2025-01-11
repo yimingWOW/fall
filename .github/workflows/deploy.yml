@@ -26,6 +26,7 @@ jobs:
         run: |
           cd app
           npm install
+          npm install --save buffer
           npm install --save @solana/spl-token
           npm install --save @project-serum/anchor
           npm install --save-dev @types/bn.js
