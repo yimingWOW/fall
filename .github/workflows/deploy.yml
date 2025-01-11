@@ -20,8 +20,9 @@ jobs:
         run: |
           cd app
           npm install
-          npm install --save-dev @types/bn.js   
-          npm install --save-dev @project-serum/anchor  
+          npm install --save @solana/spl-token
+          npm install --save-dev @types/bn.js
+          npm install --save-dev @project-serum/anchor
 
       - name: Build
         run: |
