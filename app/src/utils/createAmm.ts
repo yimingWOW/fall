@@ -1,6 +1,7 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import fallIdl from '../idl/fall.json';
+import { Idl } from '@coral-xyz/anchor';
 
 export async function createAmm(
   wallet: any,
@@ -15,7 +16,7 @@ export async function createAmm(
     );
 
     const program = new anchor.Program(
-      fallIdl,
+      (fallIdl as any) as Idl,
       provider
     );
 
