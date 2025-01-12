@@ -95,38 +95,32 @@ pub fn swap_exact_tokens_for_tokens<'info>(
 
     // Apply trading fee, used to compute the output
     let taxed_input = input - input * ctx.accounts.pool.fee as u64 / 10000;
-
     let pool_a = &ctx.accounts.pool_account_a;
     let pool_b = &ctx.accounts.pool_account_b;
+
     let output = if swap_a {
-        I64F64::from_num(taxed_input)
-            .checked_mul(I64F64::from_num(pool_b.amount))
-            .unwrap()
-            .checked_div(
-                I64F64::from_num(pool_a.amount)
-                    .checked_add(I64F64::from_num(taxed_input))
-                    .unwrap(),
-            )
-            .unwrap()
+        // 用 token_a 交换 token_b
+        let new_pool_a_amount = I64F64::from_num(pool_a.amount) + I64F64::from_num(taxed_input); // 新的池子A的数量
+        let k = I64F64::from_num(pool_a.amount) * I64F64::from_num(pool_b.amount); // 恒定乘积
+        let new_pool_b_amount = k / new_pool_a_amount; // 新池子B的数量
+
+        // 输出的 token_b 数量是原池子中 token_b 的数量减去新的 token_b 数量
+        I64F64::from_num(pool_b.amount) - new_pool_b_amount
     } else {
-        I64F64::from_num(taxed_input)
-            .checked_mul(I64F64::from_num(pool_a.amount))
-            .unwrap()
-            .checked_div(
-                I64F64::from_num(pool_b.amount)
-                    .checked_add(I64F64::from_num(taxed_input))
-                    .unwrap(),
-            )
-            .unwrap()
-    }
-    .to_num::<u64>();
+        // 用 token_b 交换 token_a
+        let new_pool_b_amount = I64F64::from_num(pool_b.amount) + I64F64::from_num(taxed_input); // 新的池子B的数量
+        let k = I64F64::from_num(pool_a.amount) * I64F64::from_num(pool_b.amount); // 恒定乘积
+        let new_pool_a_amount = k / new_pool_b_amount; // 新池子A的数量
+        // 输出的 token_a 数量是原池子中 token_a 的数量减去新的 token_a 数量
+        I64F64::from_num(pool_a.amount) - new_pool_a_amount
+    };
 
     if output < min_output_amount {
         return err!(SwapError::OutputTooSmall);
     }
 
     // Compute the invariant before the trade
-    let invariant = pool_a.amount * pool_b.amount;
+    let invariant: u64 = pool_a.amount * pool_b.amount;
     // Transfer tokens to the pool
     let authority_bump = ctx.bumps.pool_authority;
     let authority_seeds = &[
@@ -159,17 +153,21 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                 },
                 signer_seeds,
             ),
-            output,
+            output.to_num::<u64>(),
         )?;
         // Verify the invariant still holds
         // Reload accounts because of the CPIs
         // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount+taxed_input) * (ctx.accounts.pool_account_b.amount-output) {
+        if invariant > (ctx.accounts.pool_account_a.amount+taxed_input) * (ctx.accounts.pool_account_b.amount-output.to_num::<u64>()) {
             return err!(SwapError::InvariantViolated);
         }
         // 更新池子状态
+        msg!("swap_exact_tokens_for_tokens: pool.token_a_amount: {}, pool.token_b_amount: {}",
+        ctx.accounts.pool.token_a_amount, ctx.accounts.pool.token_b_amount);
+        msg!("swap_exact_tokens_for_tokens: output: {}, taxed_input: {}",
+        output, taxed_input);
         ctx.accounts.pool.token_a_amount += taxed_input;
-        ctx.accounts.pool.token_b_amount -= output;
+        ctx.accounts.pool.token_b_amount -= output.to_num::<u64>();
     } else {
         token::transfer(
             CpiContext::new_with_signer(
@@ -181,7 +179,7 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                 },
                 signer_seeds,
             ),
-            output,
+            output.to_num::<u64>(),
         )?;
         token::transfer(
             CpiContext::new(
@@ -197,11 +195,15 @@ pub fn swap_exact_tokens_for_tokens<'info>(
         // Verify the invariant still holds
         // Reload accounts because of the CPIs
         // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount-output) * (ctx.accounts.pool_account_b.amount+taxed_input) {
+        if invariant > (ctx.accounts.pool_account_a.amount-output.to_num::<u64>()) * (ctx.accounts.pool_account_b.amount+taxed_input) {
             return err!(SwapError::InvariantViolated);
         }
         // 更新池子状态
-        ctx.accounts.pool.token_a_amount -= output;
+        msg!("swap_exact_tokens_for_tokens: pool.token_a_amount: {}, pool.token_b_amount: {}",
+         ctx.accounts.pool.token_a_amount, ctx.accounts.pool.token_b_amount);
+         msg!("swap_exact_tokens_for_tokens: output: {}, taxed_input: {}",
+         output, taxed_input);
+        ctx.accounts.pool.token_a_amount -= output.to_num::<u64>();
         ctx.accounts.pool.token_b_amount += taxed_input;
     }
     

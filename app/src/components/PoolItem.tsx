@@ -185,27 +185,6 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
         </div>
       )}
 
-      <div className="lending-pool-info">
-        <h4>Lending Pool</h4>
-        {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
-        ) : details ? (
-          <>
-            <div className="pool-details">
-              <span className="pool-label">Lending Pool tokenAAmount:</span>
-              <span className="pool-value">{details.lendingPool.tokenAAmount.toFixed(6)}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">Lending Pool tokenBAmount:</span>
-              <span className="pool-value">{details.lendingPool.tokenBAmount.toFixed(6)}</span>
-            </div>
-          </>
-        ) : (
-          <div className="error-message">Failed to load lending pool details</div>
-        )}
-      </div>
-
     </div>
   );
 };
