@@ -2,20 +2,23 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { createPool } from '../utils/createPool';
-import { useAmm } from '../contexts/AmmContext'; // 导入 useAmm
+import { useAmm } from '../contexts/AmmContext';
+import '../style/CreatePoolForm.css';
 
-export const PoolCreateForm: FC = () => {
+export const CreatePoolForm: FC = () => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
-  const { amm } = useAmm(); // 从上下文中获取 amm
+  const { amm } = useAmm();
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [lastTxSignature, setLastTxSignature] = useState<string>("");
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     mintA: '',
     mintB: '',
     fee: '500',
   });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -35,7 +38,6 @@ export const PoolCreateForm: FC = () => {
     }
 
     try {
-      // 验证输入的公钥格式
       const ammPubkey = new PublicKey(amm.pubkey);
       const mintAPubkey = new PublicKey(formData.mintA);
       const mintBPubkey = new PublicKey(formData.mintB);
@@ -49,9 +51,9 @@ export const PoolCreateForm: FC = () => {
         Number(formData.fee)  
       );
       
-      console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
       setLastTxSignature(signature.toString());
-      setFormData({ mintA: '', mintB: '', fee: '500' }); // 重置表单
+      setFormData({ mintA: '', mintB: '', fee: '500' });
+      setShowForm(false);
     } catch (err) {
       console.error("Error creating pool:", err);
       setError(err instanceof Error ? err.message : "Failed to create pool");
@@ -60,10 +62,33 @@ export const PoolCreateForm: FC = () => {
     }
   };
 
+  if (!showForm) {
+    return (
+      <div className="create-pool-button-wrapper">
+        <button 
+          className="create-pool-button"
+          onClick={() => setShowForm(true)}
+        >
+          <div className="button-content">
+            <span className="plus-icon">+</span>
+            <span className="button-text">Create Pool</span>
+          </div>
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="create-amm-container">
-        <h2>Create Pool</h2>
+    <div className="create-pool-form-container">
+      <button 
+        className="back-button"
+        onClick={() => setShowForm(false)}
+      >
+        ← Back to Pool List
+      </button>
+
+      <div className="create-pool-form">
+        <h2 className="form-title">Create New Pool</h2>
         {error && (
           <div className="error-message">
             {error}

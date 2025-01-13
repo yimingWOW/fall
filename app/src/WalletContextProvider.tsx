@@ -4,7 +4,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
 import { NetworkContext } from './contexts/NetworkContext';
-import './index.css';
+import './style/index.css';
 
 export type Cluster = 'mainnet-beta' | 'testnet' | 'devnet' | 'localnet';
 
@@ -23,8 +23,8 @@ export const NetworkSelect: FC<{ onChange: (cluster: Cluster) => void, value: Cl
         value={value}
         className="solana-network-select"
       >
-        <option value="localnet">Localnet</option>
         <option value="devnet">Devnet</option>
+        <option value="localnet">Localnet</option>
         <option value="testnet">Testnet</option>
         <option value="mainnet-beta">Mainnet</option>
       </select>

@@ -20,7 +20,7 @@ export interface InitPoolResult {
   initTx3: string;
 }
 
-export async function initPool(
+export async function createCreditPool(
   wallet: AnchorWallet,
   connection: Connection,
   poolPda: PublicKey,

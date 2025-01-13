@@ -1,0 +1,235 @@
+.dashboard-wrapper {
+  min-height: calc(100vh - 72px);
+  width: 100%;
+  background: #1C1C28;
+  overflow-y: auto;
+  position: relative;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.dashboard-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 导航标签容器 */
+.navigation-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  width: fit-content;
+}
+
+/* 导航标签按钮 */
+.nav-tab {
+  padding: 12px 24px;
+  border-radius: 16px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  position: relative;
+  overflow: hidden;
+  min-width: 120px;
+}
+
+/* 标签图标 */
+.tab-icon {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+/* 标签文本 */
+.tab-label {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+/* 悬停效果 */
+.nav-tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-1px);
+}
+
+.nav-tab:hover .tab-icon {
+  transform: scale(1.1);
+}
+
+/* 活跃状态 */
+.nav-tab.active {
+  background: linear-gradient(135deg, #7A4FF3, #9945FF);
+  color: white;
+  box-shadow: 0 4px 15px rgba(122, 79, 243, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  border-radius: inherit;
+}
+
+/* 特定标签的颜色 */
+.nav-tab[data-tab="amm"] .tab-icon {
+  color: #FF9800;
+}
+
+.nav-tab[data-tab="pool"] .tab-icon {
+  color: #2196F3;
+}
+
+.nav-tab[data-tab="lenderPool"] .tab-icon {
+  color: #4CAF50;
+}
+
+.nav-tab[data-tab="borrowerPool"] .tab-icon {
+  color: #E91E63;
+}
+
+.nav-tab[data-tab="liquidate"] .tab-icon {
+  color: #FF5722;
+}
+
+/* 活跃状态下图标颜色统一为白色 */
+.nav-tab.active .tab-icon {
+  color: white;
+}
+
+/* 内容区域 */
+.tab-content {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  min-height: 400px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-subtext {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .navigation-tabs {
+    padding: 0.5rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .nav-tab {
+    flex: 1 1 calc(33.33% - 0.5rem);
+    padding: 10px 16px;
+    min-width: auto;
+  }
+
+  .tab-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .nav-tab {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+  
+  .tab-icon {
+    font-size: 1.1rem;
+  }
+  
+  .tab-label {
+    font-size: 0.9rem;
+  }
+
+  .tab-content {
+    padding: 1rem;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-out;
+}

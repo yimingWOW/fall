@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { WalletContextProvider } from './WalletContextProvider';
-import './index.css';
+import './style/index.css';
 
 import { Buffer } from 'buffer';
 import 'stream-browserify';

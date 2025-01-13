@@ -1,0 +1,212 @@
+.create-pool-button-wrapper {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 10;
+}
+
+.create-pool-button {
+  background: linear-gradient(135deg, #7A4FF3, #6340C4);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(122, 79, 243, 0.2);
+  white-space: nowrap;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plus-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.button-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.create-pool-button:hover {
+  background: linear-gradient(135deg, #6340C4, #5233A3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(122, 79, 243, 0.3);
+}
+
+.create-pool-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(122, 79, 243, 0.2);
+}
+
+.create-pool-form-container {
+  position: absolute;
+  inset: 0;
+  background: #1A1B23;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 50;
+  padding: 2rem;
+  border-radius: 20px;
+  overflow-y: auto;
+  height: auto;
+  min-height: 100%;
+}
+
+.create-pool-form {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 0 2rem 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.back-button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.back-button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-title {
+  text-align: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1rem 0 2rem;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #7A4FF3;
+  background: rgba(122, 79, 243, 0.1);
+}
+
+.form-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-button {
+  width: 100%;
+  background: #7A4FF3;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  position: relative;
+  bottom: 0;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #6340C4;
+  transform: translateY(-2px);
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: rgba(255, 59, 48, 0.1);
+  color: #FF3B30;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.success-message {
+  background: rgba(52, 199, 89, 0.1);
+  color: #34C759;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.success-message a {
+  color: #34C759;
+  text-decoration: underline;
+  margin-left: 0.5rem;
+}
+
+.pool-list-title {
+  position: relative;
+  z-index: 20;
+  padding-left: 8rem;
+}
+
+@media (max-width: 768px) {
+  .create-pool-form {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .back-button {
+    top: 1rem;
+    left: 1rem;
+  }
+} 

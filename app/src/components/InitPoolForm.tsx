@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
-import { initPool } from '../utils/initPool';
+import { createCreditPool } from '../utils/createCreditPool';
 import { useAmm } from '../contexts/AmmContext';
 import { PoolInfo } from '../utils/getPoolList';
 
@@ -38,7 +38,7 @@ export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
       const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
 
-      const signature = await initPool(
+      const signature = await createCreditPool(
         wallet,
         connection,
         poolPubkey,

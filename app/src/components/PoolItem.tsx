@@ -3,9 +3,11 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { getPoolDetail, PoolDetailInfo } from '../utils/getPoolDetail';
 import { SwapForm } from './SwapForm';
 import { DepositLiquidityForm } from './DepositLiquidityForm';
-import { InitPoolForm } from './InitPoolForm';
+import { CheckCreditPoolForm } from './CheckCreditPoolForm';
 import { PoolInfo } from '../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
+import '../style/PoolItem.css';
+
 interface PoolItemProps {
   pool: PoolInfo;
   onTxSuccess: (signature: string) => void;
@@ -14,7 +16,7 @@ interface PoolItemProps {
 export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   const { connection } = useConnection();
   const { publicKey: walletPublicKey } = useWallet();
-  const [activeForm, setActiveForm] = useState<'none' | 'initPool' | 'deposit' | 'swap'>('none');
+  const [activeForm, setActiveForm] = useState<'none' | 'deposit' | 'swap'>('none');
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
@@ -45,6 +47,10 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
 
   return (
     <div className="pool-item">
+      <CheckCreditPoolForm 
+        pool={pool}
+      />
+
       <div className="pool-header">
         <h3>Pool Details</h3>
       </div>
@@ -63,58 +69,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
             {pool.pubkey.toString()}
           </span>
         </div>
-
-        <div className="pool-details">
-          <span className="pool-label">Token A mint addr:</span>
-          <span className="pool-value" title={pool.mintA.toString()}>
-            {pool.mintA.toString()}
-          </span>
-        </div>
-
-        <div className="pool-details">
-          <span className="pool-label">Token B mint addr:</span>
-          <span className="pool-value" title={pool.mintB.toString()}>
-            {pool.mintB.toString()}
-          </span>
-        </div>
-
-        <div className="pool-details">
-          <span className="pool-label">Fee:</span>
-          <span className="pool-value" title={pool.fee.toString()}>
-            {pool.fee}
-          </span>
-        </div>
-
-        <div className="pool-details">
-          <span className="pool-label">Min Collateral Ratio:</span>
-          <span className="pool-value" title={pool.minCollateralRatio.toString()}>
-            {pool.minCollateralRatio}
-          </span>
-        </div>
-
       </div>
-
-      <div className="pool-actions">
-        <button
-          className="action-button"
-          onClick={() => setActiveForm(activeForm === 'initPool' ? 'none' : 'initPool')}
-        >
-          {activeForm === 'initPool' ? 'Hide Init Pool' : 'Init Pool'}
-        </button>
-      </div>
-
-      {activeForm === 'initPool' && (
-        <div className="form-container">
-          <InitPoolForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
 
       <div className="pool-price-info">
         <h4>Pool Liquidity & Prices</h4>
@@ -184,7 +139,6 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           />
         </div>
       )}
-
     </div>
   );
 };

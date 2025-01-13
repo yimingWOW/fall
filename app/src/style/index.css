@@ -1,0 +1,198 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #1C1C28;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. 布局容器 */
+.container {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* 3. 导航栏样式 */
+.navbar {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+/* 4. 网络选择器样式 */
+.solana-network-select-container {
+  position: relative;
+  display: inline-block;
+}
+
+.solana-network-select {
+  appearance: none;
+  background-color: #1C1C1C;
+  border: 1px solid #383838;
+  border-radius: 12px;
+  padding: 8px 36px 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 160px;
+  height: 40px;
+}
+
+.solana-network-select:hover {
+  border-color: #4E44CE;
+  background-color: #232323;
+}
+
+.solana-network-select:focus {
+  outline: none;
+  border-color: #9945FF;
+  box-shadow: 0 0 0 2px rgba(153, 69, 255, 0.1);
+}
+
+.solana-network-select-container::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #FFFFFF;
+  pointer-events: none;
+}
+
+/* 7. 按钮样式 */
+.action-button,
+.lending-pool-action-button,
+.lending-pool-refresh-button {
+  background-color: #512da8;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px;
+  transition: all 0.3s ease;
+  width: auto;
+}
+
+.action-button:hover,
+.lending-pool-action-button:hover,
+.lending-pool-refresh-button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.action-button:disabled,
+.lending-pool-action-button:disabled,
+.lending-pool-refresh-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* 8. 消息提示样式 */
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.success-message {
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  color: #4CAF50;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+/* 9. 加载和空状态 */
+.loading {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+/* 10. 钱包按钮样式 */
+.wallet-adapter-button {
+  height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 12px !important;
+  background-color: #4E44CE !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-button:hover {
+  background-color: #5a50d8 !important;
+}
+
+/* 11. 响应式设计 */
+@media (max-width: 768px) {
+  .navbar-content {
+    padding: 0 1rem;
+  }
+  
+  .navigation-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .nav-tab {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+  
+  .pool-list-container {
+    padding: 10px;
+  }
+} */
