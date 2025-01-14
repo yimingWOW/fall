@@ -3,7 +3,7 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { getPoolList } from '../utils/getPoolList';
 import { PoolInfo } from '../utils/getPoolList';
 import { LenderPoolItem } from './LenderPoolItem';
-import '../style/PoolList.css';
+import '../style/LenderPoolList.css';
 
 export const LenderPoolList: FC = () => {
   const wallet = useAnchorWallet();
@@ -61,7 +61,7 @@ export const LenderPoolList: FC = () => {
 
   return (
     <div className="pool-list-container">
-      <h2 className="pool-list-title">Available Lending Pools</h2>
+      <h2 className="pool-list-title">Available Credit Pools</h2>
       {pools.length === 0 ? (
         <div className="no-pools-message">
           No pools available

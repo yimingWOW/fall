@@ -1,0 +1,90 @@
+.pool-list-container {
+  width: 100%;
+  padding: 20px;
+}
+
+.pool-list-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.pool-list-title {
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.pool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pool-list-item {
+  background: rgba(30, 35, 45, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pool-list-item:hover {
+  background: rgba(40, 45, 55, 0.6);
+  transform: translateY(-1px);
+}
+
+.pool-tokens {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.token-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.token-label {
+  color: #a7a7a7;
+  font-size: 14px;
+}
+
+.token-address {
+  color: #fff;
+  font-family: monospace;
+}
+
+.token-separator {
+  color: #a7a7a7;
+  margin: 0 8px;
+}
+
+.pool-view-details {
+  color: #a7a7a7;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.pool-detail-view {
+  width: 100%;
+  padding: 20px;
+}
+
+.back-button {
+  background: rgba(30, 35, 45, 0.5);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  width: fit-content;
+  transition: background 0.2s;
+}
+
+.back-button:hover {
+  background: rgba(40, 45, 55, 0.5);
+} 

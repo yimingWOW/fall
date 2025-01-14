@@ -78,11 +78,6 @@ export const DepositCollateralForm: FC<DepositCollateralFormProps> = ({ pool, on
             disabled={isLoading}
           />
         </div>
-        <div className="lendingPool-info-summary">
-          <div>Pool: {pool.pubkey.toString()}</div>
-          <div>Token A: {pool.mintA.toString()}</div>
-          <div>Token B: {pool.mintB.toString()}</div>
-        </div>
         <button 
           type="submit" 
           className="action-button"

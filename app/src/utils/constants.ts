@@ -3,7 +3,7 @@ export const CONFIG = {
   fallIdl
 } as const;
 
-export const BASE_RATE = fallIdl.constants.find(constant => constant.name === "BASE_RATE")?.value;
+export const BASE_RATE = 10000;
 
 export const AUTHORITY_SEED= "a"; // authority
 export const LIQUIDITY_SEED= "b"; // liquidity

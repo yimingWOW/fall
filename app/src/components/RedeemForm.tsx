@@ -3,7 +3,6 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { redeem } from '../utils/redeem';
 import { PoolInfo } from '../utils/getPoolList';
-import { BASE_RATE } from '../utils/constants';
 
 interface RedeemFormProps {
   pool: PoolInfo;
@@ -56,12 +55,8 @@ export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
         </div>
       )}
       <form onSubmit={handleSubmit}>
-        <div className="lending-pool-info-summary">
-          <div>Min Collateral Ratio: {(pool.minCollateralRatio / 100).toFixed(2)}%</div>
-          <div>Base Rate: {BASE_RATE}%</div>
-        </div>
         <div className="warning-message">
-          Note: This will redeem all your lending receipt tokens.
+          Note: This will redeem all your lending receipt and return your tokenA.
         </div>
         <button 
           type="submit" 

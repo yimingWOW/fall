@@ -4,18 +4,24 @@ import { PublicKey } from '@solana/web3.js';
 import { borrow } from '../utils/borrow';
 import BN from 'bn.js';
 import { PoolInfo } from '../utils/getPoolList';
+import { PoolDetailInfo } from '../utils/getPoolDetail';
+import '../style/BorrowForm.css';
+import { BASE_RATE } from '../utils/constants';
 
 interface BorrowFormProps {
   pool: PoolInfo;
+  details: PoolDetailInfo;
   onSuccess: (signature: string) => void;
 }
 
-export const BorrowForm: FC<BorrowFormProps> = ({ pool, onSuccess }) => {
+export const BorrowForm: FC<BorrowFormProps> = ({ pool, details, onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [borrowAmount, setBorrowAmount] = useState("");
+
+  const maxBorrowAmount = Number(details.userAssets.collateralReceiptAmount) * details.pool.bToA/pool.minCollateralRatio*BASE_RATE;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,13 +35,15 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, onSuccess }) => {
     }
 
     try {
-      // 验证金额
       const borrowAmountNum = parseFloat(borrowAmount);
       if (isNaN(borrowAmountNum) || borrowAmountNum <= 0) {
         throw new Error("Invalid borrow amount");
       }
 
-      // 从 lendingPool 对象获取必要的公钥
+      if (borrowAmountNum > maxBorrowAmount) {
+        throw new Error("Amount exceeds maximum borrowable amount");
+      }
+
       const poolPubkey = new PublicKey(pool.pubkey);
       const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
@@ -46,11 +54,11 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, onSuccess }) => {
         poolPubkey,
         mintAPubkey,
         mintBPubkey,
-        new BN(borrowAmountNum ), // 转换为 lamports
+        new BN(borrowAmountNum),
       );
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
-      setBorrowAmount(""); // 重置表单
+      setBorrowAmount("");
       onSuccess(signature);
     } catch (err) {
       console.error("Error borrowing:", err);
@@ -72,14 +80,20 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, onSuccess }) => {
       )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Amount to Borrow (Token A):</label>
+          <label>
+            Amount to Borrow (Token A):
+            <span className="max-amount">
+              Max: {maxBorrowAmount.toFixed(6)}
+            </span>
+          </label>
           <input
             type="number"
             value={borrowAmount}
             onChange={(e) => setBorrowAmount(e.target.value)}
-            placeholder="Enter amount to borrow"
+            placeholder={`Enter amount (max: ${maxBorrowAmount.toFixed(6)})`}
             required
             min="0"
+            max={maxBorrowAmount}
             step="any"
             disabled={isLoading}
           />

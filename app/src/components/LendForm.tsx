@@ -4,6 +4,7 @@ import { PublicKey } from '@solana/web3.js';
 import { lend } from '../utils/lend';
 import BN from 'bn.js';
 import { PoolInfo } from '../utils/getPoolList';
+import '../style/LendForm.css';
 
 interface LendFormProps {
   pool: PoolInfo;
@@ -58,7 +59,7 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
   console.log(pool);
   return (
     <div className="form-wrapper">
-      <h3>Lend Tokens</h3>
+      <h3>Lend TokenA</h3>
       {error && (
         <div className="error-message">
           {error}
@@ -66,7 +67,7 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
       )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Amount to Lend:</label>
+          <label>Token A Amount to Lend:</label>
           <input
             type="number"
             value={amount}
@@ -77,11 +78,6 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
             step="any"
             disabled={isLoading}
           />
-        </div>
-        <div className="lendingPool-info-summary">
-          <div>Pool: {pool.pubkey.toString()}</div>
-          <div>Token A: {pool.mintA.toString()}</div>
-          <div>Token B: {pool.mintB.toString()}</div>
         </div>
         <button 
           type="submit" 

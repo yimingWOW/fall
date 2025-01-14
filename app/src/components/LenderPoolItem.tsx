@@ -1,11 +1,14 @@
 import { FC, useState, useEffect } from 'react';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { getPoolDetail, PoolDetailInfo } from '../utils/getPoolDetail';
+import { checkCreditPool } from '../utils/checkCreditPool';
 import { LendForm } from './LendForm';
 import { RedeemForm } from './RedeemForm';
 import { PoolInfo } from '../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
-import { CheckCreditPoolForm } from './CheckCreditPoolForm';
+import { InitPoolForm } from './InitPoolForm';
+import '../style/LenderPoolItem.css';
+
 interface PoolItemProps {
   pool: PoolInfo;
   onTxSuccess: (signature: string) => void;
@@ -13,10 +16,32 @@ interface PoolItemProps {
 
 export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   const { connection } = useConnection();
+  const wallet = useAnchorWallet();
   const { publicKey: walletPublicKey } = useWallet();
-  const [activeForm, setActiveForm] = useState<'none' | 'lend' | 'redeem' | 'borrow' | 'repay' | 'depositCollateral'>('none');
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [isCreditPool, setIsCreditPool] = useState(false);
+
+  const checkPool = async () => {
+    try {
+      if (!wallet) return;
+      
+      const isCredit = await checkCreditPool(
+        wallet,
+        connection,
+        pool.pubkey,
+        pool.mintA
+      );
+      
+      setIsCreditPool(isCredit.isCreditPoolInitialized);
+    } catch (error) {
+      console.error('Error checking credit pool:', error);
+    }
+  };
+
+  useEffect(() => {
+    checkPool();
+  }, [connection, pool, wallet]);
 
   const fetchDetails = async () => {
     try {
@@ -40,16 +65,36 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   };
 
   useEffect(() => {
-    fetchDetails();
-  }, [pool, connection, walletPublicKey]);
+    if (isCreditPool) {
+      fetchDetails();
+    }
+  }, [pool, connection, walletPublicKey, isCreditPool]);
+
+  console.log("isCreditPool", isCreditPool);
+
+  if (!isCreditPool) {
+    return (
+      <div className="pool-item">
+        <div className="init-pool-section">
+          <div className="init-pool-description">
+            <p>This liquidity pool has not created a lending pool yet.</p>
+            <p>Click the button below to create one.</p>
+          </div>
+          <InitPoolForm 
+            pool={pool}
+            onSuccess={() => {
+              setIsCreditPool(true);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pool-item">
-      <CheckCreditPoolForm 
-        pool={pool}
-      />
       <div className="pool-header">
-        <h3>Pool Details</h3>
+        <h3>Credit Pool Details</h3>
       </div>
       
       <div className="pool-info">
@@ -77,18 +122,17 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       </div>
 
       <div className="lending-pool-info">
-        <h4>Lending Pool</h4>
         {isLoadingDetails ? (
           <div className="loading-lending-pool-details">Loading lending pool details...</div>
         ) : details ? (
           <>
             <div className="pool-details">
-              <span className="pool-label">Lending Pool tokenAAmount:</span>
+              <span className="pool-label">Credit Pool tokenA Amount:</span>
               <span className="pool-value">{details.lendingPool.tokenAAmount.toFixed(6)}</span>
             </div>
 
             <div className="pool-details">
-              <span className="pool-label">Lending Pool tokenBAmount:</span>
+              <span className="pool-label">Credit Pool tokenB Amount:</span>
               <span className="pool-value">{details.lendingPool.tokenBAmount.toFixed(6)}</span>
             </div>
 
@@ -101,32 +145,15 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       <div className="user-assets-details">
         <h4>Your Assets</h4>
         {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
+          <div className="loading-lending-pool-details">Loading credit pool details...</div>
         ) : details ? (
           <>
             <div className="pool-details">
               <span className="pool-label">tokenA Balance:</span>
               <span className="pool-value">{details.userAssets.tokenAAmount}</span>
             </div>
-
             <div className="pool-details">
-              <span className="pool-label">tokenB Balance:</span>
-              <span className="pool-value">{details.userAssets.tokenBAmount}</span>
-            </div>
-          </>
-        ) : (
-          <div className="error-message">Failed to load lending pool details</div>
-        )}
-      </div>
-
-      <div className="user-lending-details">
-        <h4>Your lending details</h4>
-        {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
-        ) : details ? (
-          <>
-            <div className="pool-details">
-              <span className="pool-label">lended tokenB amount:</span>
+              <span className="pool-label">You have lent tokenA amount:</span>
               <span className="pool-value">{details.userAssets.lendingReceiptAmount}</span>
             </div>
           </>
@@ -135,22 +162,32 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
         )}
       </div>
 
-      <div className="lending-pool-actions">
-        <div className="lending-pool-action-buttons">
-          <button   
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'lend' ? 'none' : 'lend')}
-          >
-            {activeForm === 'lend' ? 'Hide Lend' : 'Lend'}
-          </button>
-
-          <button 
-            className="lending-pool-action-button"
-            onClick={() => setActiveForm(activeForm === 'redeem' ? 'none' : 'redeem')}
-          >
-            {activeForm === 'redeem' ? 'Hide Redeem' : 'Redeem'}
-          </button>
-        </div>
+      <div className="user-lending-details">
+        {isLoadingDetails ? (
+          <div className="loading-lending-pool-details">Credit lending pool details...</div>
+        ) : details ? (
+          <>
+            {Number(details.userAssets.lendingReceiptAmount) === 0 ? (
+              <LendForm 
+                pool={pool}
+                onSuccess={(signature) => {
+                  onTxSuccess(signature);
+                  fetchDetails();
+                }}
+              />
+            ) : (
+              <RedeemForm 
+                pool={pool}
+                onSuccess={(signature) => {
+                  onTxSuccess(signature);
+                  fetchDetails();
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <div className="error-message">Failed to load credit pool details</div>
+        )}
       </div>
 
       <div className="lending-pool-actions">
@@ -162,33 +199,6 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           {isLoadingDetails ? 'Loading...' : '🔄 Refresh'}
         </button>
       </div>
-
-      {activeForm === 'lend' && (
-        <div className="form-container">
-          <LendForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
-      {activeForm === 'redeem' && (
-        <div className="form-container">
-          <RedeemForm 
-            pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              setActiveForm('none');
-              fetchDetails();
-            }}
-          />
-        </div>
-      )}
-
     </div>
   );
 };

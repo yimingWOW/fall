@@ -28,16 +28,16 @@ export async function checkCreditPool(
         preflightCommitment: "confirmed" 
       }
     );
-
     const program = new anchor.Program(
       (fallIdl as any) as Idl,
       provider
     ) as any;
-
+    console.log("program", program);
     const [lendingPoolAuthorityPda] = PublicKey.findProgramAddressSync(
       [poolPda.toBuffer(), Buffer.from(LENDING_AUTHORITY_SEED)],
       program.programId
     );
+    console.log("lendingPoolAuthorityPda", lendingPoolAuthorityPda);
     const [collateralReceiptTokenMint] = PublicKey.findProgramAddressSync(
       [poolPda.toBuffer(), Buffer.from(COLLATERAL_TOKEN_SEED)],
       program.programId
@@ -76,7 +76,7 @@ export async function checkCreditPool(
     console.error('Error', error);
   }
   return {
-    isCreditPoolInitialized: false
+    isCreditPoolInitialized: true
   };
 }
 async function accountExists(connection: Connection, publicKey: PublicKey): Promise<boolean> {

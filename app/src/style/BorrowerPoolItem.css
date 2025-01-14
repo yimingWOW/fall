@@ -1,0 +1,140 @@
+.pool-item {
+    background: rgba(30, 35, 45, 0.5);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+  }
+  
+  .pool-header {
+    margin-bottom: 24px;
+  }
+  
+  .pool-header h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 20px;
+    text-align: center;
+  }
+  
+  .pool-info,
+  .pool-price-info,
+  .lending-pool-info,
+  .user-assets-details,
+  .user-lending-details {
+    margin-bottom: 24px;
+  }
+  
+  .pool-info h4,
+  .pool-price-info h4,
+  .lending-pool-info h4,
+  .user-assets-details h4,
+  .user-lending-details h4 {
+    color: #fff;
+    margin: 0 0 16px 0;
+    font-size: 16px;
+  }
+  
+  .pool-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(40, 45, 55, 0.3);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .pool-label {
+    color: #a7a7a7;
+    font-size: 14px;
+  }
+  
+  .pool-value {
+    color: #fff;
+    font-family: monospace;
+    font-size: 14px;
+    word-break: break-all;
+  }
+  
+  .loading-prices,
+  .loading-lending-pool-details,
+  .error-message {
+    text-align: center;
+    padding: 16px;
+    color: #a7a7a7;
+    background: rgba(40, 45, 55, 0.3);
+    border-radius: 8px;
+  }
+  
+  .error-message {
+    color: #ff4c4c;
+    background: rgba(255, 76, 76, 0.1);
+    border: 1px solid rgba(255, 76, 76, 0.3);
+  }
+  
+  .lending-pool-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-end;
+  }
+  
+  .lending-pool-action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .lending-pool-action-button {
+    background: rgb(111, 76, 255);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .lending-pool-action-button:hover:not(:disabled) {
+    background: rgb(124, 93, 255);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(111, 76, 255, 0.2);
+  }
+  
+  .lending-pool-action-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  
+  .lending-pool-action-button:disabled {
+    background: rgba(111, 76, 255, 0.5);
+    cursor: not-allowed;
+  }
+  
+  .lending-pool-refresh-button {
+    background: rgba(40, 45, 55, 0.5);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .lending-pool-refresh-button:hover:not(:disabled) {
+    background: rgba(50, 55, 65, 0.5);
+  }
+  
+  .lending-pool-refresh-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .form-container {
+    margin-top: 20px;
+  }

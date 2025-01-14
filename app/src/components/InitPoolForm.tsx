@@ -2,8 +2,8 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { createCreditPool } from '../utils/createCreditPool';
-import { useAmm } from '../contexts/AmmContext';
 import { PoolInfo } from '../utils/getPoolList';
+import '../style/InitPoolForm.css';
 
 interface InitPoolFormProps {
   pool: PoolInfo;
@@ -13,7 +13,6 @@ interface InitPoolFormProps {
 export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
-  const { amm } = useAmm();
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,12 +22,6 @@ export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
 
     if (!wallet) {
       setError("Please connect your wallet first");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!amm) {
-      setError("Please select an AMM first");
       setIsLoading(false);
       return;
     }

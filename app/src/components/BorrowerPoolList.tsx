@@ -61,7 +61,7 @@ export const BorrowerPoolList: FC = () => {
 
   return (
     <div className="pool-list-container">
-      <h2 className="pool-list-title">Available Borrowing Pools</h2>
+      <h2 className="pool-list-title">Available Credit Pools</h2>
       {pools.length === 0 ? (
         <div className="no-pools-message">
           No pools available
