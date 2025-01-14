@@ -28,12 +28,7 @@ export const SwapForm: FC<SwapFormProps> = ({ pool, onSuccess }) => {
     try {
       const details = await getPoolDetail(
         connection,
-        {
-          pubkey: pool.pubkey.toString(),
-          amm: pool.amm.toString(),
-          mintA: pool.mintA.toString(),
-          mintB: pool.mintB.toString(),
-        },
+        pool,
         wallet?.publicKey || new PublicKey('')
       );
       setPoolDetails(details);
@@ -59,7 +54,7 @@ export const SwapForm: FC<SwapFormProps> = ({ pool, onSuccess }) => {
     }
 
     // 根据交换方向选择正确的价格
-    const price = swapAtoB ? poolDetails.pool.aToB : poolDetails.pool.bToA;
+    const price = swapAtoB ? poolDetails.poolInfo.aToB : poolDetails.poolInfo.bToA;
     const outputAmount = inputAmount * price;
     
     return outputAmount.toFixed(6);
@@ -107,7 +102,7 @@ export const SwapForm: FC<SwapFormProps> = ({ pool, onSuccess }) => {
       const signature = await swap(
         wallet,
         connection,
-        new PublicKey(pool.pubkey),
+        new PublicKey(pool.poolPk),
         new PublicKey(pool.amm),
         new PublicKey(pool.mintA),
         new PublicKey(pool.mintB),

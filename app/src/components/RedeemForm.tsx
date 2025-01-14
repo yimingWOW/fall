@@ -28,7 +28,7 @@ export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
 
     try {
       // 从 lendingPool 对象获取必要的公钥
-      const poolPubkey = new PublicKey(pool.pubkey);
+      const poolPubkey = new PublicKey(pool.poolPk);
 
       const signature = await redeem(
         wallet,

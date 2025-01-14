@@ -8,6 +8,7 @@ import { PoolInfo } from '../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
 import { InitPoolForm } from './InitPoolForm';
 import '../style/LenderPoolItem.css';
+import { shortenAddress } from '../utils/string';
 
 interface PoolItemProps {
   pool: PoolInfo;
@@ -29,7 +30,7 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       const isCredit = await checkCreditPool(
         wallet,
         connection,
-        pool.pubkey,
+        pool.poolPk,
         pool.mintA
       );
       
@@ -48,12 +49,7 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       setIsLoadingDetails(true);
       const poolDetail = await getPoolDetail(
         connection, 
-        {
-          pubkey: pool.pubkey.toString(),
-          amm: pool.amm.toString(),
-          mintA: pool.mintA.toString(),
-          mintB: pool.mintB.toString(),
-        }, 
+        pool, 
         walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
@@ -100,46 +96,35 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       <div className="pool-info">
         <div className="pool-details">
           <span className="pool-label">Pool Pubkey:</span>
-          <span className="pool-value" title={pool.pubkey.toString()}>
-            {pool.pubkey.toString()}
+          <span className="pool-value" title={pool.poolPk.toString()}>
+            {shortenAddress(pool.poolPk.toString())}
           </span>
         </div>
 
         <div className="pool-details">
           <span className="pool-label">Token A mint addr:</span>
           <span className="pool-value" title={pool.mintA.toString()}>
-            {pool.mintA.toString()}
+            {shortenAddress(pool.mintA.toString())}
           </span>
+        </div>
+        
+        <div className="pool-details">
+          <span className="pool-label">Credit Pool tokenA Amount:</span>
+          <span className="pool-value">{details?.lendingPoolInfo.tokenAAmount.toFixed(6)}</span>
         </div>
 
         <div className="pool-details">
           <span className="pool-label">Token B mint addr:</span>
           <span className="pool-value" title={pool.mintB.toString()}>
-            {pool.mintB.toString()}
+            {shortenAddress(pool.mintB.toString())}
           </span>
         </div>
 
-      </div>
-
-      <div className="lending-pool-info">
-        {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
-        ) : details ? (
-          <>
-            <div className="pool-details">
-              <span className="pool-label">Credit Pool tokenA Amount:</span>
-              <span className="pool-value">{details.lendingPool.tokenAAmount.toFixed(6)}</span>
-            </div>
-
-            <div className="pool-details">
+        <div className="pool-details">
               <span className="pool-label">Credit Pool tokenB Amount:</span>
-              <span className="pool-value">{details.lendingPool.tokenBAmount.toFixed(6)}</span>
-            </div>
+          <span className="pool-value">{details?.lendingPoolInfo.tokenBAmount.toFixed(6)}</span>
+        </div>
 
-          </>
-        ) : (
-          <div className="error-message">Failed to load lending pool details</div>
-        )}
       </div>
 
       <div className="user-assets-details">

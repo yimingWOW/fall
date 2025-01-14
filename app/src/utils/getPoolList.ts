@@ -3,7 +3,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import fallIdl from '../idl/fall.json';
 import { Idl } from '@coral-xyz/anchor';
 export interface PoolInfo {
-  pubkey: PublicKey;
+  poolPk: PublicKey;
   amm: PublicKey;
   mintA: PublicKey;
   mintB: PublicKey;
@@ -11,6 +11,8 @@ export interface PoolInfo {
   minCollateralRatio: number;
   tokenAAmount: number;
   tokenBAmount: number;
+  aToB: number;
+  bToA: number;
 }
 
 export async function getPoolList(
@@ -30,8 +32,9 @@ export async function getPoolList(
     ) as any;
 
     const accounts = await program.account.pool.all();
+
     return accounts.map((account: any) => ({
-      pubkey: account.publicKey.toString(),
+      poolPk: account.publicKey.toString(),
       amm: account.account.amm.toString(),
       mintA: account.account.mintA.toString(),
       mintB: account.account.mintB.toString(),

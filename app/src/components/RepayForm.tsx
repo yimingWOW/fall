@@ -27,7 +27,7 @@ export const RepayForm: FC<RepayFormProps> = ({ pool, onSuccess }) => {
     }
 
     try {
-      const poolPubkey = new PublicKey(pool.pubkey);
+      const poolPubkey = new PublicKey(pool.poolPk);
       const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
       const signature = await repay(

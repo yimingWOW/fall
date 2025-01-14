@@ -2,21 +2,22 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { liquidate } from '../utils/liquidate';
-import { getPendingLiquidation, type PendingLiquidation } from '../utils/getPendingLiquidation';
+import { getPendingLiquidation } from '../utils/getPendingLiquidation';
+import '../styles/LiquidateForm.css';
 
 export const LiquidateForm: FC = () => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
   const [poolAddress, setPoolAddress] = useState<string>("");
-  const [borrowerAddress, setBorrowerAddress] = useState<string>("");
   const [lastTxSignature, setLastTxSignature] = useState<string>("");
-  const [pendingLiquidations, setPendingLiquidations] = useState<PendingLiquidation[]>([]);
+  const [pendingLiquidations, setPendingLiquidations] = useState<PublicKey[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
+  const [processingLiquidation, setProcessingLiquidation] = useState<string | null>(null);
 
 
   const handleSearch = async (e: React.FormEvent) => {
+
     e.preventDefault();
     if (!wallet || !poolAddress) {
       setError("Please connect wallet and enter pool address");
@@ -26,8 +27,8 @@ export const LiquidateForm: FC = () => {
     try {
       setError("");
       setIsLoadingList(true);
-      const poolKey = new PublicKey(poolAddress);
-      const liquidations = await getPendingLiquidation(wallet, poolKey, connection);
+      const liquidations = await getPendingLiquidation(wallet,new PublicKey(poolAddress),connection);
+      console.log(liquidations);
       setPendingLiquidations(liquidations);
     } catch (err) {
       console.error("Error fetching pending liquidations:", err);
@@ -39,25 +40,22 @@ export const LiquidateForm: FC = () => {
   };
 
 
-  const handleLiquidate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLiquidatePosition = async (borrowerKey: PublicKey) => {
     setError("");
-    setIsLoading(true);
+    setProcessingLiquidation(borrowerKey.toString());
 
     if (!wallet) {
       setError("Please connect your wallet first");
-      setIsLoading(false);
+      setProcessingLiquidation(null);
       return;
     }
 
     let poolKey: PublicKey;
-    let borrowerKey: PublicKey;
     try {
       poolKey = new PublicKey(poolAddress);
-      borrowerKey = new PublicKey(borrowerAddress);
     } catch (err) {
-      setError("Invalid pool or borrower address");
-      setIsLoading(false);
+      setError("Invalid pool address");
+      setProcessingLiquidation(null);
       return;
     }
 
@@ -72,13 +70,12 @@ export const LiquidateForm: FC = () => {
       console.log(`Transaction URL: https://explorer.solana.com/tx/${result.tx}`);
       setLastTxSignature(result.tx);
       
-      setPoolAddress("");
-      setBorrowerAddress("");
+      handleSearch(new Event('submit') as any);
     } catch (err) {
       console.error("Error liquidating position:", err);
       setError(err instanceof Error ? err.message : "Failed to liquidate. Please try again.");
     } finally {
-      setIsLoading(false);
+      setProcessingLiquidation(null);
     }
   };
 
@@ -104,7 +101,7 @@ export const LiquidateForm: FC = () => {
 
         <div className="search-form">
         <div className="form-group">
-          <label htmlFor="pool-address">Pool Address:</label>
+          <label htmlFor="pool-address">Pool PublicKey(Could get from Lend page):</label>
           <div className="input-with-button">
             <input
               id="pool-address"
@@ -126,49 +123,29 @@ export const LiquidateForm: FC = () => {
 
 
         <div className="pending-liquidations">
-          <h3>Pending Liquidations</h3>
+          <h3>Pending Bankrupts</h3>
           {isLoadingList ? (
-            <div className="loading">Loading pending liquidations...</div>
+            <div className="loading">Loading pending Bankrupts...</div>
           ) : pendingLiquidations.length === 0 ? (
-            <p>No pending liquidations found</p>
+            <p>No pending Bankrupts found</p>
           ) : (
             <ul className="liquidation-list">
               {pendingLiquidations.map((item, index) => (
-                <li 
-                  key={index} 
-                  className="liquidation-item"
-                  onClick={() => setBorrowerAddress(item.userAuthorityPda.toString())}
-                >
-                  <div>Borrower Authority PDA: {item.userAuthorityPda.toString()}</div>
+                <li key={index} className="liquidation-item">
+                  <div>{item.toString()}</div>
+                  <button
+                    onClick={() => handleLiquidatePosition(item)}
+                    disabled={processingLiquidation === item.toString()}
+                    className="liquidate-button"
+                  >
+                    {processingLiquidation === item.toString() ? 'Processing...' : 'Liquidate to earn'}
+                  </button>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </div>
-
-      <form onSubmit={handleLiquidate} className="liquidate-form">
-        <div className="form-group">
-          <label htmlFor="borrower-address">Note: The current demo does not yet support liquidation based on PDAs. The public key is not the same as the PDA. So the PDA above is useless now. U'd better to use another account to borrow and then liquidate that account with it's Public Key.</label>
-          <label htmlFor="borrower-address">Borrower Address:</label>
-          <input
-            id="borrower-address"
-            type="text"
-            value={borrowerAddress}
-            onChange={(e) => setBorrowerAddress(e.target.value)}
-            placeholder="Enter borrower address"
-            className="input-field"
-          />
-        </div>
-
-        <button 
-          type="submit" 
-          className="submit-button"
-          disabled={isLoading || !wallet || !poolAddress || !borrowerAddress}
-        >
-          {isLoading ? 'Liquidating...' : 'Liquidate Position'}
-        </button>
-      </form>
     </div>
 
   );

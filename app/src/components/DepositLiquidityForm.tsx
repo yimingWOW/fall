@@ -34,7 +34,7 @@ export const DepositLiquidityForm: FC<DepositLiquidityFormProps> = ({
       const signature = await depositLiquidity(
         wallet,
         connection,
-        new PublicKey(pool.pubkey),
+        new PublicKey(pool.poolPk),
         new PublicKey(pool.amm),
         new PublicKey(pool.mintA),
         new PublicKey(pool.mintB),

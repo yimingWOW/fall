@@ -34,7 +34,7 @@ export const DepositCollateralForm: FC<DepositCollateralFormProps> = ({ pool, on
         throw new Error("Invalid amount");
       }
 
-      const poolPubkey = new PublicKey(pool.pubkey);
+      const poolPubkey = new PublicKey(pool.poolPk);
       const mintBPubkey = new PublicKey(pool.mintB);
 
       const signature = await depositCollateral(

@@ -22,12 +22,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       setIsLoadingDetails(true);
       const poolDetail = await getPoolDetail(
         connection, 
-        {
-          pubkey: pool.pubkey.toString(),
-          amm: pool.amm.toString(),
-          mintA: pool.mintA.toString(),
-          mintB: pool.mintB.toString(),
-        }, 
+        pool,
         walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
@@ -61,11 +56,11 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           <>
             <div className="pool-details">
               <span className="pool-label">Price (A → B):</span>
-              <span className="pool-value">1 A = {details.pool.aToB.toFixed(6)} B</span>
+              <span className="pool-value">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
             </div>
             <div className="pool-details">
               <span className="pool-label">Price (B → A):</span>
-              <span className="pool-value">1 B = {details.pool.bToA.toFixed(6)} A</span>
+              <span className="pool-value">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
             </div>
           </>
         ) : (

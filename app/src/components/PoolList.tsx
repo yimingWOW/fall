@@ -69,7 +69,7 @@ export const PoolList: FC = () => {
         <div className="pool-list">
           {pools.map((pool) => (
             <div 
-              key={pool.pubkey.toString()} 
+              key={pool.poolPk.toString()} 
               className="pool-list-item"
               onClick={() => setSelectedPool(pool)}
             >

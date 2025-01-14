@@ -27,7 +27,7 @@ export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
     }
 
     try {
-      const poolPubkey = new PublicKey(pool.pubkey);
+      const poolPubkey = new PublicKey(pool.poolPk);
       const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
 

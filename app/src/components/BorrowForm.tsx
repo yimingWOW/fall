@@ -21,7 +21,7 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, details, onSuccess }) =>
   const [isLoading, setIsLoading] = useState(false);
   const [borrowAmount, setBorrowAmount] = useState("");
 
-  const maxBorrowAmount = Number(details.userAssets.collateralReceiptAmount) * details.pool.bToA/pool.minCollateralRatio*BASE_RATE;
+  const maxBorrowAmount = Number(details.userAssets.collateralReceiptAmount) * details.poolInfo.bToA/pool.minCollateralRatio*BASE_RATE;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, details, onSuccess }) =>
         throw new Error("Amount exceeds maximum borrowable amount");
       }
 
-      const poolPubkey = new PublicKey(pool.pubkey);
+      const poolPubkey = new PublicKey(pool.poolPk);
       const mintAPubkey = new PublicKey(pool.mintA);
       const mintBPubkey = new PublicKey(pool.mintB);
 
@@ -99,7 +99,7 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, details, onSuccess }) =>
           />
         </div>
         <div className="lending-pool-info-summary">
-          <div>Pool: {pool.pubkey.toString().slice(0, 4)}...{pool.pubkey.toString().slice(-4)}</div>
+          <div>Pool: {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}</div>
           <div>Token A (Borrow): {pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</div>
           <div>Token B (Collateral): {pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</div>
           <div>Min Collateral Ratio: {minCollateralRatio}%</div>

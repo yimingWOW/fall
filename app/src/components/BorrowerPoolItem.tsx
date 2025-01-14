@@ -26,12 +26,7 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
       setIsLoadingDetails(true);
       const poolDetail = await getPoolDetail(
         connection, 
-        {
-          pubkey: pool.pubkey.toString(),
-          amm: pool.amm.toString(),
-          mintA: pool.mintA.toString(),
-          mintB: pool.mintB.toString(),
-        },
+        pool,
         walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
@@ -57,15 +52,15 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           <>
             <div className="pool-details">
               <span className="pool-label">TokenA Amount in Liquidity Pool:</span>
-              <span className="pool-value">{details.pool.tokenAAmount.toFixed(6)}</span>
+              <span className="pool-value">{details.poolInfo.tokenAAmount.toFixed(6)}</span>
               <span className="pool-label">TokenB Amount in Liquidity Pool:</span>
-              <span className="pool-value">{details.pool.tokenBAmount.toFixed(6)}</span>
+              <span className="pool-value">{details.poolInfo.tokenBAmount.toFixed(6)}</span>
             </div>
             <div className="pool-details">
               <span className="pool-label">Price (A → B):</span>
-              <span className="pool-value">1 A = {details.pool.aToB.toFixed(6)} B</span>
+              <span className="pool-value">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
               <span className="pool-label">Price (B → A):</span>
-              <span className="pool-value">1 B = {details.pool.bToA.toFixed(6)} A</span>
+              <span className="pool-value">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
             </div>
           </>
         ) : (
@@ -87,6 +82,11 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
             </div>
 
             <div className="pool-details">
+              <span className="pool-label">Credit Pool tokenA Amount:</span>
+              <span className="pool-value">{details.lendingPoolInfo.tokenAAmount.toFixed(6)}</span>
+            </div>
+
+            <div className="pool-details">
               <span className="pool-label">Token B mint addr:</span>
               <span className="pool-value" title={pool.mintB.toString()}>
                 {pool.mintB.toString()}
@@ -94,21 +94,18 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
             </div>
 
             <div className="pool-details">
+              <span className="pool-label">Credit Pool tokenB Amount:</span>
+              <span className="pool-value">{details.lendingPoolInfo.tokenBAmount.toFixed(6)}</span>
+            </div>
+            
+            <div className="pool-details">
               <span className="pool-label">Min Collateral Ratio:</span>
               <span className="pool-value" title={pool.minCollateralRatio.toString()}>
                 {(pool.minCollateralRatio/BASE_RATE).toFixed(6)}
               </span>
             </div>
 
-            <div className="pool-details">
-              <span className="pool-label">Credit Pool tokenA Amount:</span>
-              <span className="pool-value">{details.lendingPool.tokenAAmount.toFixed(6)}</span>
-            </div>
 
-            <div className="pool-details">
-              <span className="pool-label">Credit Pool tokenB Amount:</span>
-              <span className="pool-value">{details.lendingPool.tokenBAmount.toFixed(6)}</span>
-            </div>
           </>
         ) : (
           <div className="error-message">Failed to load credit pool details</div>

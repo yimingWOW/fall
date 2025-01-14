@@ -2,15 +2,11 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { getAccount, getAssociatedTokenAddress, getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
 import { AUTHORITY_SEED,LENDING_AUTHORITY_SEED,LENDING_TOKEN_SEED,BORROW_TOKEN_SEED,COLLATERAL_TOKEN_SEED,BORROWER_AUTHORITY_SEED } from './constants';
+import { PoolInfo } from './getPoolList';
 
 export type PoolDetailInfo = {
-  pool: {
-    aToB: number;
-    bToA: number;
-    tokenAAmount: number;
-    tokenBAmount: number;
-  };
-  lendingPool: {
+  poolInfo: PoolInfo;
+  lendingPoolInfo: {
     tokenAAmount: number;
     tokenBAmount: number;
     addresses: {
@@ -33,16 +29,11 @@ export type PoolDetailInfo = {
 
 export async function getPoolDetail(
   connection: Connection,
-  pool: {
-    pubkey: string;
-    amm: string;
-    mintA: string;
-    mintB: string;
-  },
+  pool: PoolInfo,
   walletPublicKey: PublicKey  
 ): Promise<PoolDetailInfo> {
   try {
-    const poolPda = new PublicKey(pool.pubkey);
+    const poolPda = new PublicKey(pool.poolPk);
     const mintA = new PublicKey(pool.mintA);
     const mintB = new PublicKey(pool.mintB);
 
@@ -147,13 +138,19 @@ export async function getPoolDetail(
     const userCollateralReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, collateralReceiptMint);
 
     return {
-      pool: {
+      poolInfo: {
+        poolPk: poolPda,
+        amm: new PublicKey(pool.amm),
+        mintA: mintA,
+        mintB: mintB,
+        fee: pool.fee,
+        minCollateralRatio: pool.minCollateralRatio,
         aToB: aToB,
         bToA: bToA,
         tokenAAmount: poolTokenAAmount,
         tokenBAmount: poolTokenBAmount,
       },
-      lendingPool: {
+      lendingPoolInfo: {
         tokenAAmount: Number(lendingPoolAccountAInfo.amount),
         tokenBAmount: Number(lendingPoolAccountBInfo.amount),
         lendingReceiptSupply: Number(lendingReceiptMintInfo.supply),

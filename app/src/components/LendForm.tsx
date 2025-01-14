@@ -37,7 +37,7 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
       }
 
       // 从 lendingPool 对象获取必要的公钥
-      const poolPubkey = new PublicKey(pool.pubkey);
+      const poolPubkey = new PublicKey(pool.poolPk);
       const signature = await lend(
         wallet,
         connection,
