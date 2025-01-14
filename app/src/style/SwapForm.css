@@ -1,0 +1,187 @@
+.swap-wrapper {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.swap-wrapper form {
+  width: 100%;
+}
+
+.swap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  background: rgba(20, 25, 35, 0.5);
+  border-radius: 16px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.swap-box {
+  width: 100%;
+  background: rgba(30, 35, 45, 0.8);
+  border-radius: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.swap-header {
+  width: 100%;
+  text-align: left;
+  color: #a7a7a7;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.token-section {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.token-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(40, 45, 55, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  text-align: right;
+  width: 100%;
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.swap-direction-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(40, 45, 55, 0.8);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.swap-direction-toggle::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4'%3E%3C/path%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.swap-direction-toggle:hover {
+  background: rgba(50, 55, 65, 0.8);
+}
+
+.submit-button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: #5fb916;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submit-button:disabled {
+  background: rgba(95, 185, 22, 0.5);
+  cursor: not-allowed;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #6acc1a;
+}
+
+.slippage-settings {
+  width: 100%;
+  background: rgba(30, 35, 45, 0.8);
+  border-radius: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slippage-header {
+  color: #a7a7a7;
+  font-size: 14px;
+}
+
+.slippage-input-container {
+  display: flex;
+  align-items: center;
+  background: rgba(40, 45, 55, 0.5);
+  border-radius: 8px;
+  padding: 6px 12px;
+  width: auto;
+  min-width: 80px;
+}
+
+.slippage-input-container input {
+  width: 40px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  padding: 4px;
+  text-align: right;
+}
+
+.percentage-symbol {
+  color: #fff;
+  margin-left: 4px;
+}
+
+.slippage-input-container input::-webkit-outer-spin-button,
+.slippage-input-container input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.slippage-input-container input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* 隐藏输入框的原生加减按钮 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

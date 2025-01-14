@@ -25,7 +25,26 @@
   font-size: 1.8rem;
   font-weight: 600;
   color: white;
-  margin: 0;
+  margin: 0 auto;  /* 修改这里 */
+  text-align: center;
+  width: 100%;
+  padding: 1rem 0;  /* 添加一些上下间距 */
+}
+
+.pool-list-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pool-header {
+  display: flex;
+  justify-content: center;  /* 修改这里 */
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
 }
 
 .pool-list {

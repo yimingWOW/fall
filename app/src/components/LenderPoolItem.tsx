@@ -5,6 +5,7 @@ import { LendForm } from './LendForm';
 import { RedeemForm } from './RedeemForm';
 import { PoolInfo } from '../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
+import { CheckCreditPoolForm } from './CheckCreditPoolForm';
 interface PoolItemProps {
   pool: PoolInfo;
   onTxSuccess: (signature: string) => void;
@@ -44,6 +45,9 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
 
   return (
     <div className="pool-item">
+      <CheckCreditPoolForm 
+        pool={pool}
+      />
       <div className="pool-header">
         <h3>Pool Details</h3>
       </div>

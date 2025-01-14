@@ -37,7 +37,7 @@ interface Props {
 }
 
 export const WalletContextProvider: FC<Props> = ({ children }) => {
-  const [network, setNetwork] = useState<Cluster>('localnet');
+  const [network, setNetwork] = useState<Cluster>('devnet');
   const endpoint = useMemo(() => ENDPOINTS[network], [network]);
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 

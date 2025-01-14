@@ -177,22 +177,3 @@ html, body {
 .wallet-adapter-button:hover {
   background-color: #5a50d8 !important;
 }
-
-/* 11. 响应式设计 */
-@media (max-width: 768px) {
-  .navbar-content {
-    padding: 0 1rem;
-  }
-  
-  .navigation-tabs {
-    flex-wrap: wrap;
-  }
-  
-  .nav-tab {
-    flex: 1 1 calc(50% - 0.5rem);
-  }
-  
-  .pool-list-container {
-    padding: 10px;
-  }
-} */
