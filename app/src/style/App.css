@@ -150,3 +150,20 @@
     margin: 1rem;
   }
 } 
+
+.app-logo {
+  height: 32px; /* 调整大小 */
+  width: auto;
+  margin-right: 12px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.connect-logo {
+  width: 64px; /* 调整大小 */
+  height: auto;
+  margin-bottom: 20px;
+} 

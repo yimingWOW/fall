@@ -6,6 +6,8 @@ import { NetworkSelect } from './WalletContextProvider';
 import { useNetwork } from './contexts/NetworkContext';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './style/App.css';
+import logo from '../public/favicon.png'; // 请确保图片路径正确
+
 
 const App: FC = () => {
   const { connected } = useWallet();
@@ -16,6 +18,7 @@ const App: FC = () => {
       <nav className="app-nav">
         <div className="nav-content">
           <div className="nav-left">
+            <img src={logo} alt="Fall Logo" className="app-logo" />
             <h1 className="app-title">Fall</h1>
           </div>
           <div className="nav-right">
@@ -32,7 +35,7 @@ const App: FC = () => {
         {!connected ? (
           <div className="connect-wallet">
             <div className="connect-card">
-              <span className="connect-icon">🌟</span>
+              <img src={logo} alt="Fall Logo" className="connect-logo" />
               <h2>Welcome to Fall</h2>
               <p>Please connect your wallet to continue</p>
             </div>
