@@ -1,0 +1,17 @@
+{
+  "wallet": "Bftejq113zeXk3A5rEaRdT9bwCohG9jUEtYp1mpAMmLy",
+  "tokenA": {
+    "mint": "7itXgv9Ab3Ajwr9rbjDJrW3h43fM1aGqtdFmzA2LJcAR",
+    "account": "BkHcqSXtURzpCb7hPndFZHMJutyNpkAesHRbzN9ajoXe",
+    "targetAccount1": "84dZfnUN5bouWHzKgZQJiMVgg7XDzuTPCyP6TZvbZaYV",
+    "targetAccount2": "4B7ZPrTz2Cpd9GZMBYP7XXpZg1a1eECoBVrUTj5Jy9sy"
+  },
+  "tokenB": {
+    "mint": "BJNYw71xWxBTCvQE2CLddqJvfbCTrfA4LjJMkA7JnFJb",
+    "account": "2a7q4Bg2iF9jLVko4M3dJZMkvnRcNzZTR7f7WDKRW8vv",
+    "targetAccount1": "F4nTEp7BzEij3espvDi8o5PHZdfHCGBGjzAQECo9qxze",
+    "targetAccount2": "HNR3H88HmJ4J8VZFKubMdzExspCCwZNpYDAgC2nF6woT"
+  },
+  "targetWallet1": "GUXNPX5ci1Qj76MZe2aRJ33zK48VmT6gXVyR86CsF4T5",
+  "targetWallet2": "2mXXs3ZLK7UpDDwHmJajcMTT3YRkg4Ymo9osQSUu8CAu"
+}
