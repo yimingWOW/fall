@@ -167,3 +167,42 @@
   height: auto;
   margin-bottom: 20px;
 } 
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1rem;
+}
+
+.social-icon {
+  color: #ffffff;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.social-icon:hover {
+  color: #9945FF;
+} 
+
+.social-links-corner {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 1rem;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.social-icon {
+  color: #ffffff;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.social-icon:hover {
+  color: #9945FF;
+} 

@@ -6,7 +6,7 @@ import { NetworkSelect } from './WalletContextProvider';
 import { useNetwork } from './contexts/NetworkContext';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './style/App.css';
-import logo from '../public/favicon.png'; // 请确保图片路径正确
+import logo from '../public/favicon.png'; 
 
 
 const App: FC = () => {
@@ -44,6 +44,25 @@ const App: FC = () => {
           <Dashboard />
         )}
       </main>
+
+      <div className="social-links-corner">
+        <a 
+          href="https://github.com/yimingWOW/fall" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="social-icon"
+        >
+          <i className="fab fa-github"></i>
+        </a>
+        <a 
+          href="https://x.com/fall_labs" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="social-icon"
+        >
+          <i className="fa-brands fa-x-twitter"></i>
+        </a>
+      </div>
     </div>
   );
 };

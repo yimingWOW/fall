@@ -9,6 +9,7 @@ import { AmmProvider } from '../contexts/AmmContext';
 import { LenderPoolList } from './LenderPoolList';
 import { BorrowerPoolList } from './BorrowerPoolList';
 import { EXCLUDED_PUBLIC_KEY } from '../utils/constants';
+import { Guide } from './Guide';
 import '../style/Dashboard.css';
 
 interface TabButtonProps {
@@ -38,6 +39,15 @@ const Dashboard: FC = () => {
         <div className="dashboard-container">
           <div className="dashboard-content">
             <nav className="navigation-tabs">
+
+              <TabButton 
+                isActive={activeTab === 'guide'} 
+                onClick={() => setActiveTab('guide')}
+                icon="🧭"
+                label="Guide"
+                data-tab="guide"
+              />
+
               {publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY && (
                 <TabButton 
                   isActive={activeTab === 'amm'} 
@@ -87,7 +97,11 @@ const Dashboard: FC = () => {
                   <AmmList />
                   <CreateAmmForm />
                 </div>
-              ) : activeTab === 'pool' ? (
+              ) : activeTab === 'guide' ? (
+                <div>
+                  <Guide />
+                </div>
+              ): activeTab === 'pool' ? (
                 <div>
                   <div className="pool-header">
                     <CreatePoolForm />
