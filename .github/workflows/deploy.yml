@@ -31,6 +31,7 @@ jobs:
           npm install --save @project-serum/anchor
           npm install --save @types/bn.js
           npm install --save vite-plugin-node-polyfills
+          npm install --save @metaplex-foundation/mpl-token-metadata
 
       - name: Build
         run: |
