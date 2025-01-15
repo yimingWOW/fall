@@ -631,140 +631,6 @@
     bn.js "^5.2.0"
     debug "^4.3.4"
 
-"@metaplex-foundation/mpl-token-metadata@^3.3.0":
-  version "3.3.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/mpl-token-metadata/-/mpl-token-metadata-3.3.0.tgz"
-  integrity sha512-t5vO8Wr3ZZZPGrVrGNcosX5FMkwQSgBiVMQMRNDG2De7voYFJmIibD5jdG05EoQ4Y5kZVEiwhYaO+wJB3aO5AA==
-  dependencies:
-    "@metaplex-foundation/mpl-toolbox" "^0.9.4"
-
-"@metaplex-foundation/mpl-toolbox@^0.9.4":
-  version "0.9.4"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/mpl-toolbox/-/mpl-toolbox-0.9.4.tgz"
-  integrity sha512-fd6JxfoLbj/MM8FG2x91KYVy1U6AjBQw4qjt7+Da3trzQaWnSaYHDcYRG/53xqfvZ9qofY1T2t53GXPlD87lnQ==
-
-"@metaplex-foundation/umi-bundle-defaults@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-bundle-defaults/-/umi-bundle-defaults-1.0.0.tgz"
-  integrity sha512-Z8Ah4vJNkO5/sDvtG49kULNdGskaGYfJSygA9p061zG8BztML1okBkx0QZG/TM0fB0cMI8w5cwTd1O5gT64+Kg==
-  dependencies:
-    "@metaplex-foundation/umi-downloader-http" "^1.0.0"
-    "@metaplex-foundation/umi-eddsa-web3js" "^1.0.0"
-    "@metaplex-foundation/umi-http-fetch" "^1.0.0"
-    "@metaplex-foundation/umi-program-repository" "^1.0.0"
-    "@metaplex-foundation/umi-rpc-chunk-get-accounts" "^1.0.0"
-    "@metaplex-foundation/umi-rpc-web3js" "^1.0.0"
-    "@metaplex-foundation/umi-serializer-data-view" "^1.0.0"
-    "@metaplex-foundation/umi-transaction-factory-web3js" "^1.0.0"
-
-"@metaplex-foundation/umi-downloader-http@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-downloader-http/-/umi-downloader-http-1.0.0.tgz"
-  integrity sha512-qBG3A6SG8cgOwu+DVeGIDyakKw1oZsoi+ta6jPQYredeISDJwbysepg7O6ickvGmdjPA6WLeoVRjiZWmt2LgDg==
-
-"@metaplex-foundation/umi-eddsa-web3js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-eddsa-web3js/-/umi-eddsa-web3js-1.0.0.tgz"
-  integrity sha512-mIdp65Fsi7bhFcDUFZxcThGQaMXQahMNGR46HkXUHglQtRxxYGLduT3XEq/aLPVZCW9mWfyK/M03AInwIAcJTw==
-  dependencies:
-    "@metaplex-foundation/umi-web3js-adapters" "^1.0.0"
-    "@noble/curves" "^1.0.0"
-    "@soceanfi/solana-cli-config" "0.2.0"
-
-"@metaplex-foundation/umi-http-fetch@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-http-fetch/-/umi-http-fetch-1.0.0.tgz"
-  integrity sha512-yZbAcuxMOdSSFhvltWIMescBAuf4ddeYjK4LABbTXWKhZFTliYdSSMmViLArbO6lBJAekKhyNbIdM/uH6KhE/w==
-  dependencies:
-    node-fetch "^2.6.7"
-
-"@metaplex-foundation/umi-options@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-options/-/umi-options-1.0.0.tgz"
-  integrity sha512-DhfwrXTsvOrDwPGT5FpzC7VooLGMRjUSBV8W9xkp+WMxkzbNXeUV+bFmoTNx+0ynLhINp6Ij76W/Rl+4dIwU0w==
-
-"@metaplex-foundation/umi-program-repository@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-program-repository/-/umi-program-repository-1.0.0.tgz"
-  integrity sha512-kw1u/Dv7p4olyM1am0FbPvjPWbgoHDBI/cS7Dl0h0PFqlBq9I4JHZmpd53+C4P7lFZtWEcDWKEgmdqAsCja40Q==
-
-"@metaplex-foundation/umi-public-keys@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-public-keys/-/umi-public-keys-1.0.0.tgz"
-  integrity sha512-irTc5QGOCgV0mGLY/SU3YOrXVmvEEOrqb1gDvtBtr714X4EtwSv5Aqner9L1/s4PzaXmeN4f86FWFWM3knrlEw==
-  dependencies:
-    "@metaplex-foundation/umi-serializers-encodings" "^1.0.0"
-
-"@metaplex-foundation/umi-rpc-chunk-get-accounts@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-rpc-chunk-get-accounts/-/umi-rpc-chunk-get-accounts-1.0.0.tgz"
-  integrity sha512-srFzEAGh9rOfAclBSFE947SSNHcpq4SH8mThSt7EiDf59iPe/r1n5IPyZp1sHogEQJ4KKXst7vBV03qC7ASuDg==
-
-"@metaplex-foundation/umi-rpc-web3js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-rpc-web3js/-/umi-rpc-web3js-1.0.0.tgz"
-  integrity sha512-SANWIFaMfOVZCxecD9ycd1tzhKiJrkwRqHotEcM+LMb5EKMagTsqEHh3VAsCg3XfjKOG8m3XMeBJ534aySfEHw==
-  dependencies:
-    "@metaplex-foundation/umi-web3js-adapters" "^1.0.0"
-
-"@metaplex-foundation/umi-serializer-data-view@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-serializer-data-view/-/umi-serializer-data-view-1.0.0.tgz"
-  integrity sha512-LSn0uZiBC+qJrsaY98lIPFnMLDqlXlcJt0TZJhBKZNPIBLdSwvcU60ABloycxafR+dzpM0vzne0JXNVaKf3Cug==
-
-"@metaplex-foundation/umi-serializers-core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-serializers-core/-/umi-serializers-core-1.0.0.tgz"
-  integrity sha512-Ov95ARxh179EX6elN6LoHeC+TczirYvzFeIA4gGZKTISpP3sqwRrej6ppnY6qQFk2bFKCKJyvVGiyP2jjuqjJg==
-
-"@metaplex-foundation/umi-serializers-encodings@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-serializers-encodings/-/umi-serializers-encodings-1.0.0.tgz"
-  integrity sha512-1278rWbkA9ZAPaq+EXmOwM9pi1LC8eaHsgm0XVFebxsZFkaHbCYPXmB9vkO2jTFFFy4uy5hsYGPRValFl4GdWg==
-  dependencies:
-    "@metaplex-foundation/umi-serializers-core" "^1.0.0"
-
-"@metaplex-foundation/umi-serializers-numbers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-serializers-numbers/-/umi-serializers-numbers-1.0.0.tgz"
-  integrity sha512-OXKX/hQbbc16X7PvpmM2hZ9WrhDBTPJsEcEbRSN4kQewNdmpyMnfXhaqW84Tfc99Ipvyl6Lpe3Dbl/oOTHqong==
-  dependencies:
-    "@metaplex-foundation/umi-serializers-core" "^1.0.0"
-
-"@metaplex-foundation/umi-serializers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-serializers/-/umi-serializers-1.0.0.tgz"
-  integrity sha512-9lbVzH2cHjAfhrTm7oJ7+5xnfNz+/J3YY554JZUh+Dw7WxiQUvhs0v5DxrNNGbEZQENjm+gORnZ8WX3a3gW2VA==
-  dependencies:
-    "@metaplex-foundation/umi-options" "^1.0.0"
-    "@metaplex-foundation/umi-public-keys" "^1.0.0"
-    "@metaplex-foundation/umi-serializers-core" "^1.0.0"
-    "@metaplex-foundation/umi-serializers-encodings" "^1.0.0"
-    "@metaplex-foundation/umi-serializers-numbers" "^1.0.0"
-
-"@metaplex-foundation/umi-transaction-factory-web3js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-transaction-factory-web3js/-/umi-transaction-factory-web3js-1.0.0.tgz"
-  integrity sha512-VyHo6gTElAFCOpA87bQJE2nvEqOV8c72dGIlb/qAJAF85kca1Pw7jh6YFVFaZMOKNXFpFrbHofgS+uNQZRYXRg==
-  dependencies:
-    "@metaplex-foundation/umi-web3js-adapters" "^1.0.0"
-
-"@metaplex-foundation/umi-web3js-adapters@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi-web3js-adapters/-/umi-web3js-adapters-1.0.0.tgz"
-  integrity sha512-daAuxorWSwF3cOWz9UjlYKlgGVM6eTw7cbLKyj8Sk90umxv5sfMZR5CjmaILHsXz5uaYIcjoivabSngucp4xNA==
-  dependencies:
-    buffer "^6.0.3"
-
-"@metaplex-foundation/umi@^1.0.0", "@metaplex-foundation/umi@>= 0.8.2 < 1":
-  version "1.0.0"
-  resolved "https://registry.npmmirror.com/@metaplex-foundation/umi/-/umi-1.0.0.tgz"
-  integrity sha512-kCYwVI4REdDW8SwJGjPkef70t3JBPqkyf6k+zu/tBKUXdGh7jOkbZnUghdXk5GZ2Md+bqh9dtM93u/66N6xcWA==
-  dependencies:
-    "@metaplex-foundation/umi-options" "^1.0.0"
-    "@metaplex-foundation/umi-public-keys" "^1.0.0"
-    "@metaplex-foundation/umi-serializers" "^1.0.0"
-
 "@near-js/crypto@^0.0.3", "@near-js/crypto@0.0.3":
   version "0.0.3"
   resolved "https://registry.npmmirror.com/@near-js/crypto/-/crypto-0.0.3.tgz"
@@ -901,7 +767,7 @@
     depd "^2.0.0"
     mustache "^4.0.0"
 
-"@noble/curves@^1.0.0", "@noble/curves@^1.4.2":
+"@noble/curves@^1.4.2":
   version "1.7.0"
   resolved "https://registry.npmmirror.com/@noble/curves/-/curves-1.7.0.tgz"
   integrity sha512-UTMhXK9SeDhFJVrHeUJ5uZlI6ajXg10O6Ddocf9S6GjbSBVZsJo88HzKwXznNfGpMTRDyJkqMjNDPYgf0qFWnw==
@@ -993,13 +859,6 @@
   dependencies:
     "@noble/hashes" "~1.4.0"
     "@scure/base" "~1.1.6"
-
-"@soceanfi/solana-cli-config@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.npmmirror.com/@soceanfi/solana-cli-config/-/solana-cli-config-0.2.0.tgz"
-  integrity sha512-te44VYk+a5NpYu3Cek6wGo+Lou8zT5DUCos3FA6spr/WBfXb4L1SsmOtxgDCB9GRIuBQJgwDFcydAC+G9oL2PQ==
-  dependencies:
-    yaml "^2.1.1"
 
 "@solana/buffer-layout-utils@^0.2.0":
   version "0.2.0"
@@ -1140,7 +999,7 @@
     "@solana/spl-token-metadata" "^0.1.6"
     buffer "^6.0.3"
 
-"@solana/web3.js@^1", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.72.0", "@solana/web3.js@^1.88.0", "@solana/web3.js@^1.95.3", "@solana/web3.js@^1.98.0":
+"@solana/web3.js@^1.21.0", "@solana/web3.js@^1.32.0", "@solana/web3.js@^1.36.0", "@solana/web3.js@^1.50.1", "@solana/web3.js@^1.56.2", "@solana/web3.js@^1.63.1", "@solana/web3.js@^1.66.2", "@solana/web3.js@^1.68.0", "@solana/web3.js@^1.88.0", "@solana/web3.js@^1.95.3", "@solana/web3.js@^1.98.0":
   version "1.98.0"
   resolved "https://registry.npmmirror.com/@solana/web3.js/-/web3.js-1.98.0.tgz"
   integrity sha512-nz3Q5OeyGFpFCR+erX2f6JPt3sKhzhYcSycBCSPkWjzSVDh/Rr1FqTVMRe58FKO16/ivTUcuJjeS5MyBvpkbzA==
@@ -3250,11 +3109,6 @@ y18n@^5.0.5:
   version "5.0.8"
   resolved "https://registry.npmmirror.com/y18n/-/y18n-5.0.8.tgz"
   integrity sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==
-
-yaml@^2.1.1:
-  version "2.7.0"
-  resolved "https://registry.npmmirror.com/yaml/-/yaml-2.7.0.tgz"
-  integrity sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==
 
 yargs-parser@^20.2.2:
   version "20.2.9"
