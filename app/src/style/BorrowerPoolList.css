@@ -46,6 +46,7 @@
 
 .pool-list-item:hover {
   background: #2a2b38;
+  border-left: 3px solid #ed3a7c; /* 为借款人列表添加特殊的边框颜色 */
 }
 
 .pool-item-content {
@@ -95,13 +96,13 @@
 }
 
 .view-details-btn:hover {
-  background: #6d28d9;
+  background: #d62d6b; /* 按钮悬停颜色 */
 }
 
 /* Loading state */
 .loading-spinner {
   border: 3px solid #23242f;
-  border-top: 3px solid #7c3aed;
+  border-top: 3px solid #ed3a7c; /* 使用借款人主题色 */
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -129,6 +130,51 @@
 }
 
 /* Back button styles */
+.back-button {
+    width: 100%;
+    background: #7A4FF3;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    position: relative;
+    bottom: 0;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+  
+.back-button:hover:not(:disabled) {
+    background: #6340C4;
+    transform: translateY(-2px);
+}
+
+/* Pool detail view */
+.pool-detail-view {
+  padding: 20px;
+  background: #1a1b23;
+  border-radius: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.back-button-container {
+  width: 100%;
+  padding: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .pool-detail-view .back-button-container {
     width: 100%;
     padding: 0 0 20px 0;
@@ -161,13 +207,4 @@
     transform: translateY(-2px);
 }
 
-/* Pool detail view */
-.pool-detail-view {
-  padding: 20px;
-  background: #1a1b23;
-  border-radius: 12px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
-} 
+

@@ -3,6 +3,10 @@
     border-radius: 12px;
     padding: 24px;
     margin-top: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
   }
   
   .pool-header {
@@ -22,6 +26,9 @@
   .user-assets-details,
   .user-lending-details {
     margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   
   .pool-info h4,
@@ -42,6 +49,9 @@
     background: rgba(40, 45, 55, 0.3);
     border-radius: 8px;
     margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   
   .pool-label {
@@ -54,6 +64,9 @@
     font-family: monospace;
     font-size: 14px;
     word-break: break-all;
+    max-width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .loading-prices,
@@ -137,4 +150,7 @@
   
   .form-container {
     margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }

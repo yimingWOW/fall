@@ -81,21 +81,17 @@
 }
 
 .back-button {
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  z-index: 10;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    border: 1px solid #7c3aed;
+    color: #7c3aed;
+    display: block;
+    text-align: left;
+    width: fit-content;
 }
 
 .back-button:hover {

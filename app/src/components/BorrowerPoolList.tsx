@@ -3,7 +3,7 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { getPoolList } from '../utils/getPoolList';
 import { PoolInfo } from '../utils/getPoolList';
 import { BorrowerPoolItem } from './BorrowerPoolItem';
-import '../style/PoolList.css';
+import '../style/BorrowerPoolList.css';
 
 export const BorrowerPoolList: FC = () => {
   const wallet = useAnchorWallet();
@@ -42,12 +42,14 @@ export const BorrowerPoolList: FC = () => {
   if (selectedPool) {
     return (
       <div className="pool-detail-view">
-        <button 
-          className="back-button"
-          onClick={() => setSelectedPool(null)}
-        >
-          ← Back to Pool List
-        </button>
+        <div className="back-button-container">
+          <button 
+            className="back-button"
+            onClick={() => setSelectedPool(null)}
+          >
+            ← Back to Pool List
+          </button>
+        </div>
         <BorrowerPoolItem 
           pool={selectedPool} 
           onTxSuccess={(signature) => {
@@ -61,7 +63,15 @@ export const BorrowerPoolList: FC = () => {
 
   return (
     <div className="pool-list-container">
-      <h2 className="pool-list-title">Available Credit Pools</h2>
+      <div className="pool-list-header">
+        <h2 className="pool-list-title">Available Credit Pools</h2>
+        <div className="pool-list-columns">
+          <span>Trading Pair</span>
+          <span>Pool Address</span>
+          <span>Action</span>
+        </div>
+      </div>
+      
       {pools.length === 0 ? (
         <div className="no-pools-message">
           No pools available
@@ -74,23 +84,18 @@ export const BorrowerPoolList: FC = () => {
               className="pool-list-item"
               onClick={() => setSelectedPool(pool)}
             >
-              <div className="pool-tokens">
-                <div className="token-info">
-                  <span className="token-label">Token A:</span>
-                  <span className="token-address" title={pool.mintA.toString()}>
-                    {pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}
-                  </span>
+              <div className="pool-item-content">
+                <div className="pool-pair">
+                  <span>{pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</span>
+                  <span className="separator">/</span>
+                  <span>{pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</span>
                 </div>
-                <div className="token-separator">⟷</div>
-                <div className="token-info">
-                  <span className="token-label">Token B:</span>
-                  <span className="token-address" title={pool.mintB.toString()}>
-                    {pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}
-                  </span>
+                <div className="pool-address">
+                  {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}
                 </div>
-              </div>
-              <div className="pool-view-details">
-                View Details →
+                <button className="view-details-btn">
+                  View Details
+                </button>
               </div>
             </div>
           ))}

@@ -6,6 +6,10 @@
   margin-bottom: 2rem;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 /* 头部样式 */
@@ -36,6 +40,9 @@
   align-items: center;
   padding: 0.75rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .pool-details:last-child {
@@ -66,6 +73,9 @@
   padding: 1.5rem;
   margin: 1.5rem 0;
   border: 1px solid rgba(122, 79, 243, 0.2);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .pool-price-info h4 {
@@ -121,6 +131,9 @@
   padding: 1.5rem;
   margin-top: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* 响应式设计 */

@@ -3,6 +3,10 @@
   background: rgba(30, 35, 45, 0.5);
   border-radius: 12px;
   padding: 20px;
+  width: 100%;  /* 添加宽度控制 */
+  box-sizing: border-box;  /* 确保padding不会导致溢出 */
+  max-width: 100%;  /* 确保不会超过父容器 */
+  overflow: hidden;  /* 防止内容溢出 */
 }
 
 .pool-header {
@@ -21,6 +25,8 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pool-details {
@@ -30,6 +36,9 @@
   padding: 8px 12px;
   background: rgba(40, 45, 55, 0.3);
   border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .pool-label {
