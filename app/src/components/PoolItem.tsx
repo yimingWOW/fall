@@ -38,7 +38,28 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   }, [pool, connection, walletPublicKey]);
 
   return (
-    <div className="pool-item">
+    <div className="card gradient-border">
+      <div className="pool-item-content">
+        {isLoadingDetails ? (
+          <div className="code-text">Loading prices...</div>
+        ) : details ? (
+          <>
+            <div>
+              <span className="body-text">Price (A → B)</span>
+              <span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
+            </div>
+            <div>
+              <span className="body-text">Price (B → A)</span>
+              <span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
+            </div>
+          </>
+        ) : (
+          <div className="code-text" style={{ color: 'var(--error)' }}>
+            Failed to load prices
+          </div>
+        )}
+      </div>
+
       <div className="form-container">
         <SwapForm 
           pool={pool}
@@ -47,25 +68,6 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
             fetchDetails();
           }}
         />
-      </div>
-
-      <div className="pool-price-info">
-        {isLoadingDetails ? (
-          <div className="loading-prices">Loading prices...</div>
-        ) : details ? (
-          <>
-            <div className="pool-details">
-              <span className="pool-label">Price (A → B):</span>
-              <span className="pool-value">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
-            </div>
-            <div className="pool-details">
-              <span className="pool-label">Price (B → A):</span>
-              <span className="pool-value">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
-            </div>
-          </>
-        ) : (
-          <div className="error-message">Failed to load prices</div>
-        )}
       </div>
     </div>
   );

@@ -3,7 +3,8 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { getPoolList } from '../utils/getPoolList';
 import { PoolInfo } from '../utils/getPoolList';
 import { BorrowerPoolItem } from './BorrowerPoolItem';
-import '../style/BorrowerPoolList.css';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 export const BorrowerPoolList: FC = () => {
   const wallet = useAnchorWallet();
@@ -32,24 +33,24 @@ export const BorrowerPoolList: FC = () => {
 
   if (isLoading) {
     return (
-      <div className="pool-list-loading">
+      <div className="tap-page">
         <div className="loading-spinner"></div>
-        <p>Loading pools...</p>
       </div>
     );
   }
 
   if (selectedPool) {
     return (
-      <div className="pool-detail-view">
+      <div className="tap-page">
         <div className="back-button-container">
           <button 
-            className="back-button"
+            className="btn btn-primary"
             onClick={() => setSelectedPool(null)}
           >
-            ← Back to Pool List
+            Back
           </button>
         </div>
+
         <BorrowerPoolItem 
           pool={selectedPool} 
           onTxSuccess={(signature) => {
@@ -62,39 +63,49 @@ export const BorrowerPoolList: FC = () => {
   }
 
   return (
-    <div className="pool-list-container">
-      <div className="pool-list-header">
-        <h2 className="pool-list-title">Available Credit Pools</h2>
+    <div className="tap-page">
+      <div className="card">
+        <h2 className="section-title">Available Credit Pools</h2>
         <div className="pool-list-columns">
-          <span>Trading Pair</span>
-          <span>Pool Address</span>
-          <span>Action</span>
+          <div>
+            <span className="secondary-text">Trading Pair</span>
+          </div>
+          <div>
+            <span className="secondary-text">Pool Address</span>
+          </div>
+          <div>
+            <span className="secondary-text">Action</span>
+          </div>
         </div>
       </div>
       
       {pools.length === 0 ? (
-        <div className="no-pools-message">
-          No pools available
+        <div className="card">
+          <span className="code-text">No pools available</span>
         </div>
       ) : (
         <div className="pool-list">
           {pools.map((pool) => (
             <div 
               key={pool.poolPk.toString()} 
-              className="pool-list-item"
+              className="card gradient-border"
               onClick={() => setSelectedPool(pool)}
             >
               <div className="pool-item-content">
-                <div className="pool-pair">
-                  <span>{pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</span>
-                  <span className="separator">/</span>
-                  <span>{pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</span>
+              <div>
+                  <span className="code-text address-pair">
+                    <span>{pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</span>
+                    <span className="secondary-text">/</span>
+                    <span>{pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</span>
+                  </span>
                 </div>
-                <div className="pool-address">
-                  {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}
+                <div>
+                  <span className="code-text">
+                    {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}
+                  </span>
                 </div>
-                <button className="view-details-btn">
-                  View Details
+                <button className="btn btn-primary">
+                  Details
                 </button>
               </div>
             </div>

@@ -5,8 +5,9 @@ import { borrow } from '../utils/borrow';
 import BN from 'bn.js';
 import { PoolInfo } from '../utils/getPoolList';
 import { PoolDetailInfo } from '../utils/getPoolDetail';
-import '../style/BorrowForm.css';
 import { BASE_RATE } from '../utils/constants';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 interface BorrowFormProps {
   pool: PoolInfo;
@@ -68,25 +69,27 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, details, onSuccess }) =>
     }
   };
 
-  const minCollateralRatio = (pool.minCollateralRatio / 100).toFixed(2);
-
   return (
-    <div className="form-wrapper">
-      <h3>Borrow Tokens</h3>
+    <div className="card gradient-border compact">
+      <h3 className="section-title">Borrow Tokens</h3>
+      
       {error && (
-        <div className="error-message">
+        <div className="secondary-text" style={{ color: 'var(--error)' }}>
           {error}
         </div>
       )}
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>
-            Amount to Borrow (Token A):
-            <span className="max-amount">
+          <div className="code-text">
+            <span className="secondary-text">Amount to Borrow (Token A)</span>
+            <span className="highlight-text">
               Max: {maxBorrowAmount.toFixed(6)}
             </span>
-          </label>
+          </div>
+          
           <input
+            className="input"
             type="number"
             value={borrowAmount}
             onChange={(e) => setBorrowAmount(e.target.value)}
@@ -98,23 +101,20 @@ export const BorrowForm: FC<BorrowFormProps> = ({ pool, details, onSuccess }) =>
             disabled={isLoading}
           />
         </div>
-        <div className="lending-pool-info-summary">
-          <div>Pool: {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}</div>
-          <div>Token A (Borrow): {pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</div>
-          <div>Token B (Collateral): {pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</div>
-          <div>Min Collateral Ratio: {minCollateralRatio}%</div>
-          <div>Base Rate: {(pool.fee / 100).toFixed(2)}%</div>
-        </div>
-        <div className="warning-message">
+
+        <div className="note-text" style={{ marginBottom: 'var(--spacing-md)' }}>
           Note: Please ensure you provide sufficient collateral based on the minimum collateral ratio.
         </div>
-        <button 
-          type="submit" 
-          className="action-button"
-          disabled={isLoading || !wallet}
-        >
-          {isLoading ? 'Processing...' : 'Confirm Borrow'}
-        </button>
+
+        <div className="align-center">
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={isLoading || !wallet}
+          >
+            {isLoading ? 'Processing...' : 'Confirm Borrow'}
+          </button>
+        </div>
       </form>
     </div>
   );

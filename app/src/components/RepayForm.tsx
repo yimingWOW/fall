@@ -3,6 +3,8 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { repay } from '../utils/repay';
 import { PoolInfo } from '../utils/getPoolList';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 interface RepayFormProps {
   pool: PoolInfo;
@@ -48,27 +50,29 @@ export const RepayForm: FC<RepayFormProps> = ({ pool, onSuccess }) => {
   };
 
   return (
-    <div className="form-wrapper">
-      <h3>Repay Loan</h3>
+    <div className="card gradient-border compact">
+      <h3 className="section-title">Repay Loan</h3>
+      
       {error && (
-        <div className="error-message">
+        <div className="secondary-text" style={{ color: 'var(--error)' }}>
           {error}
         </div>
       )}
+
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <div className="info-message">
-            Repaying your loan will return your collateral proportionally.
-          </div>
+        <div className="note-text" style={{ marginBottom: 'var(--spacing-md)' }}>
+          Repaying your loan will return your collateral proportionally.
         </div>
 
-        <button 
-          type="submit" 
-          className="action-button"
-          disabled={isLoading || !wallet}
-        >
-          {isLoading ? 'Processing...' : 'Confirm Repay'}
-        </button>
+        <div className="align-center">
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={isLoading || !wallet}
+          >
+            {isLoading ? 'Processing...' : 'Confirm Repay'}
+          </button>
+        </div>
       </form>
     </div>
   );

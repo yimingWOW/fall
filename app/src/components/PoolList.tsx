@@ -1,9 +1,10 @@
 import { FC, useState, useEffect } from 'react';
-import { useConnection } from '@solana/wallet-adapter-react';
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { PoolInfo, getPoolList } from '../utils/getPoolList';
 import { PoolItem } from './PoolItem';
-import { useAnchorWallet } from '@solana/wallet-adapter-react';
-import '../style/PoolList.css';
+import { CreatePoolForm } from './CreatePoolForm';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 export const PoolList: FC = () => {
   const wallet = useAnchorWallet();
@@ -11,12 +12,13 @@ export const PoolList: FC = () => {
   const [pools, setPools] = useState<PoolInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPool, setSelectedPool] = useState<PoolInfo | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [lastTxSignature, setLastTxSignature] = useState<string>('');
 
   const fetchPools = async () => {
     try {
       setIsLoading(true);
-      const poolList = await getPoolList( wallet, connection);
+      const poolList = await getPoolList(wallet, connection);
       setPools(poolList);
     } catch (error) {
       console.error('Error fetching pools:', error);
@@ -27,26 +29,37 @@ export const PoolList: FC = () => {
 
   useEffect(() => {
     fetchPools();
-  }, [connection, lastTxSignature]);
+  }, [connection, wallet, lastTxSignature]);
 
   if (isLoading) {
     return (
-      <div className="pool-list-loading">
+      <div className="tap-page">
         <div className="loading-spinner"></div>
-        <p>Loading pools...</p>
       </div>
+    );
+  }
+
+  if (showCreateForm) {
+    return (
+      <CreatePoolForm 
+        onShowForm={setShowCreateForm}
+        onSuccess={(signature) => {
+          setLastTxSignature(signature);
+          setShowCreateForm(false);
+        }}
+      />
     );
   }
 
   if (selectedPool) {
     return (
-      <div className="pool-detail-view">
+      <div className="tap-page">
         <div className="back-button-container">
           <button 
-            className="back-button"
+            className="btn btn-primary"
             onClick={() => setSelectedPool(null)}
           >
-            ← Back to Pool List
+            Back
           </button>
         </div>
         <PoolItem 
@@ -61,38 +74,57 @@ export const PoolList: FC = () => {
   }
 
   return (
-    <div className="pool-list-container">
-      <div className="pool-list-header">
-        <h2 className="pool-list-title">Available Pools</h2>
+    <div className="tap-page">
+      <div className="card">
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: 'var(--spacing-md)'
+        }}>
+          <h2 className="section-title">Available Pools</h2>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowCreateForm(true)}
+          >
+            Create Pool
+          </button>
+        </div>
+        
         <div className="pool-list-columns">
-          <span>Trading Pair</span>
-          <span>Pool Address</span>
-          <span>Action</span>
+          <span className="secondary-text">Trading Pair</span>
+          <span className="secondary-text">Pool Address</span>
+          <span className="secondary-text">Action</span>
         </div>
       </div>
+      
       {pools.length === 0 ? (
-        <div className="no-pools-message">
-          No pools available
+        <div className="card">
+          <span className="code-text">No pools available</span>
         </div>
       ) : (
         <div className="pool-list">
           {pools.map((pool) => (
             <div 
               key={pool.poolPk.toString()} 
-              className="pool-list-item"
+              className="card gradient-border"
               onClick={() => setSelectedPool(pool)}
             >
               <div className="pool-item-content">
-                <div className="pool-pair">
-                  <span>{pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</span>
-                  <span className="separator">/</span>
-                  <span>{pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</span>
+              <div>
+                  <span className="code-text address-pair">
+                    <span>{pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</span>
+                    <span className="secondary-text">/</span>
+                    <span>{pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}</span>
+                  </span>
                 </div>
-                <div className="pool-address">
-                  {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}
+                <div>
+                  <span className="code-text">
+                    {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}
+                  </span>
                 </div>
-                <button className="view-details-btn">
-                  View Details
+                <button className="btn btn-primary">
+                  Details
                 </button>
               </div>
             </div>

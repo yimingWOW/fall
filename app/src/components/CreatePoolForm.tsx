@@ -3,16 +3,21 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { createPool } from '../utils/createPool';
 import { useAmm } from '../contexts/AmmContext';
-import '../style/CreatePoolForm.css';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
-export const CreatePoolForm: FC = () => {
+interface CreatePoolFormProps {
+  onShowForm: (show: boolean) => void;
+  onSuccess?: (signature: string) => void;
+}
+
+export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const { amm } = useAmm();
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [lastTxSignature, setLastTxSignature] = useState<string>("");
-  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     mintA: '',
     mintB: '',
@@ -53,7 +58,8 @@ export const CreatePoolForm: FC = () => {
       
       setLastTxSignature(signature.toString());
       setFormData({ mintA: '', mintB: '', fee: '500' });
-      setShowForm(false);
+      onSuccess?.(signature.toString());
+      onShowForm(false);
     } catch (err) {
       console.error("Error creating pool:", err);
       setError(err instanceof Error ? err.message : "Failed to create pool");
@@ -62,54 +68,47 @@ export const CreatePoolForm: FC = () => {
     }
   };
 
-  if (!showForm) {
-    return (
-      <div className="create-pool-button-wrapper">
+  return (
+    <div className="tap-page">
+      <div className="back-button-container">
         <button 
-          className="create-pool-button"
-          onClick={() => setShowForm(true)}
+          className="btn btn-primary"
+          onClick={() => onShowForm(false)}
+          style={{ marginBottom: 'var(--spacing-md)' }}
         >
-          <div className="button-content">
-            <span className="plus-icon">+</span>
-            <span className="button-text">Create Pool</span>
-          </div>
+          Back
         </button>
       </div>
-    );
-  }
 
-  return (
-    <div className="create-pool-form-container">
-      <button 
-        className="back-button"
-        onClick={() => setShowForm(false)}
-      >
-        ← Back to Pool List
-      </button>
 
-      <div className="create-pool-form">
-        <h2 className="form-title">Create New Pool</h2>
+      <div className="card gradient-border">
+        <h2 className="section-title">Create New Pool</h2>
         {error && (
-          <div className="error-message">
+          <div className="code-text" style={{ color: 'var(--error)' }}>
             {error}
           </div>
         )}
         {lastTxSignature && (
-          <div className="success-message">
-            Pool created successfully! 
+          <div>
+            <span className="code-text" style={{ color: 'var(--primary)' }}>
+              Pool created successfully! 
+            </span>
             <a 
               href={`https://explorer.solana.com/tx/${lastTxSignature}`} 
               target="_blank" 
               rel="noopener noreferrer"
+              className="code-text"
+              style={{ marginLeft: 'var(--spacing-xs)' }}
             >
               View transaction
             </a>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="form">
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>AMM Pubkey:</label>
+            <span className="sub-title">AMM Pubkey</span>
             <input
+              className="input"
               type="text"
               value={amm ? amm.pubkey : ''}
               readOnly
@@ -117,8 +116,9 @@ export const CreatePoolForm: FC = () => {
             />
           </div>
           <div className="form-group">
-            <label>Token A Mint Address:</label>
+            <span className="sub-title">Token A Mint Address</span>
             <input
+              className="input"
               type="text"
               value={formData.mintA}
               onChange={(e) => setFormData({...formData, mintA: e.target.value})}
@@ -128,8 +128,9 @@ export const CreatePoolForm: FC = () => {
             />
           </div>
           <div className="form-group">
-            <label>Token B Mint Address:</label>
+            <span className="sub-title">Token B Mint Address</span>
             <input
+              className="input"
               type="text"
               value={formData.mintB}
               onChange={(e) => setFormData({...formData, mintB: e.target.value})}
@@ -139,8 +140,9 @@ export const CreatePoolForm: FC = () => {
             />
           </div>
           <div className="form-group">
-            <label>Fee (in basis points, 1-10000, default: 500 or 5%):</label>
+            <span className="sub-title">Fee (in basis points, 1-10000, default: 500 or 5%)</span>
             <input
+              className="input"
               type="text"
               value={formData.fee}
               onChange={(e) => setFormData({...formData, fee: e.target.value})}
@@ -149,13 +151,15 @@ export const CreatePoolForm: FC = () => {
               disabled={isLoading}
             />
           </div>
+          <div className="align-center">
           <button 
             type="submit" 
-            className="submit-button"
+            className="btn btn-primary"
             disabled={isLoading || !wallet}
           >
             {isLoading ? 'Creating...' : 'Create Pool'}
-          </button>
+            </button>
+          </div>
         </form>
       </div>
     </div>

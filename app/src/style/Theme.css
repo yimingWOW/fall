@@ -1,0 +1,322 @@
+:root {
+  /* 主题颜色 */
+  --primary: #9945FF;     
+  --primary-dark: #9945FF;
+  --secondary: #9945FF;  
+  --secondary-dark: #7B35CC;
+  
+  /* 背景颜色 */
+  --bg-primary: #1a1b23;
+  --bg-secondary: #23242f;
+  --bg-hover: #2a2b38;
+  
+  /* 文字颜色 */
+  --text-primary: #ffffff;
+  --text-secondary: #8f90a0;
+  --text-muted: #888888;
+  
+  /* 特效 */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-blur: blur(10px);
+  
+  /* 间距 */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 2.5rem;
+  
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* 错误颜色变量 */
+  --error: #ff4d4f;
+}
+
+/* 通用容器样式 */
+.tap-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;     /* 容器本身居中 */
+  padding: var(--spacing-md);
+}
+
+/* 通用按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 主要按钮样式 */
+.btn.btn-primary {
+  background: var(--secondary);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  text-align: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.btn.btn-primary:hover {
+  background: var(--secondary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn.btn-primary:disabled {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 按钮内的图标和文本布局 */
+.btn .code-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* 卡片基础样式 */
+.card {
+  width: 100%;
+  max-width: 1200px;  /* 添加最大宽度 */
+  margin: 0 auto;     /* 容器本身居中 */
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  line-height: 1.6;
+}
+
+/* 渐变边框卡片 */
+.card.gradient-border {
+  position: relative;
+  background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+              linear-gradient(45deg, var(--primary), var(--secondary)) border-box;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  width: 100%;          /* 占满容器宽度 */
+  margin: 0 auto;       /* 水平居中 */
+}
+
+.card.gradient-border:hover,
+.card.gradient-border.compact:hover {
+  background: var(--bg-hover);
+  border: 2px solid transparent;
+  border-image: linear-gradient(45deg, var(--primary), var(--secondary)) 1;
+  border-left-color: var(--primary);
+}
+
+/* 新增窄版卡片样式 */
+.card.gradient-border.compact {
+  max-width: 720px;     /* 限制最大宽度 */
+  width: 100%;          /* 在最大宽度范围内占满宽度 */
+  margin: 0 auto;       /* 水平居中 */
+}
+
+/* 输入框容器样式 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* 水平居中 */
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  width: 100%;
+}
+
+/* 输入框样式 */
+.input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 240px;  /* 限制最大宽度 */
+  margin: 0 auto;    /* 水平居中 */
+  font-size: 0.9rem; /* 减小文字大小 */
+}
+
+.input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(20, 241, 149, 0.2);
+}
+
+/* 加载动画 */
+.loading-spinner {
+  border: 3px solid var(--bg-secondary);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 列表布局 */
+.pool-list-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;  /* 三等分 */
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);  /* 左右添加更多内边距 */
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.pool-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  width: 100%;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.pool-item-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-lg);  /* 减小上下内边距为 0.5rem */
+  align-items: center;
+}
+
+/* 表单组样式 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+/* 右对齐容器 */
+.align-right {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-md);
+}
+
+/* 居中对齐容器 */
+.align-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+/* 左对齐容器 */
+.align-left {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: var(--spacing-md);
+  width: 100%;         /* 确保容器占满宽度 */
+  max-width: 1200px;   /* 与其他内容保持一致的最大宽度 */
+  margin-left: auto;   /* 水平居中容器本身 */
+  margin-right: auto;  /* 水平居中容器本身 */
+  padding: 0 var(--spacing-md); /* 添加左右内边距 */
+}
+
+
+
+/* 标签导航样式 */
+.tab-nav {
+  position: fixed;
+  top: 72px; /* 导航栏高度 */
+  left: 0;
+  right: 0;
+  z-index: 99;
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: 0;
+  flex-wrap: wrap;
+}
+
+/* 标签按钮样式 */
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  background: var(--primary);
+}
+
+.tab-button.active .code-text,
+.tab-button.active .sub-title,
+.tab-button.active .section-title {
+  color: var(--bg-primary);
+}
+
+/* 返回按钮容器样式 */
+.back-button-container {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto var(--spacing-md) auto;
+  padding: 0 var(--spacing-md);  /* 与 tab-content 保持一致的内边距 */
+}
+
+/* 如果需要在某些场景下隐藏返回按钮容器 */
+.back-button-container.hidden {
+  display: none;
+}
+
+.address-pair {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  white-space: nowrap;
+}
+
+/* 为了防止内容被固定的tab-nav遮挡，需要给内容添加上边距 */
+.app-main {
+  padding-top: 64px; /* 根据tab-nav的实际高度调整 */
+}
+
+/* 添加内容区域样式 */
+.dashboard-content {
+  margin-top: 140px; /* 72px (nav) + 约68px (tab-nav高度) */
+  width: 100%;
+  padding: var(--spacing-md);
+}

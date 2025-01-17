@@ -3,7 +3,8 @@ import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { liquidate } from '../utils/liquidate';
 import { getPendingLiquidation } from '../utils/getPendingLiquidation';
-import '../styles/LiquidateForm.css';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 export const LiquidateForm: FC = () => {
   const wallet = useAnchorWallet();
@@ -15,9 +16,7 @@ export const LiquidateForm: FC = () => {
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [processingLiquidation, setProcessingLiquidation] = useState<string | null>(null);
 
-
   const handleSearch = async (e: React.FormEvent) => {
-
     e.preventDefault();
     if (!wallet || !poolAddress) {
       setError("Please connect wallet and enter pool address");
@@ -38,7 +37,6 @@ export const LiquidateForm: FC = () => {
       setIsLoadingList(false);
     }
   };
-
 
   const handleLiquidatePosition = async (borrowerKey: PublicKey) => {
     setError("");
@@ -80,73 +78,94 @@ export const LiquidateForm: FC = () => {
   };
 
   return (
-    <div className="liquidate-container">
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
-      {lastTxSignature && (
-        <div className="success-message">
-          Liquidation successful! 
-          <a 
-            href={`https://explorer.solana.com/tx/${lastTxSignature}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View transaction
-          </a>
-        </div>
-      )}
+    <div className="tap-page">
+      <div className="card gradient-border">
+        <h3 className="section-title">Liquidate Positions</h3>
+        
+        {error && (
+          <div className="body-text" style={{ color: 'var(--error)', marginBottom: 'var(--spacing-md)' }}>
+            {error}
+          </div>
+        )}
+        
+        {lastTxSignature && (
+          <div className="code-text" style={{ color: 'var(--primary)', marginBottom: 'var(--spacing-md)' }}>
+            Liquidation successful! 
+            <a 
+              href={`https://explorer.solana.com/tx/${lastTxSignature}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ marginLeft: 'var(--spacing-xs)' }}
+            >
+              View transaction
+            </a>
+          </div>
+        )}
 
-        <div className="search-form">
         <div className="form-group">
-          <label htmlFor="pool-address">Pool PublicKey(Could get from Lend page):</label>
-          <div className="input-with-button">
+          <div className="code-text">
+            <span className="body-text">
+              Pool PublicKey (Could get from Lend page)
+            </span>
+          </div>
+          
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-md)' }}>
             <input
-              id="pool-address"
+              className="input"
               type="text"
               value={poolAddress}
               onChange={(e) => setPoolAddress(e.target.value)}
               placeholder="Enter pool address"
-              className="input-field"
             />
             <button 
               onClick={handleSearch}
               disabled={isLoadingList || !wallet || !poolAddress}
-              className="search-button"
+              className="btn btn-primary"
+              style={{ minWidth: 'auto' }}
             >
               {isLoadingList ? 'Searching...' : 'Search'}
             </button>
           </div>
         </div>
 
-
-        <div className="pending-liquidations">
-          <h3>Pending Bankrupts</h3>
+        <div className="form-group">        
           {isLoadingList ? (
-            <div className="loading">Loading pending Bankrupts...</div>
+            <div className="code-text">
+              <div className="loading-spinner"></div>
+              <span className="body-text">
+              Loading pending Bankrupts...
+              </span>
+            </div>
           ) : pendingLiquidations.length === 0 ? (
-            <p>No pending Bankrupts found</p>
+            <div className="code-text">
+              <span className="body-text">
+                No pending Bankrupts found
+              </span>
+            </div>
           ) : (
-            <ul className="liquidation-list">
+            <div className="pool-list">
+              <h3 className="section-title">Pending Bankrupts</h3>
               {pendingLiquidations.map((item, index) => (
-                <li key={index} className="liquidation-item">
-                  <div>{item.toString()}</div>
-                  <button
-                    onClick={() => handleLiquidatePosition(item)}
-                    disabled={processingLiquidation === item.toString()}
-                    className="liquidate-button"
-                  >
-                    {processingLiquidation === item.toString() ? 'Processing...' : 'Liquidate to earn'}
-                  </button>
-                </li>
+                <div key={index} className="card gradient-border" 
+                     style={{ marginBottom: 'var(--spacing-sm)', padding: 'var(--spacing-sm)' }}>
+                  <div className="code-text" style={{ marginBottom: 'var(--spacing-sm)' }}>
+                    {item.toString()}
+                  </div>
+                  <div className="align-center">
+                    <button
+                      onClick={() => handleLiquidatePosition(item)}
+                      disabled={processingLiquidation === item.toString()}
+                      className="btn btn-primary"
+                    >
+                      {processingLiquidation === item.toString() ? 'Processing...' : 'Liquidate to earn'}
+                    </button>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>
     </div>
-
   );
 };

@@ -6,8 +6,9 @@ import { RepayForm } from './RepayForm';
 import { DepositCollateralForm } from './DepositCollateral';
 import { PoolInfo } from '../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
-import '../style/BorrowerPoolItem.css';
 import { BASE_RATE } from '../utils/constants';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 interface PoolItemProps {
   pool: PoolInfo;
@@ -42,157 +43,173 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   }, [pool, connection, walletPublicKey]);
 
   return (
-    <div className="pool-item">
-
-      <div className="pool-price-info">
-        <h4>Current Prices</h4>
+    <div className="tap-page">
+      <div className="card gradient-border">
+        <h2 className="section-title">Current Prices</h2>
         {isLoadingDetails ? (
-          <div className="loading-prices">Loading prices...</div>
+          <div className="loading-spinner"></div>
         ) : details ? (
           <>
-            <div className="pool-details">
-              <span className="pool-label">TokenA Amount in Liquidity Pool:</span>
-              <span className="pool-value">{details.poolInfo.tokenAAmount.toFixed(6)}</span>
-              <span className="pool-label">TokenB Amount in Liquidity Pool:</span>
-              <span className="pool-value">{details.poolInfo.tokenBAmount.toFixed(6)}</span>
-            </div>
-            <div className="pool-details">
-              <span className="pool-label">Price (A → B):</span>
-              <span className="pool-value">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
-              <span className="pool-label">Price (B → A):</span>
-              <span className="pool-value">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
+            <div className="pool-item-content">
+              <div>
+                <span className="body-text">
+                  Price (A → B)
+                </span>
+                <span className="code-text">
+                  1 A = {details.poolInfo.aToB.toFixed(6)} B
+                </span>
+              </div>
+              <div>
+                <span className="body-text">
+                  Price (B → A)
+                </span>
+                <span className="code-text">
+                  1 B = {details.poolInfo.bToA.toFixed(6)} A
+                </span>
+              </div>
             </div>
           </>
         ) : (
-          <div className="error-message">Failed to load prices</div>
+          <div className="secondary-text">Failed to load prices</div>
         )}
       </div>
 
-      <div className="lending-pool-info">
-        <h4>Credit Pool</h4>
+      <div className="card gradient-border">
+        <h2 className="section-title">Credit Pool</h2>
         {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
+          <div className="loading-spinner"></div>
         ) : details ? (
           <>
-            <div className="pool-details">
-              <span className="pool-label">Token A mint addr:</span>
-              <span className="pool-value" title={pool.mintA.toString()}>
-                {pool.mintA.toString()}
-              </span>
+            <div className="pool-item-content">
+              <div>
+                <span className="body-text">
+                  TokenA Addr
+                </span>
+                <span className="code-text" title={pool.mintA.toString()}>
+                  {pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}
+                </span>
+              </div>
+              <div>
+                <span className="body-text">
+                  TokenA Balance
+                </span>
+                <span className="code-text">
+                  {details.lendingPoolInfo.tokenAAmount.toFixed(6)}
+                </span>
+              </div>
             </div>
 
-            <div className="pool-details">
-              <span className="pool-label">Credit Pool tokenA Amount:</span>
-              <span className="pool-value">{details.lendingPoolInfo.tokenAAmount.toFixed(6)}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">Token B mint addr:</span>
-              <span className="pool-value" title={pool.mintB.toString()}>
-                {pool.mintB.toString()}
-              </span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">Credit Pool tokenB Amount:</span>
-              <span className="pool-value">{details.lendingPoolInfo.tokenBAmount.toFixed(6)}</span>
+            <div className="pool-item-content">
+              <div>
+                <span className="body-text">
+                  TokenB Addr
+                </span>
+                <span className="code-text" title={pool.mintB.toString()}>
+                  {pool.mintB.toString().slice(0, 4)}...{pool.mintB.toString().slice(-4)}
+                </span>
+              </div>
+              <div>
+                <span className="body-text">
+                  TokenB Balance
+                </span>
+                <span className="code-text">
+                  {details.lendingPoolInfo.tokenBAmount.toFixed(6)}
+                </span>
+              </div>
             </div>
             
-            <div className="pool-details">
-              <span className="pool-label">Min Collateral Ratio:</span>
-              <span className="pool-value" title={pool.minCollateralRatio.toString()}>
-                {(pool.minCollateralRatio/BASE_RATE).toFixed(6)}
-              </span>
-            </div>
-
-
-          </>
-        ) : (
-          <div className="error-message">Failed to load credit pool details</div>
-        )}
-      </div>
-
-      <div className="user-assets-details">
-        <h4>Your Assets</h4>
-        {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading credit pool details...</div>
-        ) : details ? (
-          <>
-            <div className="pool-details">
-              <span className="pool-label">You have borrowed tokenA amount:</span>
-              <span className="pool-value">{details.userAssets.borrowReceiptAmount}</span>
-            </div>
-
-            <div className="pool-details">
-              <span className="pool-label">You have deposited collateral TokenB amount:</span>
-              <span className="pool-value">{details.userAssets.collateralReceiptAmount}</span>
+            <div className="pool-item-content">
+              <div>
+                <span className="body-text">
+                  Min Collateral Ratio
+                </span>
+                <span className="code-text">
+                  {(pool.minCollateralRatio/BASE_RATE*100).toFixed(2)}%
+                </span>
+              </div>
             </div>
           </>
         ) : (
-          <div className="error-message">Failed to load lending pool details</div>
+          <div className="secondary-text">Failed to load credit pool details</div>
         )}
       </div>
 
-      <div className="user-lending-details">
+      <div className="card gradient-border">
+        <h2 className="section-title">Your Assets</h2>
         {isLoadingDetails ? (
-          <div className="loading-lending-pool-details">Loading lending pool details...</div>
+          <div className="loading-spinner"></div>
         ) : details ? (
           <>
+            <div className="pool-item-content">
+              <div>
+                <span className="body-text">
+                  Borrowed tokenA
+                </span>
+                <span className="code-text">
+                  {details.userAssets.borrowReceiptAmount}
+                </span>
+              </div>
+              <div>
+                <span className="body-text">
+                  Collateral TokenB
+                </span>
+                <span className="code-text">
+                  {details.userAssets.collateralReceiptAmount}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="secondary-text">Failed to load lending pool details</div>
+        )}
+      </div>
 
-          <div className="lending-pool-action-buttons">
+      <div className="card gradient-border">
+        <h2 className="section-title">Actions</h2>
+
+        {isLoadingDetails ? (
+          <div className="loading-spinner"></div>
+        ) : details ? (
+          <>
             <button
-              className="lending-pool-action-button"
+              className="btn btn-primary"
               onClick={() => setShowDepositCollateral(!showDepositCollateral)}
             >
-              {showDepositCollateral ? 'Hide DepositCollateral' : 'DepositCollateral'}
+              {showDepositCollateral ? 'Show Borrow/Repay' : 'Show Deposit Collateral'}
             </button>
-          </div>
 
-          {showDepositCollateral && (
-            <div className="form-container">
+            {showDepositCollateral ? (
               <DepositCollateralForm 
                 pool={pool}
-                onSuccess={(signature) => {
-                  onTxSuccess(signature);
-                  setShowDepositCollateral(false);
-                  fetchDetails();
-                }}
-              />
-            </div>
-          )}
-
-            {Number(details.userAssets.borrowReceiptAmount) === 0 ? (
-              <BorrowForm 
-                pool={pool}
-                details={details}
                 onSuccess={(signature) => {
                   onTxSuccess(signature);
                   fetchDetails();
                 }}
               />
             ) : (
-              <RepayForm 
-                pool={pool}
-                onSuccess={(signature) => {
-                  onTxSuccess(signature);
-                  fetchDetails();
-                }}
-              />
+              Number(details.userAssets.borrowReceiptAmount) === 0 ? (
+                <BorrowForm 
+                  pool={pool}
+                  details={details}
+                  onSuccess={(signature) => {
+                    onTxSuccess(signature);
+                    fetchDetails();
+                  }}
+                />
+              ) : (
+                <RepayForm 
+                  pool={pool}
+                  onSuccess={(signature) => {
+                    onTxSuccess(signature);
+                    fetchDetails();
+                  }}
+                />
+              )
             )}
           </>
         ) : (
-          <div className="error-message">Failed to load lending pool details</div>
+          <div className="secondary-text">Failed to load lending pool details</div>
         )}
-      </div>
-
-      <div className="lending-pool-actions">
-        <button 
-          className="lending-pool-refresh-button"
-          onClick={fetchDetails}
-          disabled={isLoadingDetails}
-        >
-          {isLoadingDetails ? 'Loading...' : '🔄 Refresh'}
-        </button>
       </div>
     </div>
   );

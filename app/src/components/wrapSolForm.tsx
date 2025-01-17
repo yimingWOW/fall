@@ -1,21 +1,19 @@
 import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
-import { redeem } from '../utils/redeem';
-import { PoolInfo } from '../utils/getPoolList';
+import { wrapSol } from '../utils/wrapSol';
 import '../style/Theme.css';
 import '../style/Typography.css';
 
-interface RedeemFormProps {
-  pool: PoolInfo;
+interface WrapSolFormProps {
   onSuccess: (signature: string) => void;
 }
 
-export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
+export const WrapSolForm: FC<WrapSolFormProps> = ({ onSuccess }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,19 +26,24 @@ export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
       return;
     }
 
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      setError("Please enter a valid amount");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const poolPubkey = new PublicKey(pool.poolPk);
-      const signature = await redeem(
-        wallet,
+      const signature = await wrapSol(
         connection,
-        poolPubkey,
+        wallet,
+        Number(amount)
       );
-      
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature}`);
       onSuccess(signature);
+      setAmount(""); // Reset form after success
     } catch (err) {
-      console.error("Error redeeming:", err);
-      setError(err instanceof Error ? err.message : "Failed to redeem");
+      console.error("Error wrapping SOL:", err);
+      setError(err instanceof Error ? err.message : "Failed to wrap SOL");
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +51,7 @@ export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
 
   return (
     <div className="card gradient-border compact">
-      <h3 className="section-title">Redeem Tokens</h3>
+      <h3 className="section-title">Wrap SOL</h3>
       
       {error && (
         <div className="secondary-text" style={{ color: 'var(--error)' }}>
@@ -57,17 +60,31 @@ export const RedeemForm: FC<RedeemFormProps> = ({ pool, onSuccess }) => {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="note-text" style={{ marginBottom: 'var(--spacing-md)' }}>
-          Note: This will redeem all your lending receipt and return your tokenA.
+        <div style={{ marginBottom: 'var(--spacing-md)' }}>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Enter SOL amount"
+            step="any"
+            min="0"
+            className="input-field"
+            style={{
+              width: '100%',
+              padding: '8px',
+              borderRadius: '4px',
+              border: '1px solid var(--border-color)'
+            }}
+          />
         </div>
 
         <div className="align-center">
           <button 
             type="submit" 
             className="btn btn-primary"
-            disabled={isLoading || !wallet}
+            disabled={isLoading || !wallet || !amount}
           >
-            {isLoading ? 'Processing...' : 'Confirm Redeem'}
+            {isLoading ? 'Processing...' : 'Wrap SOL'}
           </button>
         </div>
       </form>

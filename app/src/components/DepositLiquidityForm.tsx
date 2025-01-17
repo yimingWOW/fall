@@ -53,39 +53,48 @@ export const DepositLiquidityForm: FC<DepositLiquidityFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="deposit-form">
-      {error && <div className="error-message">{error}</div>}
-      <div className="form-group">
-        <label>Amount Token A:</label>
-        <input
-          type="number"
-          step="any"
-          value={formData.amountA}
-          onChange={(e) => setFormData({...formData, amountA: e.target.value})}
-          placeholder="Enter amount for token A"
-          required
-          disabled={isLoading}
-        />
-      </div>
-      <div className="form-group">
-        <label>Amount Token B:</label>
-        <input
-          type="number"
-          step="any"
-          value={formData.amountB}
-          onChange={(e) => setFormData({...formData, amountB: e.target.value})}
-          placeholder="Enter amount for token B"
-          required
-          disabled={isLoading}
-        />
-      </div>
-      <button 
-        type="submit" 
-        className="submit-button"
-        disabled={isLoading || !wallet}
-      >
-        {isLoading ? 'Depositing...' : 'Confirm Deposit'}
-      </button>
-    </form>
+    <div className="card gradient-border">
+      <h2 className="section-title">Deposit Liquidity</h2>
+      {error && (
+        <div className="code-text" style={{ color: 'var(--error)' }}>
+          {error}
+        </div>
+      )}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <span className="sub-title">Amount Token A</span>
+          <input
+            className="input"
+            type="number"
+            step="any"
+            value={formData.amountA}
+            onChange={(e) => setFormData({...formData, amountA: e.target.value})}
+            placeholder="Enter amount for token A"
+            required
+            disabled={isLoading}
+          />
+        </div>
+        <div className="form-group">
+          <span className="sub-title">Amount Token B</span>
+          <input
+            className="input"
+            type="number"
+            step="any"
+            value={formData.amountB}
+            onChange={(e) => setFormData({...formData, amountB: e.target.value})}
+            placeholder="Enter amount for token B"
+            required
+            disabled={isLoading}
+          />
+        </div>
+        <button 
+          type="submit" 
+          className="btn btn-primary"
+          disabled={isLoading || !wallet}
+        >
+          {isLoading ? 'Depositing...' : 'Confirm Deposit'}
+        </button>
+      </form>
+    </div>
   );
 }; 

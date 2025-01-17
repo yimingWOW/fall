@@ -1,0 +1,100 @@
+/* 标题样式 */
+.gradient-title {
+    font-size: 2.5rem;
+    text-align: center;
+    background: linear-gradient(45deg, #9945FF, #14F195);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+  
+  /* 子标题样式 */
+  .section-title {
+    font-size: 1.5rem;
+    color: #14F195;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+  
+  /* 小标题样式 */
+  .sub-title {
+    font-size: 1.3rem;
+    color: #9945FF;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  
+  /* 正文样式 */
+  .body-text {
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  /* 次要文字样式 */
+  .secondary-text {
+    color: #8f90a0;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  
+  /* 链接样式 */
+  .text-link {
+    color: #14F195;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .text-link:hover {
+    color: #9945FF;
+  }
+  
+  /* 强调文字 */
+  .highlight-text {
+    color: #9945FF;
+    font-weight: 500;
+  }
+  
+  /* 代码文字 */
+  .code-text {
+    font-family: 'Courier New', Courier, monospace;
+    color: #14F195;
+    display: flex;
+    align-items: center;  /* 改为居中对齐 */
+    gap: var(--spacing-xs);
+    width: 100%;
+    line-height: 1.6;
+    font-size: 1rem; 
+    font-weight: 500;
+  }
+  
+  /* 注释文字 */
+  .note-text {
+    font-size: 0.9rem;
+    color: #888;
+    font-style: italic;
+    line-height: 1.2;
+  }
+
+    .code-text.column {  /* 添加新的类用于需要垂直布局的情况 */
+        flex-direction: column;
+        text-align: center;
+    }
+  
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .gradient-title {
+      font-size: 2rem;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+    }
+    
+    .sub-title {
+      font-size: 1.2rem;
+    }
+  } 

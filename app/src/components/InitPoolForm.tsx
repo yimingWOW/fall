@@ -52,18 +52,21 @@ export const InitPoolForm: FC<InitPoolFormProps> = ({ pool, onSuccess }) => {
   };
 
   return (
-    <div className="init-pool-container">
+    <div className="card gradient-border">
+      <h2 className="section-title">Initialize Pool</h2>
       {error && (
-        <div className="error-message">
+        <div className="code-text" style={{ color: 'var(--error)' }}>
           {error}
         </div>
       )}
       <button 
         onClick={handleInitPool}
-        className="submit-button"
+        className="btn btn-primary"
         disabled={isLoading || !wallet}
       >
-        {isLoading ? 'Initializing...' : 'Initialize Pool'}
+        <span className="code-text">
+          {isLoading ? 'Initializing...' : 'Initialize Pool'}
+        </span>
       </button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { WrapSolForm } from './wrapSolForm';
 import '../style/Guide.css';
 
 export const Guide: FC = () => {
@@ -23,14 +24,8 @@ export const Guide: FC = () => {
         <section className="guide-section">
           <h2>Setup Instructions</h2>
           <div className="guide-step">
-            <h3>Convert SOL to WSOL</h3>
-            <div className="code-block">
-              <code>spl-token wrap 1</code>
-              <button className="copy-button" onClick={() => navigator.clipboard.writeText('spl-token wrap 1')}>
-                Copy
-              </button>
-            </div>
-            <p className="note">Note: This requires spl-token and solana-cli. Visit the <a href="https://solana.com/docs/intro/installation" target="_blank" rel="noopener noreferrer">Solana Docs</a> for installation guide.</p>
+            <h3>Convert SOL to WSOL for trading in Wsol-USDT Pool</h3>
+            <WrapSolForm onSuccess={() => {}} />
           </div>
         </section>
 

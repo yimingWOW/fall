@@ -8,80 +8,37 @@
 }
 
 .app-nav {
-    width: 100%;
-    height: 72px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-}
-
-.nav-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  padding: 0 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 100;
 }
 
-.nav-left {
+.brand {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
-.app-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  background: linear-gradient(45deg, #7A4FF3, #9B6FFF);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0;
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-
-.network-select {
-  appearance: none;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: white;
-  padding: 0.5rem 2rem 0.5rem 1rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 140px;
-  position: relative;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.7rem center;
-}
-
-.network-select:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.network-select option {
-  background: #1C1C28;
-  color: white;
-  padding: 8px;
-}
-
-
-.wallet-button {
-  background: #7A4FF3 !important;
-  border-radius: 12px !important;
-  padding: 0.5rem 1.5rem !important;
-  height: auto !important;
-  transition: all 0.2s ease !important;
-}
-
-.wallet-button:hover {
-  background: #8A5FF3 !important;
-  opacity: 0.9;
+.app-logo {
+  height: 64px;
+  width: auto;
+  display: block;
 }
 
 /* 主内容区域 */
@@ -151,17 +108,6 @@
   }
 } 
 
-.app-logo {
-  height: 32px; /* 调整大小 */
-  width: auto;
-  margin-right: 12px;
-}
-
-.nav-left {
-  display: flex;
-  align-items: center;
-}
-
 .connect-logo {
   width: 64px; /* 调整大小 */
   height: auto;
@@ -177,7 +123,7 @@
 
 .social-icon {
   color: #ffffff;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   transition: color 0.2s ease;
 }
 
@@ -205,4 +151,9 @@
 
 .social-icon:hover {
   color: #9945FF;
+} 
+
+.fall-title {
+  margin: 0;
+  line-height: 1;
 } 

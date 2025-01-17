@@ -6,8 +6,9 @@ import { NetworkSelect } from './WalletContextProvider';
 import { useNetwork } from './contexts/NetworkContext';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './style/App.css';
-import logo from '../public/favicon.png'; 
-
+import './style/Theme.css';
+import './style/Typography.css';
+import logo from '../public/favicon.png';
 
 const App: FC = () => {
   const { connected } = useWallet();
@@ -16,28 +17,26 @@ const App: FC = () => {
   return (
     <div className="app-container">
       <nav className="app-nav">
-        <div className="nav-content">
-          <div className="nav-left">
-            <img src={logo} alt="Fall Logo" className="app-logo" />
-            <h1 className="app-title">Fall</h1>
-          </div>
-          <div className="nav-right">
-            <NetworkSelect 
-              onChange={setNetwork} 
-              value={network} 
-            />
-            <WalletMultiButton className="wallet-button" />
-          </div>
+        <div className="brand">
+          <img src={logo} alt="Fall Logo" className="app-logo" />
+          <h1 className="fall-title">Fall</h1>
+        </div>
+        <div className="controls">
+          <NetworkSelect 
+            onChange={setNetwork} 
+            value={network} 
+          />
+          <WalletMultiButton className="btn btn-primary" />
         </div>
       </nav>
 
       <main className="app-main">
         {!connected ? (
           <div className="connect-wallet">
-            <div className="connect-card">
+            <div className="card gradient-border compact">
               <img src={logo} alt="Fall Logo" className="connect-logo" />
-              <h2>Welcome to Fall</h2>
-              <p>Please connect your wallet to continue</p>
+              <h2 className="section-title">Welcome to Fall</h2>
+              <p className="body-text">Please connect your wallet to continue</p>
             </div>
           </div>
         ) : (
@@ -50,7 +49,7 @@ const App: FC = () => {
           href="https://github.com/yimingWOW/fall" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="social-icon"
+          className="text-link"
         >
           <i className="fab fa-github"></i>
         </a>
@@ -58,7 +57,7 @@ const App: FC = () => {
           href="https://x.com/fall_labs" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="social-icon"
+          className="text-link"
         >
           <i className="fa-brands fa-x-twitter"></i>
         </a>

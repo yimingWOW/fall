@@ -4,7 +4,8 @@ import { PublicKey } from '@solana/web3.js';
 import { lend } from '../utils/lend';
 import BN from 'bn.js';
 import { PoolInfo } from '../utils/getPoolList';
-import '../style/LendForm.css';
+import '../style/Theme.css';
+import '../style/Typography.css';
 
 interface LendFormProps {
   pool: PoolInfo;
@@ -30,13 +31,11 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
     }
 
     try {
-      // 验证金额
       const lendAmount = parseFloat(amount);
       if (isNaN(lendAmount) || lendAmount <= 0) {
         throw new Error("Invalid amount");
       }
 
-      // 从 lendingPool 对象获取必要的公钥
       const poolPubkey = new PublicKey(pool.poolPk);
       const signature = await lend(
         wallet,
@@ -46,7 +45,7 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
       );
       
       console.log(`Transaction URL: https://explorer.solana.com/tx/${signature.tx}`);
-      setAmount(""); // 重置表单
+      setAmount("");
       onSuccess(signature.tx);
     } catch (err) {
       console.error("Error lending:", err);
@@ -56,19 +55,24 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
     }
   };
 
-  console.log(pool);
   return (
-    <div className="form-wrapper">
-      <h3>Lend TokenA</h3>
+    <div className="card gradient-border compact">
+      <h3 className="section-title">Lend Tokens</h3>
+      
       {error && (
-        <div className="error-message">
+        <div className="secondary-text" style={{ color: 'var(--error)', marginBottom: 'var(--spacing-md)' }}>
           {error}
         </div>
       )}
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Token A Amount to Lend:</label>
+          <div className="code-text">
+            <span className="secondary-text">Amount to Lend (Token A):</span>
+          </div>
+          
           <input
+            className="input"
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -79,13 +83,22 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
             disabled={isLoading}
           />
         </div>
-        <button 
-          type="submit" 
-          className="action-button"
-          disabled={isLoading || !wallet}
-        >
-          {isLoading ? 'Processing...' : 'Confirm Lend'}
-        </button>
+
+        <div className="code-text" style={{ marginBottom: 'var(--spacing-md)' }}>
+          <span className="secondary-text">
+            Note: By lending tokens, you'll receive interest based on the pool's lending rate.
+          </span>
+        </div>
+
+        <div className="align-center">
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={isLoading || !wallet}
+          >
+            {isLoading ? 'Processing...' : 'Confirm Lend'}
+          </button>
+        </div>
       </form>
     </div>
   );

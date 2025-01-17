@@ -57,17 +57,18 @@ export const DepositCollateralForm: FC<DepositCollateralFormProps> = ({ pool, on
   };
 
   return (
-    <div className="form-wrapper">
-      <h3>DepositCollateral Tokens</h3>
+    <div className="card gradient-border compact">
+      <h2 className="section-title">Deposit Collateral</h2>
       {error && (
-        <div className="error-message">
+        <div className="code-text" style={{ color: 'var(--error)' }}>
           {error}
         </div>
       )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Amount to DepositCollateral:</label>
+          <span className="sub-title">Amount to Deposit</span>
           <input
+            className="input"
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -80,10 +81,10 @@ export const DepositCollateralForm: FC<DepositCollateralFormProps> = ({ pool, on
         </div>
         <button 
           type="submit" 
-          className="action-button"
+          className="btn btn-primary"
           disabled={isLoading || !wallet}
         >
-          {isLoading ? 'Processing...' : 'Confirm DepositCollateral'}
+          {isLoading ? 'Processing...' : 'Confirm Deposit'}
         </button>
       </form>
     </div>
