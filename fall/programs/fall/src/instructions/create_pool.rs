@@ -79,8 +79,6 @@ pub fn create_pool(ctx: Context<CreatePool>, fee: u16) -> Result<()> {
     pool.amm = ctx.accounts.amm.key();
     pool.mint_a = ctx.accounts.mint_a.key();
     pool.mint_b = ctx.accounts.mint_b.key();
-    pool.fee = fee;
-    pool.min_collateral_ratio = 20000;
     pool.borrow_interest_accumulator_block_height = Clock::get()?.slot;
     pool.borrow_interest_accumulator = 0;
     pool.share_lending_block_height = Clock::get()?.slot;

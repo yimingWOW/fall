@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::constants::{BASE_RATE, MIN_COLLATERAL_RATIO_BASE};
+use crate::constants::{BASE_INTEREST_RATE, PERCENT_BASE, MIN_COLLATERAL_RATIO};
 
 #[account]
 #[derive(Default)]
@@ -9,10 +9,17 @@ pub struct Amm {
 
     /// Account that has admin authority over the AMM
     pub admin: Pubkey,
+
+    /// liquidity fee percentage: 100000 = 100%
+    pub liquidity_fee: u16, 
+
+    /// Protocol fee percentage of the liquidity fee (0-100)
+    /// e.g., 10000 means 100% of liquidity fee goes to protocol
+    pub protocol_fee_percentage: u16,
 }
 
 impl Amm {
-    pub const LEN: usize = 8 + 32 + 32;
+    pub const LEN: usize = 8 + 32 + 32 + 2 + 2;
 }
 
 #[account]
@@ -27,8 +34,6 @@ pub struct Pool {
     /// Mint of token B
     pub mint_b: Pubkey,
 
-    /// The LP fee taken on each trade, in basis points
-    pub fee: u16,
 
     /// 借贷池中token a的数量
     pub token_a_amount :u64,
@@ -36,8 +41,6 @@ pub struct Pool {
     pub token_b_amount :u64,
 
     // lending pool
-    /// 最小抵押率 (基点表示，20000 = 200%)
-    pub min_collateral_ratio: u64,
     /// 记录上次借贷池interest_step更新时的区块高度
     pub borrow_interest_accumulator_block_height: u64,
     /// 借款累计利息，随着区块高度增加而增加，但是增加幅度与资金借出量正相关
@@ -49,7 +52,7 @@ pub struct Pool {
 }
 
 impl Pool {
-    pub const LEN: usize = 8 + 32 + 32 + 32 + 2 + 8 + 8 + 8 + 8 + 8 + 8 + 8;
+    pub const LEN: usize = 8 + 32 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8;
 
     // 计算 token A 的价值，返回token A等价于token B的数量
     #[inline(never)]  // 强制不内联
@@ -89,19 +92,19 @@ impl Pool {
         let current_block_height = Clock::get()?.slot;
         let blocks_passed = calculate_blocks_passed(self.borrow_interest_accumulator_block_height, current_block_height)?;
         
-        // 计算lending pool实际累积利息: 区块数 * 基础利率  * 借出资金数
+        // 计算lending pool实际累积利息: 区块数* 借出资金数 * 基础利率  
         let interest_increase = blocks_passed
-            .checked_mul(BASE_RATE)
-            .ok_or(ProgramError::ArithmeticOverflow)?
             .checked_mul(current_borrowed)
+            .ok_or(ProgramError::ArithmeticOverflow)?
+            .checked_mul(BASE_INTEREST_RATE)
+            .ok_or(ProgramError::ArithmeticOverflow)?
+            .checked_div(PERCENT_BASE)
             .ok_or(ProgramError::ArithmeticOverflow)?;
-        
         // 更新区块高度和累计利息
         self.borrow_interest_accumulator_block_height = current_block_height;
         self.borrow_interest_accumulator = self.borrow_interest_accumulator
             .checked_add(interest_increase)
             .ok_or(ProgramError::ArithmeticOverflow)?;
-
         Ok(())
     }
 
@@ -149,9 +152,11 @@ impl Pool {
             
         // 计算lending pool实际累积利息: 区块数 * 基础利率  * 借出资金数
         let mut interest = blocks_passed
-        .checked_mul(BASE_RATE)
-        .ok_or(StateError::CalculationError)?
         .checked_mul(borrowed_amount)
+        .ok_or(StateError::CalculationError)?
+        .checked_mul(BASE_INTEREST_RATE)
+        .ok_or(StateError::CalculationError)?
+        .checked_div(PERCENT_BASE)
         .ok_or(StateError::CalculationError)?;
         if interest==0{
             interest = 1;
@@ -167,9 +172,9 @@ impl Pool {
         borrow_amount: u64,
     ) -> Result<bool> {
         let required_collateral = (borrow_amount as u128)
-            .checked_mul(self.min_collateral_ratio as u128)
+            .checked_mul(MIN_COLLATERAL_RATIO as u128)
             .ok_or(StateError::CalculationError)?
-            .checked_div(MIN_COLLATERAL_RATIO_BASE as u128)
+            .checked_div(PERCENT_BASE as u128)
             .ok_or(StateError::CalculationError)? as u64;
         msg!("required_collateral: {}", required_collateral);
         msg!("collateral_value_in_token_a: {}", collateral_value_in_token_a);

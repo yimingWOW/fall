@@ -29,6 +29,8 @@ pub fn create_amm(ctx: Context<CreateAmm>, id: Pubkey) -> Result<()> {
     let amm = &mut ctx.accounts.amm;
     amm.id = id;
     amm.admin = ctx.accounts.admin.key();
+    amm.liquidity_fee = 10000; // 10%
+    amm.protocol_fee_percentage = 10000; // 10%
 
     Ok(())
 }

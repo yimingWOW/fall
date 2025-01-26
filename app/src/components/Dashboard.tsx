@@ -36,12 +36,6 @@ const Dashboard: FC = () => {
   return (
     <AmmProvider>
       <nav className="tab-nav">
-        <TabButton 
-          isActive={activeTab === 'guide'} 
-          onClick={() => setActiveTab('guide')}
-          icon="🧭"
-          label="Guide"
-        />
 
         {publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY && (
           <TabButton 
@@ -51,6 +45,13 @@ const Dashboard: FC = () => {
             label="AMM"
           />
         )}
+
+        <TabButton 
+          isActive={activeTab === 'guide'} 
+          onClick={() => setActiveTab('guide')}
+          icon="🧭"
+          label="Guide"
+        />
         
         <TabButton 
           isActive={activeTab === 'pool'} 

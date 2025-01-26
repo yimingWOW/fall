@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[constant]
-pub const MINIMUM_LIQUIDITY: u64 = 100;
+pub const MINIMUM_LIQUIDITY: u64 = 10;
 
 #[constant]
 pub const AUTHORITY_SEED: &[u8] = b"a"; // authority
@@ -32,7 +32,10 @@ pub const BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED: &[u8] = b"j"; // borrow_heigh
 
 
 #[constant]
-pub const MIN_COLLATERAL_RATIO_BASE: u64 = 10000; // 100%
+pub const PERCENT_BASE: u64 = 10000; // 100%
 
 #[constant]
-pub const BASE_RATE: u64 = 10000; // 100%
+pub const BASE_INTEREST_RATE: u64 = 5; // 0.05%
+
+#[constant]
+pub const MIN_COLLATERAL_RATIO: u64 = 10000; // 100%

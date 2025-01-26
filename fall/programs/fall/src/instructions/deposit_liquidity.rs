@@ -5,13 +5,21 @@ use anchor_spl::{
 };
 use fixed::types::I64F64;
 use crate::{
-    constants::{AUTHORITY_SEED, LIQUIDITY_SEED, MINIMUM_LIQUIDITY},
-    state::Pool,
+    constants::{AUTHORITY_SEED, LIQUIDITY_SEED, MINIMUM_LIQUIDITY,PERCENT_BASE},
+    state::{Pool, Amm},
 };
 
 
 #[derive(Accounts)]
 pub struct DepositLiquidity<'info> {
+    #[account(
+        seeds = [
+            amm.id.as_ref()
+        ],
+        bump,
+    )]
+    pub amm: Box<Account<'info, Amm>>,
+
     #[account(
         mut,
         seeds = [
@@ -92,6 +100,20 @@ pub struct DepositLiquidity<'info> {
     )]
     pub depositor_account_b: Box<Account<'info, TokenAccount>>,
 
+    /// CHECK: Admin account from AMM state
+    #[account(
+        constraint = admin.key() == amm.admin
+    )]
+    pub admin: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = payer,
+        associated_token::mint = liquidity_mint,
+        associated_token::authority = admin,  // Now using the admin AccountInfo
+    )]
+    pub admin_fee_account: Box<Account<'info, TokenAccount>>,
+
     /// The account paying for all rents
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -109,7 +131,7 @@ pub fn deposit_liquidity(
     amount_b: u64,
 ) -> Result<()> {
     // Prevent depositing assets the depositor does not own
-    let mut amount_a = if amount_a > ctx.accounts.depositor_account_a.amount {
+    let mut amount_a: u64 = if amount_a > ctx.accounts.depositor_account_a.amount {
         ctx.accounts.depositor_account_a.amount
     } else {
         amount_a
@@ -126,7 +148,6 @@ pub fn deposit_liquidity(
     // Defining pool creation like this allows attackers to frontrun pool creation with bad ratios
     let pool_creation = pool_a.amount == 0 && pool_b.amount == 0;
     (amount_a, amount_b) = if pool_creation {
-        // Add as is if there is no liquidity
         (amount_a, amount_b)
     } else {
         if pool_a.amount > pool_b.amount {
@@ -162,6 +183,15 @@ pub fn deposit_liquidity(
         liquidity -= MINIMUM_LIQUIDITY;
     }
 
+    // Calculate protocol fee
+    let protocol_fee = (liquidity as u128)
+        .checked_mul(ctx.accounts.amm.protocol_fee_percentage as u128)
+        .ok_or(DepositError::NumberOverflow)?
+        .checked_div(PERCENT_BASE as u128)
+        .ok_or(DepositError::NumberOverflow)? as u64;
+    
+    let user_liquidity = liquidity.checked_sub(protocol_fee).ok_or(DepositError::NumberOverflow)?;
+
     // Transfer tokens to the pool
     token::transfer(
         CpiContext::new(
@@ -186,14 +216,10 @@ pub fn deposit_liquidity(
         amount_b,
     )?;
 
-    // 更新池子状态
-    ctx.accounts.pool.token_a_amount += amount_a;
-    ctx.accounts.pool.token_b_amount += amount_b;
-    msg!("token_a_amount: {}", ctx.accounts.pool.token_a_amount);
-    msg!("token_b_amount: {}", ctx.accounts.pool.token_b_amount);
-    
+    // Update pool state
+    ctx.accounts.pool.token_a_amount = ctx.accounts.pool.token_a_amount.checked_add(amount_a).ok_or(DepositError::NumberOverflow)?;
+    ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount.checked_add(amount_b).ok_or(DepositError::NumberOverflow)?;
 
-    // Mint the liquidity to user
     let authority_bump = ctx.bumps.pool_authority;
     let authority_seeds = &[
         &ctx.accounts.pool.amm.to_bytes(),
@@ -203,6 +229,8 @@ pub fn deposit_liquidity(
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
+
+    // Mint liquidity tokens to user
     token::mint_to(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -213,8 +241,24 @@ pub fn deposit_liquidity(
             },
             signer_seeds,
         ),
-        liquidity,
+        user_liquidity,
     )?;
+
+    // Mint protocol fee to admin if it's not zero
+    if protocol_fee > 0 {
+        token::mint_to(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                MintTo {
+                    mint: ctx.accounts.liquidity_mint.to_account_info(),
+                    to: ctx.accounts.admin_fee_account.to_account_info(),
+                    authority: ctx.accounts.admin.to_account_info(),
+                },
+                signer_seeds,
+            ),
+            protocol_fee,
+        )?;
+    }
 
     Ok(())
 }

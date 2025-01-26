@@ -3,14 +3,21 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{self, Mint, Token, TokenAccount, Transfer},
 };
-use fixed::types::I64F64;
 use crate::{
-    constants::AUTHORITY_SEED,
-    state:: Pool,
+    constants::{AUTHORITY_SEED, PERCENT_BASE},
+    state::{Amm, Pool},
 };
 
 #[derive(Accounts)]
 pub struct SwapExactTokensForTokens<'info> {
+    #[account(
+        seeds = [
+            amm.id.as_ref()
+        ],
+        bump,
+    )]
+    pub amm: Box<Account<'info, Amm>>,
+
     #[account(
         seeds = [
             pool.amm.as_ref(),
@@ -84,40 +91,62 @@ pub fn swap_exact_tokens_for_tokens<'info>(
     input_amount: u64,
     min_output_amount: u64,
 ) -> Result<()> {
+    // Zero amount check
+    require!(input_amount > 0, SwapError::InvalidInput);
+    
+    // Check pool is not empty
+    require!(
+        ctx.accounts.pool_account_a.amount > 0 && ctx.accounts.pool_account_b.amount > 0,
+        SwapError::EmptyPool
+    );
+
     // Prevent depositing assets the depositor does not own
-    let input = if swap_a && input_amount > ctx.accounts.trader_account_a.amount {
-        ctx.accounts.trader_account_a.amount
-    } else if !swap_a && input_amount > ctx.accounts.trader_account_b.amount {
-        ctx.accounts.trader_account_b.amount
+    let input = if swap_a {
+        require!(ctx.accounts.trader_account_a.amount >= input_amount, SwapError::InsufficientBalance);
+        input_amount
     } else {
+        require!(ctx.accounts.trader_account_b.amount >= input_amount, SwapError::InsufficientBalance);
         input_amount
     };
 
-    // Apply trading fee, used to compute the output
-    let taxed_input = input - input * ctx.accounts.pool.fee as u64 / 10000;
+    // Apply trading fee with overflow protection
+    let fee_amount = input
+        .checked_mul(ctx.accounts.amm.liquidity_fee as u64)
+        .ok_or(SwapError::MathOverflow)?
+        .checked_div(PERCENT_BASE)
+        .ok_or(SwapError::MathOverflow)?;
+    let taxed_input = input.checked_sub(fee_amount).ok_or(SwapError::MathOverflow)?;
+
     let pool_a = &ctx.accounts.pool_account_a;
     let pool_b = &ctx.accounts.pool_account_b;
 
+    // Calculate output amount using u128 for better precision
     let output = if swap_a {
-        // 用 token_a 交换 token_b
-        let new_pool_a_amount = I64F64::from_num(pool_a.amount) + I64F64::from_num(taxed_input); // 新的池子A的数量
-        let k = I64F64::from_num(pool_a.amount) * I64F64::from_num(pool_b.amount); // 恒定乘积
-        let new_pool_b_amount = k / new_pool_a_amount; // 新池子B的数量
-
-        // 输出的 token_b 数量是原池子中 token_b 的数量减去新的 token_b 数量
-        I64F64::from_num(pool_b.amount) - new_pool_b_amount
+        let new_pool_a: u128 = (pool_a.amount as u128)
+            .checked_add(taxed_input as u128)
+            .ok_or(SwapError::MathOverflow)?;
+        let k = (pool_a.amount as u128)
+            .checked_mul(pool_b.amount as u128)
+            .ok_or(SwapError::MathOverflow)?;
+        let output = (pool_b.amount as u128)
+            .checked_sub(k.checked_div(new_pool_a).ok_or(SwapError::MathOverflow)?)
+            .ok_or(SwapError::MathOverflow)?;
+        output as u64
     } else {
-        // 用 token_b 交换 token_a
-        let new_pool_b_amount = I64F64::from_num(pool_b.amount) + I64F64::from_num(taxed_input); // 新的池子B的数量
-        let k = I64F64::from_num(pool_a.amount) * I64F64::from_num(pool_b.amount); // 恒定乘积
-        let new_pool_a_amount = k / new_pool_b_amount; // 新池子A的数量
-        // 输出的 token_a 数量是原池子中 token_a 的数量减去新的 token_a 数量
-        I64F64::from_num(pool_a.amount) - new_pool_a_amount
+        let new_pool_b: u128 = (pool_b.amount as u128)
+            .checked_add(taxed_input as u128)
+            .ok_or(SwapError::MathOverflow)?;
+        let k = (pool_a.amount as u128)
+            .checked_mul(pool_b.amount as u128)
+            .ok_or(SwapError::MathOverflow)?;
+        let output = (pool_a.amount as u128)
+            .checked_sub(k.checked_div(new_pool_b).ok_or(SwapError::MathOverflow)?)
+            .ok_or(SwapError::MathOverflow)?;
+        output as u64
     };
 
-    if output < min_output_amount {
-        return err!(SwapError::OutputTooSmall);
-    }
+    // Slippage check
+    require!(output >= min_output_amount, SwapError::ExcessiveSlippage);
 
     // Compute the invariant before the trade
     let invariant: u64 = pool_a.amount * pool_b.amount;
@@ -153,21 +182,20 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                 },
                 signer_seeds,
             ),
-            output.to_num::<u64>(),
+            output,
         )?;
         // Verify the invariant still holds
         // Reload accounts because of the CPIs
         // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount+taxed_input) * (ctx.accounts.pool_account_b.amount-output.to_num::<u64>()) {
+        if invariant > (ctx.accounts.pool_account_a.amount+taxed_input) * (ctx.accounts.pool_account_b.amount-output) {
             return err!(SwapError::InvariantViolated);
         }
-        // 更新池子状态
-        msg!("swap_exact_tokens_for_tokens: pool.token_a_amount: {}, pool.token_b_amount: {}",
-        ctx.accounts.pool.token_a_amount, ctx.accounts.pool.token_b_amount);
-        msg!("swap_exact_tokens_for_tokens: output: {}, taxed_input: {}",
-        output, taxed_input);
-        ctx.accounts.pool.token_a_amount += taxed_input;
-        ctx.accounts.pool.token_b_amount -= output.to_num::<u64>();
+        ctx.accounts.pool.token_a_amount = ctx.accounts.pool.token_a_amount
+            .checked_add(taxed_input)
+            .ok_or(SwapError::MathOverflow)?;
+        ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount
+            .checked_sub(output)
+            .ok_or(SwapError::MathOverflow)?;
     } else {
         token::transfer(
             CpiContext::new_with_signer(
@@ -179,7 +207,7 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                 },
                 signer_seeds,
             ),
-            output.to_num::<u64>(),
+            output,
         )?;
         token::transfer(
             CpiContext::new(
@@ -195,16 +223,16 @@ pub fn swap_exact_tokens_for_tokens<'info>(
         // Verify the invariant still holds
         // Reload accounts because of the CPIs
         // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount-output.to_num::<u64>()) * (ctx.accounts.pool_account_b.amount+taxed_input) {
+        if invariant > (ctx.accounts.pool_account_a.amount-output) * (ctx.accounts.pool_account_b.amount+taxed_input) {
             return err!(SwapError::InvariantViolated);
         }
         // 更新池子状态
-        msg!("swap_exact_tokens_for_tokens: pool.token_a_amount: {}, pool.token_b_amount: {}",
-         ctx.accounts.pool.token_a_amount, ctx.accounts.pool.token_b_amount);
-         msg!("swap_exact_tokens_for_tokens: output: {}, taxed_input: {}",
-         output, taxed_input);
-        ctx.accounts.pool.token_a_amount -= output.to_num::<u64>();
-        ctx.accounts.pool.token_b_amount += taxed_input;
+        ctx.accounts.pool.token_a_amount = ctx.accounts.pool.token_a_amount
+            .checked_sub(output)
+            .ok_or(SwapError::MathOverflow)?;
+        ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount
+            .checked_add(taxed_input)
+            .ok_or(SwapError::MathOverflow)?;
     }
     
     Ok(())
@@ -216,4 +244,14 @@ pub enum SwapError {
     OutputTooSmall,
     #[msg("Invariant violated")]
     InvariantViolated,
+    #[msg("Invalid input amount")]
+    InvalidInput,
+    #[msg("Pool is empty")]
+    EmptyPool,
+    #[msg("Insufficient balance")]
+    InsufficientBalance,
+    #[msg("Math overflow")]
+    MathOverflow,
+    #[msg("Slippage tolerance exceeded")]
+    ExcessiveSlippage,
 }
