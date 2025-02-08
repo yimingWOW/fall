@@ -9,6 +9,7 @@
   justify-content: space-between;
   align-items: center;
   color: #fff;
+  max-width: 560px;
 }
   
 .pool-select .placeholder {

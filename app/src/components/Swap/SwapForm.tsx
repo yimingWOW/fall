@@ -166,44 +166,41 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
 
   return (
     <div className="wrapper">
-      <form onSubmit={handleSubmit}>
-        <div className="section">
-          <div className="pool-select" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-            {selectedPool ? (
-              <span>{selectedPool.displayName}</span>
-            ) : (
-              <span className="placeholder">Select a pool</span>
-            )}
-            <span className="dropdown-arrow">▼</span>
-          </div>
-          
-          {isDropdownOpen && (
-            <div className="step">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search pools..."
-                onClick={(e) => e.stopPropagation()}
-                autoFocus
-              />
-              <div className="body-text">
-                {filteredPools.map((pool) => (
-                  <div
-                    key={pool.poolPk.toString()}
-                    className="pool-option"
-                    onClick={() => handlePoolSelect(pool)}
-                  >
-                    {pool.displayName}
-                  </div>
-                ))}
-                {filteredPools.length === 0 && (
-                  <div className="no-results">No pools found</div>
-                )}
-              </div>
-            </div>
+        <form onSubmit={handleSubmit}>
+        <div className="pool-select" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+          {selectedPool ? (
+            <span>{selectedPool.displayName}</span>
+          ) : (
+            <span className="placeholder">Select a pool</span>
           )}
+          <span className="dropdown-arrow">▼</span>
         </div>
+        {isDropdownOpen && (
+          <div className="step">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search pools..."
+              onClick={(e) => e.stopPropagation()}
+              autoFocus
+            />
+            <div className="body-text">
+              {filteredPools.map((pool) => (
+                <div
+                  key={pool.poolPk.toString()}
+                  className="pool-option"
+                  onClick={() => handlePoolSelect(pool)}
+                >
+                  {pool.displayName}
+                </div>
+              ))}
+              {filteredPools.length === 0 && (
+                <div className="no-results">No pools found</div>
+              )}
+            </div>
+          </div>
+        )}
 
         {selectedPool && (
           <div className="wrapper-container">
