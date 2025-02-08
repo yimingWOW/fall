@@ -2,7 +2,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import fallIdl from '../idl/fall.json';
 import { Idl } from '@coral-xyz/anchor';
-
+import { ADMIN_PUBLIC_KEY } from './constants';
 export async function createAmm(
   wallet: any,
   connection: Connection,
@@ -29,7 +29,7 @@ export async function createAmm(
       .createAmm(ammId)
       .accounts({
         amm: ammPda,
-        admin: provider.wallet.publicKey,
+        admin: ADMIN_PUBLIC_KEY,
         payer: provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       }).rpc();

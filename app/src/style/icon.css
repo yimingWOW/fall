@@ -1,0 +1,54 @@
+.swap-direction-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: none; 
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 4px auto;
+    position: relative;
+    transition: background 0.2s;
+}
+
+.swap-direction-toggle::before {
+    content: "↑↓";
+    font-size: 12px;
+    color: rgb(255, 255, 255);
+} 
+
+.swap-direction-toggle:hover {
+    background-color: var(--hover-color);
+}
+  
+.token-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.plus-divider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 32px;
+}
+  
+.plus-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(40, 45, 55, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+}
+
+.dropdown-arrow {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}

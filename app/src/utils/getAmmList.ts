@@ -4,10 +4,16 @@ import * as anchor from '@coral-xyz/anchor';
 import fallIdl from '../idl/fall.json';
 import { Idl } from '@coral-xyz/anchor';
 
+export interface AmmInfo {
+  pubkey: string;
+  ammid: string;
+  admin: string;
+}
+
 export const getAmmAccounts = async (
   wallet: AnchorWallet,
   connection: Connection
-) => {
+): Promise<AmmInfo[]> => {
   console.log('Getting AMM accounts connection:', connection);
   const provider = new anchor.AnchorProvider(
     connection,
@@ -32,5 +38,6 @@ export const getAmmAccounts = async (
   return accounts.map((account: any) => ({
     pubkey: account.publicKey.toString(),
     ammid: account.account.id.toString(),
+    admin: account.account.admin.toString()
   }));
 }; 

@@ -1,0 +1,44 @@
+.solana-network-select-container {
+  position: relative;
+  display: inline-block;
+}
+
+.solana-network-select {
+  appearance: none;
+  background-color: #1C1C1C;
+  border: 1px solid #383838;
+  border-radius: 12px;
+  padding: 8px 36px 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 160px;
+  height: 40px;
+}
+
+.solana-network-select:hover {
+  border-color: #4E44CE;
+  background-color: #232323;
+}
+
+.solana-network-select:focus {
+  outline: none;
+  border-color: #9945FF;
+  box-shadow: 0 0 0 2px rgba(153, 69, 255, 0.1);
+}
+
+.solana-network-select-container::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #FFFFFF;
+  pointer-events: none;
+}

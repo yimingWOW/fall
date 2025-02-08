@@ -4,6 +4,7 @@ import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import fallIdl from '../idl/fall.json';
 import { 
+  ADMIN_PUBLIC_KEY,
   AUTHORITY_SEED,
   LIQUIDITY_SEED,
   LENDING_AUTHORITY_SEED,
@@ -15,8 +16,10 @@ import {
 } from '../utils/constants';
 import { Idl } from '@coral-xyz/anchor';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
+
 export interface CreatePoolResult {
-  tx: string;
+  tx1: string;
+  tx2: string;
   initTx1: string;
   initTx2: string;
   initTx3: string;
@@ -27,10 +30,8 @@ export async function createPool(
   ammPda: PublicKey,
   mintA: PublicKey,
   mintB: PublicKey,
-  fee: number,
 ): Promise<CreatePoolResult> {
   try {
-    console.log('Step 1: Creating provider');
     const provider = new anchor.AnchorProvider(
       connection,
       wallet,
@@ -39,7 +40,6 @@ export async function createPool(
         preflightCommitment: "confirmed" 
       }
     );
-
     const program = new anchor.Program(
       (fallIdl as any) as Idl,
       provider
@@ -54,17 +54,9 @@ export async function createPool(
       program.programId
     );
     const [liquidityMintPda] = PublicKey.findProgramAddressSync(
-      [ammPda.toBuffer(), mintA.toBuffer(), mintB.toBuffer(), Buffer.from(LIQUIDITY_SEED)],
+      [poolPda.toBuffer(), Buffer.from(LIQUIDITY_SEED)],
       program.programId
     );
-    const poolAccountA = await anchor.utils.token.associatedAddress({
-      mint: mintA,
-      owner: poolAuthorityPda
-    });
-    const poolAccountB = await anchor.utils.token.associatedAddress({
-      mint: mintB,
-      owner: poolAuthorityPda
-    });
     const [lendingPoolAuthorityPda] = PublicKey.findProgramAddressSync(
       [poolPda.toBuffer(), Buffer.from(LENDING_AUTHORITY_SEED)],
       program.programId
@@ -81,14 +73,6 @@ export async function createPool(
       [poolPda.toBuffer(), Buffer.from(COLLATERAL_TOKEN_SEED)],
       program.programId
     );
-    const lendingPoolAccountA = await anchor.utils.token.associatedAddress({
-      mint: mintA,
-      owner: lendingPoolAuthorityPda
-    });
-    const lendingPoolAccountB = await anchor.utils.token.associatedAddress({
-      mint: mintB,
-      owner: lendingPoolAuthorityPda
-    });
     const [lenderLendingBlockHeightMint] = PublicKey.findProgramAddressSync(
       [poolPda.toBuffer(), Buffer.from(LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED)],
       program.programId
@@ -97,31 +81,73 @@ export async function createPool(
       [poolPda.toBuffer(), Buffer.from(BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED)],
       program.programId
     );
-  const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
-    units: 1_000_000  
-  });
-  console.log('Step 1: Creating pool...');
-  let tx: string='';
-  if (!await accountExists(connection, poolPda)) {
-    tx = await program.methods
-      .createPool(fee).accounts({
+    const adminFeeAccount = await anchor.utils.token.associatedAddress({
+      mint: liquidityMintPda,
+      owner: new PublicKey(ADMIN_PUBLIC_KEY),
+    });
+    const poolAccountA = await anchor.utils.token.associatedAddress({
+      mint: mintA,
+      owner: poolAuthorityPda
+    });
+    const poolAccountB = await anchor.utils.token.associatedAddress({
+      mint: mintB,
+      owner: poolAuthorityPda
+    });
+    const lendingPoolAccountA = await anchor.utils.token.associatedAddress({
+      mint: mintA,
+      owner: lendingPoolAuthorityPda
+    });
+    const lendingPoolAccountB = await anchor.utils.token.associatedAddress({
+      mint: mintB,
+      owner: lendingPoolAuthorityPda
+    });
+    const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
+      units: 1_000_000  
+    });
+    console.log('Step 1: Creating pool...');
+    let tx1: string='';
+    if (!await accountExists(connection, poolPda)) {
+      tx1 = await program.methods.createPool1().accounts({
         amm: ammPda,
         mintA: mintA,
         mintB: mintB,
         pool: poolPda,
         poolAuthority: poolAuthorityPda,
-        mintLiquidity: liquidityMintPda,
         poolAccountA: poolAccountA,
         poolAccountB: poolAccountB,
         payer: provider.wallet.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      }).preInstructions([modifyComputeUnits]).rpc({
-        commitment: 'confirmed',
-      });
-      await connection.confirmTransaction(tx, 'confirmed');
-    console.log('Transaction signature:', tx);
+        }).preInstructions([modifyComputeUnits]).rpc({
+          commitment: 'confirmed',
+        });
+      await connection.confirmTransaction(tx1, 'confirmed');
+      console.log('Transaction signature:', tx1);
+    } else {
+      console.log('Pool already exists, skipping...');
+    }
+    console.log('Step 2: Creating pool...');
+    let tx2: string='';
+    if (!await accountExists(connection, liquidityMintPda)) {
+      tx2 = await program.methods.createPool2().accounts({
+          amm: ammPda,
+          mintA: mintA,
+          mintB: mintB,
+          pool: poolPda,
+          poolAuthority: poolAuthorityPda,
+          liquidityMint: liquidityMintPda,
+          admin: ADMIN_PUBLIC_KEY,
+          adminFeeAccount: adminFeeAccount,
+          payer: provider.wallet.publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        }).preInstructions([modifyComputeUnits]).rpc({
+          commitment: 'confirmed',
+        });
+        await connection.confirmTransaction(tx2, 'confirmed');
+      console.log('Transaction signature:', tx2);
     } else {
       console.log('Pool already exists, skipping...');
     }
@@ -182,9 +208,9 @@ export async function createPool(
     } else {
       console.log("Lending pool 3 already initialized, skipping...");
     }
-
     return {
-      tx,
+      tx1,
+      tx2,
       initTx1,
       initTx2,
       initTx3,
@@ -193,7 +219,8 @@ export async function createPool(
     console.error('Error', error);
   }
   return {
-    tx: '',
+    tx1: '',
+    tx2: '',
     initTx1: '',
     initTx2: '',
     initTx3: '',

@@ -1,0 +1,115 @@
+import { FC, useState, useEffect } from 'react';
+import { useConnection, useWallet, useAnchorWallet } from '@solana/wallet-adapter-react';
+import { getPoolDetail, PoolDetailInfo } from '../../utils/getPoolDetail';
+import { DepositLiquidityForm } from './DepositLiquidityForm';
+import { PoolInfo } from '../../utils/getPoolList';
+import { PublicKey } from '@solana/web3.js';
+import '../../style/Theme.css';
+import { WithdrawLiquidityForm } from './WithdrawLiquidityForm';
+import { PoolStatus } from './PoolStatus';
+import { shouldInitializePool } from '../utils/pool';
+import '../../style/button.css';
+import '../../style/Typography.css';
+
+interface PoolItemProps {
+  pool: PoolInfo;
+  onTxSuccess: (signature: string) => void;
+}
+
+export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
+  const { connection } = useConnection();
+  const wallet = useAnchorWallet();
+  const { publicKey: walletPublicKey } = useWallet();
+  const [details, setDetails] = useState<PoolDetailInfo | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [isPriceReversed, setIsPriceReversed] = useState(false);
+
+  const fetchDetails = async () => {
+    try {
+      if (!wallet) return;
+      setIsLoadingDetails(true);
+      const poolDetail = await getPoolDetail(
+        wallet,
+        connection, 
+        pool,
+        walletPublicKey || new PublicKey('')
+      );
+      setDetails(poolDetail);
+    } catch (error) {
+      console.error('Error fetching pool prices:', error);
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchDetails();
+  }, [pool, connection, walletPublicKey]);
+
+  return (
+    <div className="card-container">
+      {shouldInitializePool(details?.poolStatus || null) ? (
+        <div className="section">
+          <PoolStatus
+            pool={pool}
+            poolStatus={details?.poolStatus || null}
+            onTxSuccess={onTxSuccess}
+          />
+        </div>
+      ) : (
+        <div className="section">
+          {isLoadingDetails ? (
+            <div className="step">
+              <div className="code-text">Loading prices...</div>
+            </div>
+          ) : details ? (
+            <div className="align-center">
+              <div className="step" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="body-text">Price</span>
+                <button className="swap-direction-toggle" onClick={() => setIsPriceReversed(!isPriceReversed)}></button>
+                {!isPriceReversed ? (
+                  <span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
+                ) : (
+                  <span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="step">
+              <div className="code-text" style={{ color: 'var(--error)' }}>
+                Failed to load prices
+              </div>
+            </div>
+          )}
+          <DepositLiquidityForm 
+            pool={pool}
+            onSuccess={(signature) => {
+              onTxSuccess(signature);
+              fetchDetails();
+            }}
+          />
+          <div className="wrapper"></div>
+          {isLoadingDetails ? (
+            <div className="loading-state">
+              <div className="code-text">Loading your liquidity amount...</div>
+            </div>
+          ) : details ? (
+            <WithdrawLiquidityForm
+              pool={pool}
+              amount={parseFloat(details.userAssets.liquidityAmount)}
+              onSuccess={(signature) => {
+                onTxSuccess(signature);
+                fetchDetails();
+              }}
+            />
+          ) : (
+            <div className="error-state">
+              <div className="code-text">Failed to load your liquidity amount</div>
+            </div>
+          )}
+          </div>
+        
+      )}
+    </div>
+  );
+};

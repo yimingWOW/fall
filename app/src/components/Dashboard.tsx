@@ -1,16 +1,16 @@
 import { FC, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { CreateAmmForm } from './CreateAmmForm';
-import { AmmList } from './AmmList';
-import { PoolList } from './PoolList';
-import { LiquidateForm } from './LiquidateForm';
+import { AmmList } from './Amm/AmmList.tsx';
+import { SwapForm } from './Swap/SwapForm';
+import { LiquidateForm } from './Liquidate/LiquidateForm';
 import { AmmProvider } from '../contexts/AmmContext';
-import { LenderPoolList } from './LenderPoolList';
-import { BorrowerPoolList } from './BorrowerPoolList';
+import { LenderPoolList } from './Lend/LendPoolList.tsx';
+import { BorrowerPoolList } from './Borrow/BorrowPoolList.tsx';
 import { EXCLUDED_PUBLIC_KEY } from '../utils/constants';
-import { Guide } from './Guide';
+import { Guide } from './Guide/Guide.tsx';
 import '../style/Theme.css';
 import '../style/Typography.css';
+import { FarmForm } from './Farm/FarmForm.tsx';
 
 interface TabButtonProps {
   isActive: boolean;
@@ -24,19 +24,17 @@ const TabButton: FC<TabButtonProps> = ({ isActive, onClick, icon, label }) => (
     className={`tab-button ${isActive ? 'active' : ''}`}
     onClick={onClick}
   >
-    <div className="section-title">{icon}</div>
-    <div className="section-title">{label}</div>
+    <div className="section-title">{icon}{label}</div>
   </button>
 );
 
 const Dashboard: FC = () => {
   const { publicKey } = useWallet();
-  const [activeTab, setActiveTab] = useState('pool');
+  const [activeTab, setActiveTab] = useState('guide');
 
   return (
     <AmmProvider>
       <nav className="tab-nav">
-
         {publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY && (
           <TabButton 
             isActive={activeTab === 'amm'} 
@@ -54,10 +52,17 @@ const Dashboard: FC = () => {
         />
         
         <TabButton 
-          isActive={activeTab === 'pool'} 
-          onClick={() => setActiveTab('pool')}
+          isActive={activeTab === 'swap'} 
+          onClick={() => setActiveTab('swap')}
           icon="↔️"
           label="Swap"
+        />
+
+        <TabButton 
+          isActive={activeTab === 'farm'} 
+          onClick={() => setActiveTab('farm')}
+          icon="🌾"
+          label="Farm"
         />
         
         <TabButton 
@@ -86,18 +91,19 @@ const Dashboard: FC = () => {
         {activeTab === 'amm' && publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY ? (
           <>
             <AmmList />
-            <CreateAmmForm />
           </>
         ) : activeTab === 'guide' ? (
           <Guide />
-        ) : activeTab === 'pool' ? (
-          <PoolList />
+        ) : activeTab === 'swap' ? (
+          <SwapForm onSuccess={() => {}} />
         ) : activeTab === 'lenderPool' ? (
           <LenderPoolList />
         ) : activeTab === 'borrowerPool' ? (
           <BorrowerPoolList />
         ) : activeTab === 'liquidate' ? (
           <LiquidateForm />
+        ) : activeTab === 'farm' ? (
+          <FarmForm />
         ) : (
           <div className="code-text">Coming Soon...</div>
         )}

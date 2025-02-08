@@ -26,17 +26,17 @@ go.work
 
 .json
 
-./fall/test-ledger
+./fall/test-ledger/
 
-./fall/node_modules
+./fall/node_modules/
 
-./fall/target
+./fall/target/
 
-./fall/temp_keys
+./fall/temp_keys/
 
-./fall/recovered-keys
+./fall/recovered-keys/
 
-./fall/dist
+./fall/dist/
 
 # Logs
 logs

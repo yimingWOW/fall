@@ -6,19 +6,17 @@ import {
   getAssociatedTokenAddress
 } from '@solana/spl-token';
 import { Idl } from '@coral-xyz/anchor';
-import { BN } from 'bn.js';
 import fallIdl from '../idl/fall.json';
-import { AUTHORITY_SEED, LIQUIDITY_SEED, ADMIN_PUBLIC_KEY } from './constants';
+import { AUTHORITY_SEED, LIQUIDITY_SEED } from './constants';
 
-export async function depositLiquidity(
+export async function withdrawLiquidity(
   wallet: any,
   connection: Connection,
   pool: PublicKey,
   amm: PublicKey,
   mintA: PublicKey,
   mintB: PublicKey,
-  amountA: number,
-  amountB: number,
+  amount: number,
 ) {
   try {
     const provider = new anchor.AnchorProvider(
@@ -42,7 +40,7 @@ export async function depositLiquidity(
       program.programId
     );
 
-    const [liquidityMint] = PublicKey.findProgramAddressSync(
+    const [mintLiquidity] = PublicKey.findProgramAddressSync(
       [
         pool.toBuffer(),
         Buffer.from(LIQUIDITY_SEED)
@@ -75,42 +73,32 @@ export async function depositLiquidity(
     );
 
     const depositorAccountLiquidity = await getAssociatedTokenAddress(
-      liquidityMint,
+      mintLiquidity,
       wallet.publicKey,
       true
     );
-    const adminFeeAccount = await getAssociatedTokenAddress(
-      liquidityMint,
-      new PublicKey(ADMIN_PUBLIC_KEY),
-      true
-    );
 
-    const tx = await program.methods.depositLiquidity(new BN(amountA),new BN(amountB)).accounts({
-        amm,
+    const tx = await program.methods.withdrawLiquidity(amount).accounts({
         pool,
         poolAuthority,
+        depositor: wallet.publicKey,
+        mintLiquidity,
         mintA,
         mintB,
-        depositor: wallet.publicKey,
-        liquidityMint,
         poolAccountA,
         poolAccountB,
         depositorAccountLiquidity,
         depositorAccountA,
         depositorAccountB,
-        admin: ADMIN_PUBLIC_KEY,
-        adminFeeAccount: adminFeeAccount,
         payer: wallet.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      }).rpc(
-        {
+      }).rpc({
           skipPreflight: false,
           maxRetries: 3,
           commitment: 'confirmed',
-        }
-      );
+        });
     return tx;
   } catch (error) {
     console.error('Error in depositLiquidity:', error);

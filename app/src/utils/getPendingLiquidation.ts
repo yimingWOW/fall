@@ -6,7 +6,7 @@ import { BORROW_TOKEN_SEED, BORROWER_AUTHORITY_SEED, COLLATERAL_TOKEN_SEED } fro
 import { getPoolDetail } from './getPoolDetail';
 import { Idl } from '@coral-xyz/anchor';
 import { getAccountsByInstruction } from './getSignaturesForAddress';
-import { BASE_RATE } from './constants';
+import { BASE_RATE, MIN_COLLATERAL_RATIO } from './constants';  
 
 export interface PendingLiquidation {
     userAuthorityPda: PublicKey;
@@ -41,7 +41,7 @@ export async function getPendingLiquidation(
       tokenAAmount: pool.tokenAAmount,
       tokenBAmount: pool.tokenBAmount,
     }
-    const poolDetail = await getPoolDetail(connection, poolInfo as any, wallet.publicKey);
+    const poolDetail = await getPoolDetail(wallet, connection, poolInfo as any, wallet.publicKey);
     const [borrowReceiptTokenMint] = PublicKey.findProgramAddressSync(
         [
           poolPda.toBuffer(),
@@ -69,7 +69,7 @@ export async function getPendingLiquidation(
       );
       const borrowReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, borrowReceiptTokenMint);
       const collateralReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, collateralReceiptTokenMint);
-      if (collateralReceiptTokenAmount < borrowReceiptTokenAmount *poolDetail.poolInfo.aToB* poolDetail.poolInfo.minCollateralRatio/BASE_RATE) {
+      if (collateralReceiptTokenAmount < borrowReceiptTokenAmount *poolDetail.poolInfo.aToB* MIN_COLLATERAL_RATIO/BASE_RATE) {
         pendingLiquidation.push(account);
       }
     }

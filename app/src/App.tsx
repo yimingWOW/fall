@@ -6,6 +6,10 @@ import { NetworkSelect } from './WalletContextProvider';
 import { useNetwork } from './contexts/NetworkContext';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './style/App.css';
+import './style/button.css';
+import './style/copy.css';
+import './style/error.css';
+import './style/tap.css';
 import './style/Theme.css';
 import './style/Typography.css';
 import logo from '../public/favicon.png';
@@ -26,14 +30,14 @@ const App: FC = () => {
             onChange={setNetwork} 
             value={network} 
           />
-          <WalletMultiButton className="btn btn-primary" />
+          <WalletMultiButton className="button btn-primary" />
         </div>
       </nav>
 
       <main className="app-main">
         {!connected ? (
           <div className="connect-wallet">
-            <div className="card gradient-border compact">
+            <div className="wrapper">
               <img src={logo} alt="Fall Logo" className="connect-logo" />
               <h2 className="section-title">Welcome to Fall</h2>
               <p className="body-text">Please connect your wallet to continue</p>

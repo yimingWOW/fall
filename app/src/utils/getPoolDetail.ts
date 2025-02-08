@@ -1,10 +1,25 @@
-import { Connection, PublicKey } from '@solana/web3.js';
-import { getAccount, getAssociatedTokenAddress, getAssociatedTokenAddressSync, getMint } from '@solana/spl-token';
-import fallIdl from '../idl/fall.json';
-import { AUTHORITY_SEED,LENDING_AUTHORITY_SEED,LENDING_TOKEN_SEED,BORROW_TOKEN_SEED,COLLATERAL_TOKEN_SEED,BORROWER_AUTHORITY_SEED } from './constants';
+import { getAccount, getAssociatedTokenAddress, getMint } from '@solana/spl-token';
+import { LENDING_AUTHORITY_SEED,LENDING_TOKEN_SEED,BORROW_TOKEN_SEED,COLLATERAL_TOKEN_SEED,BORROWER_AUTHORITY_SEED,LIQUIDITY_SEED } from './constants';
 import { PoolInfo } from './getPoolList';
+import * as anchor from '@coral-xyz/anchor';
+import { Connection, PublicKey } from '@solana/web3.js';
+import fallIdl from '../idl/fall.json';
+import { 
+  LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED,
+} from './constants';
+import { Idl } from '@coral-xyz/anchor';
+import { AnchorWallet } from '@solana/wallet-adapter-react';
+
+export interface PoolStatusInfo {
+  createPool1: boolean;
+  createPool2: boolean;
+  initLendingPool1: boolean;
+  initLendingPool2: boolean;
+  initLendingPool3: boolean;
+}
 
 export type PoolDetailInfo = {
+  poolStatus: PoolStatusInfo;
   poolInfo: PoolInfo;
   lendingPoolInfo: {
     tokenAAmount: number;
@@ -21,6 +36,7 @@ export type PoolDetailInfo = {
   userAssets: {
     tokenAAmount: string;
     tokenBAmount: string;
+    liquidityAmount: string;
     lendingReceiptAmount: string;
     borrowReceiptAmount: string;
     collateralReceiptAmount: string;
@@ -28,131 +44,160 @@ export type PoolDetailInfo = {
 }
 
 export async function getPoolDetail(
+  wallet: AnchorWallet,
   connection: Connection,
   pool: PoolInfo,
   walletPublicKey: PublicKey  
 ): Promise<PoolDetailInfo> {
+  console.log("walletPublicKey", walletPublicKey);
+
   try {
-    const poolPda = new PublicKey(pool.poolPk);
+    const provider = new anchor.AnchorProvider(
+      connection,
+      wallet,
+      { 
+        commitment: "confirmed",
+        preflightCommitment: "confirmed" 
+      }
+    );
+    const program = new anchor.Program(
+      (fallIdl as any) as Idl,
+      provider
+    ) as any;
+
+    const poolPk = new PublicKey(pool.poolPk);
     const mintA = new PublicKey(pool.mintA);
     const mintB = new PublicKey(pool.mintB);
 
-    const [poolAuthority] = PublicKey.findProgramAddressSync(
-      [
-        new PublicKey(pool.amm).toBuffer(),
-        new PublicKey(pool.mintA).toBuffer(),
-        new PublicKey(pool.mintB).toBuffer(),
-        Buffer.from(AUTHORITY_SEED)
-      ],
-      new PublicKey(fallIdl.address)
-    );
-    const poolAccountA = await getAssociatedTokenAddress(
-      new PublicKey(pool.mintA),
-      poolAuthority,
-      true
-    );
-    const poolAccountB = await getAssociatedTokenAddress(
-      new PublicKey(pool.mintB),
-      poolAuthority,
-      true
-    );
     const [borrowerAuthority] = PublicKey.findProgramAddressSync(
       [
-        poolPda.toBuffer(),
+        poolPk.toBuffer(),
         walletPublicKey.toBuffer(),
         Buffer.from(BORROWER_AUTHORITY_SEED)
       ],
       new PublicKey(fallIdl.address)
     );
-    const poolAccountAInfo = await getAccount(connection as any, poolAccountA);
-    const poolAccountBInfo = await getAccount(connection as any, poolAccountB);
-    const poolTokenAAmount = Number(poolAccountAInfo.amount);
-    const poolTokenBAmount = Number(poolAccountBInfo.amount);
-    const aToB = poolTokenBAmount / poolTokenAAmount;
-    const bToA = poolTokenAAmount / poolTokenBAmount;
-
+    const [liquidityMint] = PublicKey.findProgramAddressSync(
+      [
+        poolPk.toBuffer(),
+        Buffer.from(LIQUIDITY_SEED)
+      ],
+      new PublicKey(fallIdl.address)
+    );
     const [lendingPoolAuthority] = PublicKey.findProgramAddressSync(
       [
-        poolPda.toBuffer(),
+        poolPk.toBuffer(),
         Buffer.from(LENDING_AUTHORITY_SEED)
       ],
       new PublicKey(fallIdl.address)
     );
     const [lendingReceiptMint] = PublicKey.findProgramAddressSync(
       [
-        poolPda.toBuffer(),
+        poolPk.toBuffer(),
         Buffer.from(LENDING_TOKEN_SEED)
       ],
       new PublicKey(fallIdl.address)
     );
     const [borrowReceiptMint] = PublicKey.findProgramAddressSync(
       [
-        poolPda.toBuffer(),
+        poolPk.toBuffer(),
         Buffer.from(BORROW_TOKEN_SEED)
       ],
       new PublicKey(fallIdl.address)
     );
     const [collateralReceiptMint] = PublicKey.findProgramAddressSync(
       [
-        poolPda.toBuffer(),
+        poolPk.toBuffer(),
         Buffer.from(COLLATERAL_TOKEN_SEED)
       ],
       new PublicKey(fallIdl.address)
     );
-
-    const lendingPoolAccountA = await getAssociatedTokenAddress(
-      mintA,
-      lendingPoolAuthority,
-      true
+    const [liquidityMintPda] = PublicKey.findProgramAddressSync(
+      [poolPk.toBuffer(), Buffer.from(LIQUIDITY_SEED)], 
+      program.programId
     );
-
-    const lendingPoolAccountB = await getAssociatedTokenAddress(
-      mintB,
-      lendingPoolAuthority,
-      true
+    const [lendingPoolAuthorityPda] = PublicKey.findProgramAddressSync(
+      [poolPk.toBuffer(), Buffer.from(LENDING_AUTHORITY_SEED)],
+      program.programId
     );
-
-    const lendingPoolAccountAInfo = await getAccount(connection as any, lendingPoolAccountA);
-    const lendingPoolAccountBInfo = await getAccount(connection as any, lendingPoolAccountB);
-    const lendingReceiptMintInfo = await getMint(connection as any, lendingReceiptMint);
-    const borrowReceiptMintInfo = await getMint(connection as any, borrowReceiptMint);
-    const collateralReceiptMintInfo = await getMint(connection as any, collateralReceiptMint);
-
-    console.log("walletPublicKey",walletPublicKey);
-    const userTokenA = await getAssociatedTokenAddressSync(
-      mintA,
-      walletPublicKey,
-      true
+    const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
+      [poolPk.toBuffer(),Buffer.from(LENDING_TOKEN_SEED)],
+      program.programId
     );
-
-    const userTokenB = await getAssociatedTokenAddress(
-      mintB,
-      walletPublicKey,
-      true
+    const [lenderLendingBlockHeightMint] = PublicKey.findProgramAddressSync(
+      [poolPk.toBuffer(), Buffer.from(LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED)],
+      program.programId
     );
+    const lendingPoolAccountA = await anchor.utils.token.associatedAddress({
+      mint: mintA,
+      owner: lendingPoolAuthorityPda
+    });
 
-    const userTokenAAccount = await getAccount(connection as any, userTokenA);
-    const userTokenBAccount = await getAccount(connection as any, userTokenB);
-    const userLendingReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, lendingReceiptMint);
-    const userBorrowReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, borrowReceiptMint);
-    const userCollateralReceiptAccount = await getUserTokenAmount(connection as any, borrowerAuthority, collateralReceiptMint);
+    const [
+      createPool1,
+      createPool2,
+      initLendingPool1,
+      initLendingPool2,
+      initLendingPool3,
+      poolAccountAInfo,
+      poolAccountBInfo,
+      lendingPoolAccountAInfo,
+      lendingPoolAccountBInfo,
+      lendingReceiptMintInfo,
+      borrowReceiptMintInfo,
+      collateralReceiptMintInfo,
+      userTokenAAccount,
+      userTokenBAccount,
+      userLiquidityAmount,
+      userLendingReceiptAmount,
+      userBorrowReceiptAmount,
+      userCollateralReceiptAmount,
+    ] = await Promise.all([
+      accountExists(connection, poolPk).catch(() => false),
+      accountExists(connection, liquidityMintPda).catch(() => false),
+      accountExists(connection, lendingPoolAccountA).catch(() => false),
+      accountExists(connection, lendingReceiptTokenMint).catch(() => false),
+      accountExists(connection, lenderLendingBlockHeightMint).catch(() => false),
+      getUserTokenAmount(connection, walletPublicKey, pool.mintA).catch(() => 0),
+      getUserTokenAmount(connection, walletPublicKey, pool.mintB).catch(() => 0),
+      getUserTokenAmount(connection, lendingPoolAuthority, pool.mintA).catch(() => 0),
+      getUserTokenAmount(connection, lendingPoolAuthority, pool.mintB).catch(() => 0),
+      getMint(connection, lendingReceiptMint).catch(() => ({ supply: 0 })),
+      getMint(connection, borrowReceiptMint).catch(() => ({ supply: 0 })),
+      getMint(connection, collateralReceiptMint).catch(() => ({ supply: 0 })),
+      getUserTokenAmount(connection, walletPublicKey, mintA).catch(() => 0),
+      getUserTokenAmount(connection, walletPublicKey, mintB).catch(() => 0),
+      getUserTokenAmount(connection, walletPublicKey, liquidityMint).catch(() => 0),
+      getUserTokenAmount(connection, borrowerAuthority, lendingReceiptMint).catch(() => 0),
+      getUserTokenAmount(connection, borrowerAuthority, borrowReceiptMint).catch(() => 0),
+      getUserTokenAmount(connection, borrowerAuthority, collateralReceiptMint).catch(() => 0),
+    ]);
+
+    // 避免除以零的情况
+    const aToB = poolAccountAInfo === 0 ? 0 : Number(poolAccountBInfo) / Number(poolAccountAInfo);
+    const bToA = poolAccountBInfo === 0 ? 0 : Number(poolAccountAInfo) / Number(poolAccountBInfo);
 
     return {
+      poolStatus: {
+        createPool1,
+        createPool2,
+        initLendingPool1,
+        initLendingPool2,
+        initLendingPool3,
+      },
       poolInfo: {
-        poolPk: poolPda,
+        poolPk: poolPk,
         amm: new PublicKey(pool.amm),
         mintA: mintA,
         mintB: mintB,
-        fee: pool.fee,
-        minCollateralRatio: pool.minCollateralRatio,
-        aToB: aToB,
-        bToA: bToA,
-        tokenAAmount: poolTokenAAmount,
-        tokenBAmount: poolTokenBAmount,
+        aToB,
+        bToA,
+        tokenAAmount: Number(poolAccountAInfo),
+        tokenBAmount: Number(poolAccountBInfo),
       },
       lendingPoolInfo: {
-        tokenAAmount: Number(lendingPoolAccountAInfo.amount),
-        tokenBAmount: Number(lendingPoolAccountBInfo.amount),
+        tokenAAmount: Number(lendingPoolAccountAInfo),
+        tokenBAmount: Number(lendingPoolAccountBInfo),
         lendingReceiptSupply: Number(lendingReceiptMintInfo.supply),
         borrowReceiptSupply: Number(borrowReceiptMintInfo.supply),
         collateralReceiptSupply: Number(collateralReceiptMintInfo.supply),
@@ -163,16 +208,55 @@ export async function getPoolDetail(
         },
       },
       userAssets: {
-        tokenAAmount: userTokenAAccount.amount.toString(),
-        tokenBAmount: userTokenBAccount.amount.toString(),
-        lendingReceiptAmount: userLendingReceiptAccount.toString(),
-        borrowReceiptAmount: userBorrowReceiptAccount.toString(),
-        collateralReceiptAmount: userCollateralReceiptAccount.toString()
+        tokenAAmount: userTokenAAccount.toString(),
+        tokenBAmount: userTokenBAccount.toString(),
+        liquidityAmount: userLiquidityAmount.toString(),
+        lendingReceiptAmount: userLendingReceiptAmount.toString(),
+        borrowReceiptAmount: userBorrowReceiptAmount.toString(),
+        collateralReceiptAmount: userCollateralReceiptAmount.toString()
       }
     };
   } catch (error) {
     console.error('Error getting lending pool details:', error);
-    throw error;
+    return {
+      poolStatus: {
+        createPool1: false,
+        createPool2: false,
+        initLendingPool1: false,
+        initLendingPool2: false,
+        initLendingPool3: false,
+      },
+      poolInfo: {
+        poolPk: new PublicKey(pool.poolPk),
+        amm: new PublicKey(pool.amm),
+        mintA: new PublicKey(pool.mintA),
+        mintB: new PublicKey(pool.mintB),
+        aToB: 0,
+        bToA: 0,
+        tokenAAmount: 0,
+        tokenBAmount: 0,
+      },
+      lendingPoolInfo: {
+        tokenAAmount: 0,
+        tokenBAmount: 0,
+        lendingReceiptSupply: 0,
+        borrowReceiptSupply: 0,
+        collateralReceiptSupply: 0,
+        addresses: {
+          lendingReceipt: '',
+          borrowReceipt: '',
+          collateralReceipt: '',
+        },
+      },
+      userAssets: {
+        tokenAAmount: '0',
+        tokenBAmount: '0',
+        liquidityAmount: '0',
+        lendingReceiptAmount: '0',
+        borrowReceiptAmount: '0',
+        collateralReceiptAmount: '0'
+      }
+    };
   }
 }
 
@@ -185,4 +269,10 @@ async function getUserTokenAmount (connection: Connection, walletPublicKey: Publ
     console.log("getUserTokenAmount",e);
     return 0;
   }
+}
+
+
+async function accountExists(connection: Connection, publicKey: PublicKey): Promise<boolean> {
+  const account = await connection.getAccountInfo(publicKey);
+  return account !== null;
 }

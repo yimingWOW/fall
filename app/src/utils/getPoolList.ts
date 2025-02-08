@@ -7,12 +7,15 @@ export interface PoolInfo {
   amm: PublicKey;
   mintA: PublicKey;
   mintB: PublicKey;
-  fee: number;
-  minCollateralRatio: number;
   tokenAAmount: number;
   tokenBAmount: number;
   aToB: number;
   bToA: number;
+  displayName?: string;
+  tokenAIcon?: string;
+  tokenBIcon?: string;
+  tokenASymbol?: string;
+  tokenBSymbol?: string;
 }
 
 export async function getPoolList(
@@ -34,14 +37,13 @@ export async function getPoolList(
     const accounts = await program.account.pool.all();
 
     return accounts.map((account: any) => ({
-      poolPk: account.publicKey.toString(),
-      amm: account.account.amm.toString(),
-      mintA: account.account.mintA.toString(),
-      mintB: account.account.mintB.toString(),
-      fee: account.account.fee.toString(),
-      minCollateralRatio: account.account.minCollateralRatio.toString(),
+      poolPk: new PublicKey(account.publicKey.toString()),
+      amm: new PublicKey(account.account.amm.toString()),
+      mintA: new PublicKey(account.account.mintA.toString()),
+      mintB: new PublicKey(account.account.mintB.toString()),
       tokenAAmount: account.account.tokenAAmount.toString(),
       tokenBAmount: account.account.tokenBAmount.toString(),
+      displayName: `${account.account.mintA.toString().slice(0,4)}...${account.account.mintB.toString().slice(0,4)}`
     }));
   } catch (error) {
     console.error('Error fetching pool accounts:', error);

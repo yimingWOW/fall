@@ -1,5 +1,5 @@
 {
-  "address": "C8sj5h7nejVHeyWvq6aCwrFWY5Q5QGuZDPqVwVHPxNLm",
+  "address": "ER5MQJBiygFkq5Sm7QH19wajvQRnTpkpvvEVJNJez8VW",
   "metadata": {
     "name": "fall",
     "version": "0.1.0",
@@ -752,16 +752,16 @@
       ]
     },
     {
-      "name": "create_pool",
+      "name": "create_pool_1",
       "discriminator": [
-        233,
-        146,
-        209,
-        142,
-        207,
-        104,
-        64,
-        188
+        65,
+        185,
+        40,
+        205,
+        113,
+        45,
+        173,
+        179
       ],
       "accounts": [
         {
@@ -1025,12 +1025,214 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "create_pool_2",
+      "discriminator": [
+        207,
+        49,
+        43,
+        9,
+        129,
+        200,
+        113,
+        224
+      ],
+      "accounts": [
         {
-          "name": "fee",
-          "type": "u16"
+          "name": "amm",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "amm.id",
+                "account": "Amm"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint_a"
+        },
+        {
+          "name": "mint_b"
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "amm"
+              },
+              {
+                "kind": "account",
+                "path": "mint_a"
+              },
+              {
+                "kind": "account",
+                "path": "mint_b"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "amm"
+              },
+              {
+                "kind": "account",
+                "path": "mint_a"
+              },
+              {
+                "kind": "account",
+                "path": "mint_b"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  97
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidity_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  98
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin"
+        },
+        {
+          "name": "admin_fee_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "admin"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "liquidity_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "deposit_collateral",
@@ -1546,24 +1748,33 @@
       ],
       "accounts": [
         {
+          "name": "amm",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "amm.id",
+                "account": "Amm"
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "pool.amm",
-                "account": "Pool"
+                "path": "amm"
               },
               {
                 "kind": "account",
-                "path": "pool.mint_a",
-                "account": "Pool"
+                "path": "mint_a"
               },
               {
                 "kind": "account",
-                "path": "pool.mint_b",
-                "account": "Pool"
+                "path": "mint_b"
               }
             ]
           }
@@ -1574,8 +1785,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "pool.amm",
-                "account": "Pool"
+                "path": "amm"
               },
               {
                 "kind": "account",
@@ -1595,16 +1805,10 @@
           }
         },
         {
-          "name": "mint_a",
-          "relations": [
-            "pool"
-          ]
+          "name": "mint_a"
         },
         {
-          "name": "mint_b",
-          "relations": [
-            "pool"
-          ]
+          "name": "mint_b"
         },
         {
           "name": "depositor",
@@ -2040,6 +2244,99 @@
               {
                 "kind": "account",
                 "path": "mint_b"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "admin"
+        },
+        {
+          "name": "admin_fee_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "admin"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "liquidity_mint"
               }
             ],
             "program": {
@@ -5567,6 +5864,18 @@
       ],
       "accounts": [
         {
+          "name": "amm",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "amm.id",
+                "account": "Amm"
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "pda": {
             "seeds": [
@@ -6656,7 +6965,7 @@
           {
             "name": "id",
             "docs": [
-              "The primary key of the AMM"
+              "Primary key of the AMM"
             ],
             "type": "pubkey"
           },
@@ -6666,6 +6975,21 @@
               "Account that has admin authority over the AMM"
             ],
             "type": "pubkey"
+          },
+          {
+            "name": "liquidity_fee",
+            "docs": [
+              "liquidity fee percentage: 100000 = 100%"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "protocol_fee_percentage",
+            "docs": [
+              "Protocol fee percentage of the liquidity fee (0-100)",
+              "e.g., 10000 means 100% of liquidity fee goes to protocol"
+            ],
+            "type": "u16"
           }
         ]
       }
@@ -6697,13 +7021,6 @@
             "type": "pubkey"
           },
           {
-            "name": "fee",
-            "docs": [
-              "The LP fee taken on each trade, in basis points"
-            ],
-            "type": "u16"
-          },
-          {
             "name": "token_a_amount",
             "docs": [
               "借贷池中token a的数量"
@@ -6714,13 +7031,6 @@
             "name": "token_b_amount",
             "docs": [
               "借贷池中token b的数量"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "min_collateral_ratio",
-            "docs": [
-              "最小抵押率 (基点表示，20000 = 200%)"
             ],
             "type": "u64"
           },
@@ -6779,9 +7089,9 @@
       "value": "[97]"
     },
     {
-      "name": "BASE_RATE",
+      "name": "BASE_INTEREST_RATE",
       "type": "u64",
-      "value": "10000"
+      "value": "5"
     },
     {
       "name": "BORROWER_AUTHORITY_SEED",
@@ -6826,10 +7136,15 @@
     {
       "name": "MINIMUM_LIQUIDITY",
       "type": "u64",
-      "value": "100"
+      "value": "10"
     },
     {
-      "name": "MIN_COLLATERAL_RATIO_BASE",
+      "name": "MIN_COLLATERAL_RATIO",
+      "type": "u64",
+      "value": "10000"
+    },
+    {
+      "name": "PERCENT_BASE",
       "type": "u64",
       "value": "10000"
     }

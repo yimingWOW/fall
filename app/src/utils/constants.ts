@@ -3,7 +3,6 @@ export const CONFIG = {
   fallIdl
 } as const;
 
-export const BASE_RATE = 10000;
 
 export const AUTHORITY_SEED= "a"; // authority
 export const LIQUIDITY_SEED= "b"; // liquidity
@@ -18,5 +17,8 @@ export const BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED= "j"; // borrow_height_toke
 // Constants
 export const MINIMUM_LIQUIDITY = 100;
 export const PRICE_SCALE = 1_000_000_000; 
+export const MIN_COLLATERAL_RATIO = 10000;
+export const BASE_RATE = 10000;
 
 export const EXCLUDED_PUBLIC_KEY = 'GUXNPX5ci1Qj76MZe2aRJ33zK48VmT6gXVyR86CsF4T5';
+export const ADMIN_PUBLIC_KEY = 'EisXsrG1aCoaJTFSDdXTBRAEAZP46wPWkKJpF7RfC3DV';

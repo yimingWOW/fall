@@ -157,3 +157,10 @@
   margin: 0;
   line-height: 1;
 } 
+
+/* 添加内容区域样式 */
+.dashboard-content {
+  margin-top: 140px; /* 72px (nav) + 约68px (tab-nav高度) */
+  width: 100%;
+  padding: var(--spacing-md);
+}
