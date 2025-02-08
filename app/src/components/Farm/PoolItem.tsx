@@ -63,17 +63,29 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
               <div className="code-text">Loading prices...</div>
             </div>
           ) : details ? (
-            <div className="align-center">
-              <div className="step" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="body-text">Price</span>
-                <button className="swap-direction-toggle" onClick={() => setIsPriceReversed(!isPriceReversed)}></button>
-                {!isPriceReversed ? (
-                  <span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
-                ) : (
-                  <span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
-                )}
+              <>                
+              <div className="align-center">
+                <div className="step" >
+                  <div className="info-row">
+                    <span className="body-text">Price</span>
+                    <button className="swap-direction-toggle" onClick={() => setIsPriceReversed(!isPriceReversed)}></button>
+                    {!isPriceReversed ? (
+                      <span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
+                    ) : (
+                      <span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+              <div className="step" >
+                <div className="info-row">
+                  <span className="body-text">Pool TokenA Amount:</span>
+                  <span className="code-text">{details?.poolInfo.tokenAAmount.toFixed(6)}</span>
+                  <span className="body-text">Pool TokenB Amount:</span>
+                  <span className="code-text">{details?.poolInfo.tokenBAmount.toFixed(6)}</span>
+                </div>
+              </div>
+            </>
           ) : (
             <div className="step">
               <div className="code-text" style={{ color: 'var(--error)' }}>
@@ -89,26 +101,33 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
             }}
           />
           <div className="wrapper"></div>
-          {isLoadingDetails ? (
-            <div className="loading-state">
-              <div className="code-text">Loading your liquidity amount...</div>
-            </div>
-          ) : details ? (
-            <WithdrawLiquidityForm
-              pool={pool}
-              amount={parseFloat(details.userAssets.liquidityAmount)}
-              onSuccess={(signature) => {
-                onTxSuccess(signature);
-                fetchDetails();
-              }}
-            />
-          ) : (
-            <div className="error-state">
-              <div className="code-text">Failed to load your liquidity amount</div>
-            </div>
-          )}
+            {isLoadingDetails ? (
+              <div className="loading-state">
+                <div className="code-text">Loading your liquidity amount...</div>
+              </div>
+            ) : details ? (
+              <WithdrawLiquidityForm
+                pool={pool}
+                amount={parseFloat(details.userAssets.liquidityAmount)}
+                onSuccess={(signature) => {
+                  onTxSuccess(signature);
+                  fetchDetails();
+                }}
+              />
+            ) : (
+              <div className="error-state">
+                <div className="code-text">Failed to load your liquidity amount</div>
+              </div>
+            )}
+            {walletPublicKey?.toBase58() == details?.poolInfo.admin.toString() && (
+              <div className="step">
+                <div className="info-row">
+                  <div className="body-text">You are the admin of this pool</div>
+                  <div className="code-text">You have {details?.poolInfo.adminFeeAmount} admin fee</div>
+                </div>
+              </div>
+            )}
           </div>
-        
       )}
     </div>
   );

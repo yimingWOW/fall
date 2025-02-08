@@ -73,24 +73,26 @@ export const BorrowerPoolList: FC = () => {
         <div className="section">
           {pools.map((pool) => (
             <div key={pool.poolPk.toString()} className="step" onClick={() => setSelectedPool(pool)}>
-              <div className="token-pair-container">
-                <img 
-                  src={pool.tokenAIcon || defaultTokenIcon} 
-                  alt={pool.tokenASymbol || 'Token A'} 
-                  className="token-icon"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = defaultTokenIcon;
-                  }}
-                />
-                <div className="swap-direction-toggle" />
-                <img 
-                  src={pool.tokenBIcon || defaultTokenIcon} 
-                  alt={pool.tokenBSymbol || 'Token B'} 
-                  className="token-icon"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = defaultTokenIcon;
-                  }}
-                />
+              <div className="info-row">
+                <div className="token-pair-container">
+                  <img 
+                    src={pool.tokenAIcon || defaultTokenIcon} 
+                    alt={pool.tokenASymbol || 'Token A'} 
+                    className="token-icon"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = defaultTokenIcon;
+                    }}
+                  />
+                  <div className="swap-direction-toggle" />
+                  <img 
+                    src={pool.tokenBIcon || defaultTokenIcon} 
+                    alt={pool.tokenBSymbol || 'Token B'} 
+                    className="token-icon"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = defaultTokenIcon;
+                    }}
+                  />
+                </div>
                 <span className="body-text">Trading Pair: </span>
                 <span className="code-text address-pair">
                   <span>{pool.mintA.toString().slice(0, 4)}...{pool.mintA.toString().slice(-4)}</span>

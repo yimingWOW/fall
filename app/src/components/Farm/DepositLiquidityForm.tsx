@@ -128,12 +128,8 @@ export const DepositLiquidityForm: FC<DepositLiquidityFormProps> = ({
             type="submit" 
             className="button btn-primary"
             disabled={isLoading || !wallet || !formData.amountA || !formData.amountB}
-          >
-            {!wallet 
-              ? 'Connect Wallet' 
-              : isLoading 
-                ? 'Depositing Liquidity...' 
-                : 'Deposit Liquidity'}
+            >
+            {!wallet  ? 'Connect Wallet'  : isLoading  ? 'Depositing Liquidity...'  : 'Deposit Liquidity'}
           </button>
         </div>
       </form>

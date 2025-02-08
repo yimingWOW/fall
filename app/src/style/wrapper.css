@@ -54,20 +54,21 @@
     min-width: fit-content; /* 确保容器宽度适应内容 */
   }
 
-  .token-section {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 0 4px;
-  }
+.token-section {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
 
-  .token-pair-container {
-    display: flex;
-    align-items: center;
-    gap: 0px; /* 减小间距 */
-  }
+.token-pair-container {
+  display: flex;
+  align-items: center;
+  gap: 0px; /* 减小间距 */
+  max-width: 200px;
+}
 
   
 

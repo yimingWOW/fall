@@ -5,10 +5,13 @@ import { Idl } from '@coral-xyz/anchor';
 export interface PoolInfo {
   poolPk: PublicKey;
   amm: PublicKey;
+  admin: PublicKey;
   mintA: PublicKey;
   mintB: PublicKey;
   tokenAAmount: number;
   tokenBAmount: number;
+  liquidityMintAmount: number;
+  adminFeeAmount: number;
   aToB: number;
   bToA: number;
   displayName?: string;

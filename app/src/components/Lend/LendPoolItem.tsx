@@ -126,11 +126,7 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           <div className="step">
             <div className="info-row">
               <span className="body-text">Your TokenA Balance:</span>
-              <span className="code-text">{details?.lendingPoolInfo.tokenAAmount.toFixed(6)}</span>
-              <span className="body-text">Your TokenB Balance:</span>
-              <span className="code-text">{details?.lendingPoolInfo.tokenBAmount.toFixed(6)}</span>
-            </div>
-            <div className="info-row">
+              <span className="code-text">{details?.userAssets.tokenAAmount}</span>
               <span className="body-text">You have lent tokenA:</span>
               <span className="code-text">{details.userAssets.lendingReceiptAmount}</span>
             </div>
