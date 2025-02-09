@@ -13,6 +13,7 @@ import './style/tap.css';
 import './style/Theme.css';
 import './style/Typography.css';
 import logo from '../public/favicon.png';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 const App: FC = () => {
   const { connected } = useWallet();
@@ -44,7 +45,10 @@ const App: FC = () => {
             </div>
           </div>
         ) : (
-          <Dashboard />
+          <Routes>
+            <Route path="/" element={<Navigate to="/guide" replace />} />
+            <Route path="/:tab" element={<Dashboard />} />
+          </Routes>
         )}
       </main>
 

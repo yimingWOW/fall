@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AmmList } from './Amm/AmmList.tsx';
@@ -33,12 +33,22 @@ const Dashboard: FC = () => {
   const { publicKey } = useWallet();
   const navigate = useNavigate();
   const { tab } = useParams();
-  const [currentTab, setCurrentTab] = useState(tab || 'guide');
+  const [currentTab, setCurrentTab] = useState(() => {
+    return tab && ['amm', 'guide', 'swap', 'farm', 'lenderPool', 'borrowerPool', 'liquidate'].includes(tab)
+      ? tab
+      : 'guide';
+  });
   
   const handleTabChange = (newTab: string) => {
     setCurrentTab(newTab);
     navigate(`/${newTab}`);
   };
+
+  useEffect(() => {
+    if (tab && tab !== currentTab) {
+      setCurrentTab(tab);
+    }
+  }, [tab, currentTab]);
 
   return (
     <AmmProvider>
