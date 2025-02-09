@@ -46,10 +46,10 @@ export type PoolDetailInfo = {
 export async function getPoolDetail(
   wallet: AnchorWallet,
   connection: Connection,
-  pool: PoolInfo,
+  poolPk: PublicKey,
   walletPublicKey: PublicKey  
 ): Promise<PoolDetailInfo> {
-  console.log("walletPublicKey", walletPublicKey);
+  console.log("poolPk", poolPk);
 
   try {
     const provider = new anchor.AnchorProvider(
@@ -65,12 +65,14 @@ export async function getPoolDetail(
       provider
     ) as any;
 
-    const poolPk = new PublicKey(pool.poolPk);
+    console.log("poolPk", poolPk);
+    const pool = await program.account.pool.fetch(poolPk);
+    console.log("pool", pool);
+    const amm = await program.account.amm.fetch(pool.amm);
+    console.log("amm", amm);
+
     const mintA = new PublicKey(pool.mintA);
     const mintB = new PublicKey(pool.mintB);
-
-    const amm = await program.account.amm.fetch(new PublicKey(pool.amm));
-
     const [borrowerAuthority] = PublicKey.findProgramAddressSync(
       [
         poolPk.toBuffer(),
@@ -243,11 +245,11 @@ export async function getPoolDetail(
         initLendingPool3: false,
       },
       poolInfo: {
-        poolPk: new PublicKey(pool.poolPk),
-        amm: new PublicKey(pool.amm),
-        admin: new PublicKey(pool.admin),
-        mintA: new PublicKey(pool.mintA),
-        mintB: new PublicKey(pool.mintB),
+        poolPk: new PublicKey(poolPk),
+        amm: new PublicKey(""),
+        admin: new PublicKey(""),
+        mintA: new PublicKey(""),
+        mintB: new PublicKey(""),
         liquidityMintAmount: 0,
         adminFeeAmount: 0,
         aToB: 0,

@@ -8,7 +8,7 @@ interface CopyableAddressProps {
 }
 
 export const CopyableAddress: FC<CopyableAddressProps> = ({ 
-  address,
+  address = '',
   shortened = true 
 }) => {
   const [copySuccess, setCopySuccess] = useState(false);

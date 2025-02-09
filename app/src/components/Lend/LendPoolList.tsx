@@ -1,16 +1,12 @@
 import { FC } from 'react';
 import { PoolList } from '../utils/poollist';
-import { LenderPoolItem } from './LendPoolItem';
+import { Outlet } from 'react-router-dom';
 
 export const LenderPoolList: FC = () => {
   return (
-    <PoolList
-      renderPoolItem={(pool, onTxSuccess) => (
-        <LenderPoolItem 
-          pool={pool} 
-          onTxSuccess={onTxSuccess}
-        />
-      )}
-    />
+    <div>
+      <PoolList />
+      <Outlet />  {/* 这里会渲染子路由（LenderPoolItem）*/}
+    </div>
   );
 };

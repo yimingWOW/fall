@@ -1,16 +1,12 @@
 import { FC } from 'react';
 import { PoolList } from '../utils/poollist';
-import { BorrowerPoolItem } from './BorrowPoolItem';
+import { Outlet } from 'react-router-dom';
 
 export const BorrowerPoolList: FC = () => {
   return (
-    <PoolList
-      renderPoolItem={(pool, onTxSuccess) => (
-        <BorrowerPoolItem 
-          pool={pool} 
-          onTxSuccess={onTxSuccess}
-        />
-      )}
-    />
+    <div>
+      <PoolList />
+      <Outlet />  
+    </div>
   );
 }; 

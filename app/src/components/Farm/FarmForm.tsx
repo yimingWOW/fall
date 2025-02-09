@@ -1,25 +1,16 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { PoolList } from '../utils/poollist';
-import { PoolItem } from './PoolItem';
-import { CreatePoolForm } from './CreatePoolForm';
+import { useNavigate } from 'react-router-dom';
 
 export const FarmForm: FC = () => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
-
-  if (showCreateForm) {
-    return (
-      <CreatePoolForm 
-        onShowForm={setShowCreateForm}
-        onSuccess={() => setShowCreateForm(false)}
-      />
-    );
-  }
+  const navigate = useNavigate();
 
   return (
-    <PoolList
-      renderPoolItem={(pool) => <PoolItem pool={pool} />}
-      showCreatePool={true}
-      onCreatePool={() => setShowCreateForm(true)}
-    />
+    <div>
+      <PoolList
+        showCreatePool={true}
+        onCreatePool={() => navigate('/farm/create')}
+      />
+    </div>
   );
 };

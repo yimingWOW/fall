@@ -1,17 +1,14 @@
 import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
+import { useNavigate } from 'react-router-dom';
 import { createPool } from '../../utils/createPool';
-import { useAmm } from '../../contexts/AmmContext';
+import { useAmm } from '../contexts/AmmContext';
 import '../../style/Theme.css';
 import '../../style/Typography.css';
 
-interface CreatePoolFormProps {
-  onShowForm: (show: boolean) => void;
-  onSuccess?: (signature: string) => void;
-}
-
-export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess }) => {
+export const CreatePoolForm: FC = () => {
+  const navigate = useNavigate();
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const { amm } = useAmm();
@@ -56,8 +53,7 @@ export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess 
       
       setLastTxSignature(signature.toString());
       setFormData({ mintA: '', mintB: '' });
-      onSuccess?.(signature.toString());
-      onShowForm(false);
+      navigate('/farm');
     } catch (err) {
       console.error("Error creating pool:", err);
       setError(err instanceof Error ? err.message : "Failed to create pool");
@@ -68,86 +64,86 @@ export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess 
 
   return (
     <div className="wrapper">
-        <div className="back-button-container">
-          <button 
-            className="button btn-primary"
-            onClick={() => onShowForm(false)}
-            style={{ marginBottom: 'var(--spacing-md)' }}
-          >
-            Back
-          </button>
-        </div>
-      <div className="wrapper-container">
-      <div className="wrapper-box">
-        <div className="section-title">Create New Pool</div>
-        {error && (
-          <div className="code-text" style={{ color: 'var(--error)' }}>
-            {error}
-          </div>
-        )}
-        {lastTxSignature && (
-          <div>
-            <span className="code-text" style={{ color: 'var(--primary)' }}>
-              Pool created successfully! 
-            </span>
-            <a 
-              href={`https://explorer.solana.com/tx/${lastTxSignature}`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="code-text"
-              style={{ marginLeft: 'var(--spacing-xs)' }}
-            >
-              View transaction
-            </a>
-          </div>
-        )}
-        <form onSubmit={handleSubmit}>
-          <div className="wrapper-box">
-            <span className="sub-title">AMM Pubkey</span>
-            <input
-              className="input"
-              type="text"
-              value={amm ? amm.pubkey : ''}
-              readOnly
-              disabled
-            />
-          </div>
-          <div className="wrapper-box">
-            <span className="sub-title">Token A Mint Address</span>
-            <input
-              className="input"
-              type="text"
-              value={formData.mintA}
-              onChange={(e) => setFormData({...formData, mintA: e.target.value})}
-              placeholder="Enter token A mint address"
-              required
-              disabled={isLoading}
-            />
-          </div>
-          <div className="wrapper-box">
-            <span className="sub-title">Token B Mint Address</span>
-            <input
-              className="input"
-              type="text"
-              value={formData.mintB}
-              onChange={(e) => setFormData({...formData, mintB: e.target.value})}
-              placeholder="Enter token B mint address"
-              required
-              disabled={isLoading}
-            />
-          </div>
-          <div className="align-center">
-          <button 
-            type="submit" 
-            className="button btn-primary"
-            disabled={isLoading || !wallet}
-          >
-            {isLoading ? 'Creating...' : 'Create Pool'}
-            </button>
-          </div>
-        </form>
+      <div className="back-button-container">
+        <button 
+          className="button btn-primary"
+          onClick={() => navigate('/farm')}
+          style={{ marginBottom: 'var(--spacing-md)' }}
+        >
+          Back
+        </button>
       </div>
-    </div>
+      <div className="wrapper-container">
+        <div className="wrapper-box">
+          <div className="section-title">Create New Pool</div>
+          {error && (
+            <div className="code-text" style={{ color: 'var(--error)' }}>
+              {error}
+            </div>
+          )}
+          {lastTxSignature && (
+            <div>
+              <span className="code-text" style={{ color: 'var(--primary)' }}>
+                Pool created successfully! 
+              </span>
+              <a 
+                href={`https://explorer.solana.com/tx/${lastTxSignature}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="code-text"
+                style={{ marginLeft: 'var(--spacing-xs)' }}
+              >
+                View transaction
+              </a>
+            </div>
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="wrapper-box">
+              <span className="sub-title">AMM Pubkey</span>
+              <input
+                className="input"
+                type="text"
+                value={amm ? amm.pubkey : ''}
+                readOnly
+                disabled
+              />
+            </div>
+            <div className="wrapper-box">
+              <span className="sub-title">Token A Mint Address</span>
+              <input
+                className="input"
+                type="text"
+                value={formData.mintA}
+                onChange={(e) => setFormData({...formData, mintA: e.target.value})}
+                placeholder="Enter token A mint address"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="wrapper-box">
+              <span className="sub-title">Token B Mint Address</span>
+              <input
+                className="input"
+                type="text"
+                value={formData.mintB}
+                onChange={(e) => setFormData({...formData, mintB: e.target.value})}
+                placeholder="Enter token B mint address"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="align-center">
+              <button 
+                type="submit" 
+                className="button btn-primary"
+                disabled={isLoading || !wallet}
+              >
+                {isLoading ? 'Creating...' : 'Create Pool'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

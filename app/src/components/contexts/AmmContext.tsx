@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
-import { getAmmAccounts, AmmInfo } from '../utils/getAmmList';
+import { getAmmAccounts, AmmInfo } from '../../utils/getAmmList';
 
 interface AmmContextType {
   amm: AmmInfo | null;

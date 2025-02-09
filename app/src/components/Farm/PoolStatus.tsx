@@ -8,7 +8,7 @@ import { createPool } from '../../utils/createPool';
 import { PoolStatusInfo } from '../../utils/getPoolDetail';
 
 interface PoolStatusProps {
-  pool: PoolInfo;
+  pool: PoolInfo | null;
   poolStatus: PoolStatusInfo | null;
   onTxSuccess: (signature: string) => void;
 }
@@ -45,13 +45,17 @@ export const PoolStatus: FC<PoolStatusProps> = ({ pool, onTxSuccess, poolStatus 
         console.error('Wallet not connected');
         return;
       }
+      if (!pool) {
+        console.error('Pool not found');
+        return;
+      }
       setIsLoading(true);
       const signature = await createPool(
         wallet,
         connection,
-        pool.amm,
-        pool.mintA,
-        pool.mintB
+        pool?.amm,
+        pool?.mintA,
+        pool?.mintB
       );
       onTxSuccess(signature.toString());
     } catch (error) {

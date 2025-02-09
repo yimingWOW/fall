@@ -2,7 +2,6 @@ import { FC, useState, useEffect } from 'react';
 import { useConnection, useWallet, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { getPoolDetail, PoolDetailInfo } from '../../utils/getPoolDetail';
 import { DepositLiquidityForm } from './DepositLiquidityForm';
-import { PoolInfo } from '../../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
 import '../../style/Theme.css';
 import { WithdrawLiquidityForm } from './WithdrawLiquidityForm';
@@ -10,14 +9,13 @@ import { PoolStatus } from './PoolStatus';
 import { shouldInitializePool } from '../utils/pool';
 import '../../style/button.css';
 import '../../style/Typography.css';
+import { useParams, useNavigate } from 'react-router-dom';
 
-interface PoolItemProps {
-  pool: PoolInfo;
-}
-
-export const PoolItem: FC<PoolItemProps> = ({ pool }) => {
+export const PoolItem: FC = () => {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
+  const { poolAddress } = useParams();
+  const navigate = useNavigate();
   const { publicKey: walletPublicKey } = useWallet();
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
@@ -30,12 +28,12 @@ export const PoolItem: FC<PoolItemProps> = ({ pool }) => {
       const poolDetail = await getPoolDetail(
         wallet,
         connection, 
-        pool,
+        new PublicKey(poolAddress || ''),
         walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
     } catch (error) {
-      console.error('Error fetching pool prices:', error);
+      console.error('Error fetchDetails', error);
     } finally {
       setIsLoadingDetails(false);
     }
@@ -43,14 +41,23 @@ export const PoolItem: FC<PoolItemProps> = ({ pool }) => {
   
   useEffect(() => {
     fetchDetails();
-  }, [pool, connection, walletPublicKey]);
+  }, [poolAddress, connection, walletPublicKey]);
 
   return (
     <div className="card-container">
+      <div className="back-button-container">
+        <button 
+          className="button btn-primary"
+          onClick={() => navigate('/farm')}
+          style={{ marginBottom: 'var(--spacing-md)' }}
+        >
+          Back
+        </button>
+      </div>
       {shouldInitializePool(details?.poolStatus || null) ? (
         <div className="section">
           <PoolStatus
-            pool={pool}
+            pool={details?.poolInfo || null}
             poolStatus={details?.poolStatus || null}
             onTxSuccess={fetchDetails}
           />
@@ -93,7 +100,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool }) => {
             </div>
           )}
           <DepositLiquidityForm 
-            pool={pool}
+            pool={details?.poolInfo || null}
             onSuccess={fetchDetails}
           />
           <div className="wrapper"></div>
@@ -103,7 +110,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool }) => {
               </div>
             ) : details ? (
               <WithdrawLiquidityForm
-                pool={pool}
+                pool={details?.poolInfo || null}
                 amount={parseFloat(details.userAssets.liquidityAmount)}
                 onSuccess={fetchDetails}
               />

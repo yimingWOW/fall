@@ -1,27 +1,26 @@
 import { FC, useEffect, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getPoolList, PoolInfo } from '../../utils/getPoolList';
 import defaultTokenIcon from '../../assets/default-token.png';
 import '../../style/Theme.css';
 import '../../style/Typography.css';
 
 interface PoolListProps {
-  renderPoolItem: (pool: PoolInfo, onTxSuccess: (signature: string) => void) => React.ReactNode;
   showCreatePool?: boolean;
   onCreatePool?: () => void;
 }
 
 export const PoolList: FC<PoolListProps> = ({ 
-  renderPoolItem, 
   showCreatePool = false,
   onCreatePool
 }) => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [pools, setPools] = useState<PoolInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPool, setSelectedPool] = useState<PoolInfo | null>(null);
-  const [lastTxSignature, setLastTxSignature] = useState<string>('');
 
   const fetchPools = async () => {
     try {
@@ -38,24 +37,18 @@ export const PoolList: FC<PoolListProps> = ({
 
   useEffect(() => {
     fetchPools();
-  }, [connection, wallet, lastTxSignature]);
+  }, [connection, wallet]);
+
+  const handleDetailsClick = (pool: PoolInfo, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const basePath = location.pathname.split('/')[1];
+    navigate(`/${basePath}/${pool.poolPk.toString()}`);
+  };
 
   return (
     <div className="tap-page">
       {isLoading ? (
         <div className="loading-spinner"></div>
-      ) : selectedPool ? (
-        <>
-          <div className="back-button-container">
-            <button className="button btn-primary" onClick={() => setSelectedPool(null)}>
-              Back
-            </button>
-          </div>
-          {renderPoolItem(selectedPool, (signature) => {
-            setLastTxSignature(signature);
-            fetchPools();
-          })}
-        </>
       ) : (
         <div className="section">
           {showCreatePool && (
@@ -75,7 +68,6 @@ export const PoolList: FC<PoolListProps> = ({
               <div
                 key={pool.poolPk.toString()}
                 className="step"
-                onClick={() => setSelectedPool(pool)}
               >
                 <div className="info-row">
                   <div className="token-pair-container">
@@ -107,7 +99,12 @@ export const PoolList: FC<PoolListProps> = ({
                   <span className="code-text">
                     {pool.poolPk.toString().slice(0, 4)}...{pool.poolPk.toString().slice(-4)}
                   </span>
-                  <button className="button btn-primary">Details</button>
+                  <button 
+                    className="button btn-primary"
+                    onClick={(e) => handleDetailsClick(pool, e)}
+                  >
+                    Details
+                  </button>
                 </div>
               </div>
             ))

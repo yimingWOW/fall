@@ -1,9 +1,10 @@
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { FC } from 'react';
-import Dashboard from './components/Dashboard';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { NetworkSelect } from './WalletContextProvider';
-import { useNetwork } from './contexts/NetworkContext';
+import { useNetwork } from './components/contexts/NetworkContext';
+import { useRoutes } from 'react-router-dom';
+import { routeConfig } from './Router/index';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './style/App.css';
 import './style/button.css';
@@ -13,11 +14,12 @@ import './style/tap.css';
 import './style/Theme.css';
 import './style/Typography.css';
 import logo from '../public/favicon.png';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { AmmProvider } from './components/contexts/AmmContext';
 
-const App: FC = () => {
+const AppContent: FC = () => {
   const { connected } = useWallet();
   const { network, setNetwork } = useNetwork();
+  const routeElement = useRoutes(routeConfig);
 
   return (
     <div className="app-container">
@@ -45,10 +47,7 @@ const App: FC = () => {
             </div>
           </div>
         ) : (
-          <Routes>
-            <Route path="/" element={<Navigate to="/guide" replace />} />
-            <Route path="/:tab" element={<Dashboard />} />
-          </Routes>
+          routeElement
         )}
       </main>
 
@@ -71,6 +70,14 @@ const App: FC = () => {
         </a>
       </div>
     </div>
+  );
+};
+
+const App: FC = () => {
+  return (
+    <AmmProvider>
+      <AppContent />
+    </AmmProvider>
   );
 };
 

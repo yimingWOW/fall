@@ -3,7 +3,6 @@ import { useConnection, useWallet, useAnchorWallet } from '@solana/wallet-adapte
 import { getPoolDetail, PoolDetailInfo } from '../../utils/getPoolDetail';
 import { LendForm } from './LendForm';
 import { RedeemForm } from './RedeemForm';
-import { PoolInfo } from '../../utils/getPoolList';
 import { PublicKey } from '@solana/web3.js';
 import '../../style/Theme.css';
 import '../../style/Typography.css';
@@ -12,32 +11,34 @@ import defaultTokenIcon from '../../assets/default-token.png';
 import { PoolStatus } from '../Farm/PoolStatus';
 import { shouldInitializePool } from '../utils/pool';
 import { CopyableAddress } from '../utils/copyableaddress';
-interface PoolItemProps {
-  pool: PoolInfo;
-  onTxSuccess: (signature: string) => void;
-}
+import { useParams, useNavigate } from 'react-router-dom';
 
-export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
+export const LenderPoolItem: FC = () => {
+  const { poolAddress } = useParams();
+  const navigate = useNavigate();
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
   const { publicKey: walletPublicKey } = useWallet();
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isPriceReversed, setIsPriceReversed] = useState(false);
+   
+  console.log("poolAddress", poolAddress);
 
   const fetchDetails = async () => {
     try {
       if (!wallet) return;
+      if (!poolAddress) return;
       setIsLoadingDetails(true);
       const poolDetail = await getPoolDetail(
         wallet,
         connection, 
-        pool, 
+        new PublicKey(poolAddress), 
         walletPublicKey || new PublicKey('')
       );
       setDetails(poolDetail);
     } catch (error) {
-      console.error('Error fetching pool prices:', error);
+      console.error('Error fetchDetails', error);
     } finally {
       setIsLoadingDetails(false);
     }
@@ -45,15 +46,24 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
 
   useEffect(() => {
     fetchDetails();
-  }, [pool, connection, walletPublicKey]);
+  }, [poolAddress, connection, walletPublicKey]);
 
   return (
     <div className="card-container">
+      <div className="back-button-container">
+        <button 
+          className="button btn-primary"
+          onClick={() => navigate('/lend')}
+          style={{ marginBottom: 'var(--spacing-md)' }}
+        >
+          Back
+        </button>
+      </div>
       {shouldInitializePool(details?.poolStatus || null) ? (
         <PoolStatus
-          pool={pool}
+          pool={details?.poolInfo || null}
           poolStatus={details?.poolStatus || null}
-          onTxSuccess={onTxSuccess}
+          onTxSuccess={() => {}}
         />
       ) : (
         <>
@@ -62,16 +72,16 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
         <div className="info-row">
           <div className="token-pair-container">
             <img 
-              src={pool.tokenAIcon || defaultTokenIcon}
-              alt={pool.tokenASymbol || 'Token A'}
+              src={details?.poolInfo.tokenAIcon || defaultTokenIcon}
+              alt={details?.poolInfo.tokenASymbol || 'Token A'}
               className="token-icon"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = defaultTokenIcon;
               }}
             />
             <img 
-              src={pool.tokenBIcon || defaultTokenIcon} 
-              alt={pool.tokenBSymbol || 'Token B'} 
+              src={details?.poolInfo.tokenBIcon || defaultTokenIcon} 
+              alt={details?.poolInfo.tokenBSymbol || 'Token B'} 
               className="token-icon"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = defaultTokenIcon;
@@ -79,7 +89,7 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
             />
           </div>
           <span className="body-text">Pool Address:</span>
-          <CopyableAddress address={pool.poolPk.toString()} />
+          <CopyableAddress address={poolAddress || ''} />
           <span className="body-text">Price</span>
           {!isPriceReversed ? (<span className="code-text">1 A = {details?.poolInfo.aToB.toFixed(6)} B</span>
           ) : (<span className="code-text">1 B = {details?.poolInfo.bToA.toFixed(6)} A</span>)}
@@ -94,9 +104,9 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
         <div className="step">
           <div className="info-row">
             <span className="body-text">TokenA Address:</span>
-            <span className="code-text">{shortenAddress(pool.mintA.toString())}</span>
+            <span className="code-text">{shortenAddress(details?.poolInfo.mintA.toString() || '')}</span>
             <span className="body-text">TokenB Address:</span>
-            <span className="code-text">{shortenAddress(pool.mintB.toString())}</span>
+            <span className="code-text">{shortenAddress(details?.poolInfo.mintB.toString() || '')}</span>
           </div>
           <div className="info-row">
             <span className="body-text">Pool TokenA Amount:</span>
@@ -119,11 +129,11 @@ export const LenderPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           </div>
           {Number(details.userAssets.lendingReceiptAmount) === 0 ? (
             <div className="step">
-            <LendForm pool={pool}onSuccess={(signature) => {onTxSuccess(signature);fetchDetails();}}/>
+            <LendForm pool={details?.poolInfo}onSuccess={() => {fetchDetails();}}/>
             </div>
           ) : (
             <div className="step">
-            <RedeemForm pool={pool}onSuccess={(signature) => {onTxSuccess(signature);fetchDetails();}}/>
+            <RedeemForm pool={details?.poolInfo}onSuccess={() => {fetchDetails();}}/>
             </div>
           )}
         </div>

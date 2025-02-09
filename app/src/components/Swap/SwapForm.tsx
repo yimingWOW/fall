@@ -37,7 +37,7 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
       const details = await getPoolDetail(
         wallet,
         connection,
-        selectedPool!,
+        new PublicKey(selectedPool!.poolPk),
         wallet.publicKey
       );
       setPoolDetails(details);

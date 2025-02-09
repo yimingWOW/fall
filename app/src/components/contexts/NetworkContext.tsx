@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { Cluster } from '../WalletContextProvider';
+import { Cluster } from '../../WalletContextProvider';
 
 interface NetworkContextType {
   network: Cluster;

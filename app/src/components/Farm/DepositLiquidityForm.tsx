@@ -9,7 +9,7 @@ import '../../style/wrapper.css';
 import defaultTokenIcon from '../../assets/default-token.png';
 
 interface DepositLiquidityFormProps {
-  pool: PoolInfo;
+  pool: PoolInfo | null;
   onSuccess: (signature: string) => void;
 }
 
@@ -38,10 +38,10 @@ export const DepositLiquidityForm: FC<DepositLiquidityFormProps> = ({
       const signature = await depositLiquidity(
         wallet,
         connection,
-        new PublicKey(pool.poolPk),
-        new PublicKey(pool.amm),
-        new PublicKey(pool.mintA),
-        new PublicKey(pool.mintB),
+        new PublicKey(pool?.poolPk || ''),
+        new PublicKey(pool?.amm || ''),
+        new PublicKey(pool?.mintA || ''),
+        new PublicKey(pool?.mintB || ''),
         amountA,
         amountB
       );
@@ -73,14 +73,14 @@ export const DepositLiquidityForm: FC<DepositLiquidityFormProps> = ({
             <div className="token-input-section">
               <div className="token-selector">
                 <img 
-                  src={pool.tokenAIcon || defaultTokenIcon} 
-                  alt={pool.tokenASymbol || 'Token A'} 
+                  src={pool?.tokenAIcon || defaultTokenIcon} 
+                  alt={pool?.tokenASymbol || 'Token A'} 
                   className="token-icon"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = defaultTokenIcon;
                   }}
                 />
-                <span>{pool.tokenASymbol}</span>
+                <span>{pool?.tokenASymbol}</span>
               </div>
               <input
                 type="number"
@@ -103,14 +103,14 @@ export const DepositLiquidityForm: FC<DepositLiquidityFormProps> = ({
             <div className="token-input-section">
               <div className="token-selector">
                 <img 
-                  src={pool.tokenBIcon || defaultTokenIcon} 
-                  alt={pool.tokenBSymbol || 'Token B'} 
+                  src={pool?.tokenBIcon || defaultTokenIcon} 
+                  alt={pool?.tokenBSymbol || 'Token B'} 
                   className="token-icon"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = defaultTokenIcon;
                   }}
                 />
-                <span>{pool.tokenBSymbol}</span>
+                <span>{pool?.tokenBSymbol}</span>
               </div>
               <input
                 type="number"

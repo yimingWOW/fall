@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useAmm } from '../../contexts/AmmContext';
+import { useAmm } from '../contexts/AmmContext';
 import { CreateAmmForm } from './CreateAmmForm';
 import '../../style/Theme.css';
 import '../../style/button.css';
