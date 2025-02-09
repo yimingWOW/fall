@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AmmList } from './Amm/AmmList.tsx';
 import { SwapForm } from './Swap/SwapForm';
 import { LiquidateForm } from './Liquidate/LiquidateForm';
@@ -30,82 +31,87 @@ const TabButton: FC<TabButtonProps> = ({ isActive, onClick, icon, label }) => (
 
 const Dashboard: FC = () => {
   const { publicKey } = useWallet();
-  const [activeTab, setActiveTab] = useState('guide');
+  const navigate = useNavigate();
+  const { tab } = useParams();
+  const [currentTab, setCurrentTab] = useState(tab || 'guide');
+  
+  const handleTabChange = (newTab: string) => {
+    setCurrentTab(newTab);
+    navigate(`/fall/${newTab}`);
+  };
 
   return (
     <AmmProvider>
       <nav className="tab-nav">
         {publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY && (
           <TabButton 
-            isActive={activeTab === 'amm'} 
-            onClick={() => setActiveTab('amm')}
+            isActive={currentTab === 'amm'} 
+            onClick={() => handleTabChange('amm')}
             icon="⚙️"
             label="AMM"
           />
         )}
 
         <TabButton 
-          isActive={activeTab === 'guide'} 
-          onClick={() => setActiveTab('guide')}
+          isActive={currentTab === 'guide'} 
+          onClick={() => handleTabChange('guide')}
           icon="🧭"
           label="Guide"
         />
         
         <TabButton 
-          isActive={activeTab === 'swap'} 
-          onClick={() => setActiveTab('swap')}
+          isActive={currentTab === 'swap'} 
+          onClick={() => handleTabChange('swap')}
           icon="↔️"
           label="Swap"
         />
 
         <TabButton 
-          isActive={activeTab === 'farm'} 
-          onClick={() => setActiveTab('farm')}
+          isActive={currentTab === 'farm'} 
+          onClick={() => handleTabChange('farm')}
           icon="🌾"
           label="Farm"
         />
         
         <TabButton 
-          isActive={activeTab === 'lenderPool'} 
-          onClick={() => setActiveTab('lenderPool')}
+          isActive={currentTab === 'lenderPool'} 
+          onClick={() => handleTabChange('lenderPool')}
           icon="💰"
           label="Lend"
         />
         
         <TabButton 
-          isActive={activeTab === 'borrowerPool'} 
-          onClick={() => setActiveTab('borrowerPool')}
+          isActive={currentTab === 'borrowerPool'} 
+          onClick={() => handleTabChange('borrowerPool')}
           icon="🏦"
           label="Borrow"
         />
         
         <TabButton 
-          isActive={activeTab === 'liquidate'} 
-          onClick={() => setActiveTab('liquidate')}
+          isActive={currentTab === 'liquidate'} 
+          onClick={() => handleTabChange('liquidate')}
           icon="⚡"
           label="Liquidate"
         />
       </nav>
 
       <div className="dashboard-content">
-        {activeTab === 'amm' && publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY ? (
-          <>
-            <AmmList />
-          </>
-        ) : activeTab === 'guide' ? (
+        {currentTab === 'amm' && publicKey?.toBase58() == EXCLUDED_PUBLIC_KEY ? (
+          <AmmList />
+        ) : currentTab === 'guide' ? (
           <Guide />
-        ) : activeTab === 'swap' ? (
+        ) : currentTab === 'swap' ? (
           <SwapForm onSuccess={() => {}} />
-        ) : activeTab === 'lenderPool' ? (
+        ) : currentTab === 'lenderPool' ? (
           <LenderPoolList />
-        ) : activeTab === 'borrowerPool' ? (
+        ) : currentTab === 'borrowerPool' ? (
           <BorrowerPoolList />
-        ) : activeTab === 'liquidate' ? (
+        ) : currentTab === 'liquidate' ? (
           <LiquidateForm />
-        ) : activeTab === 'farm' ? (
+        ) : currentTab === 'farm' ? (
           <FarmForm />
         ) : (
-          <div className="code-text">Coming Soon...</div>
+          <Guide />
         )}
       </div>
     </AmmProvider>
