@@ -37,7 +37,7 @@ const Dashboard: FC = () => {
   
   const handleTabChange = (newTab: string) => {
     setCurrentTab(newTab);
-    navigate(`/fall/${newTab}`);
+    navigate(`/${newTab}`);
   };
 
   return (
