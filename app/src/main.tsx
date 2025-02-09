@@ -9,7 +9,7 @@ import 'crypto-browserify';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/fall">
       <WalletContextProvider>
         <App />
       </WalletContextProvider>
