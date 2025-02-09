@@ -7,7 +7,7 @@ import { useNetwork } from './contexts/NetworkContext';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './style/App.css';
 import './style/button.css';
-import './style/copy.css';
+import './style/icon.css';
 import './style/error.css';
 import './style/tap.css';
 import './style/Theme.css';

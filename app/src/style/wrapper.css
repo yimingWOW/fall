@@ -20,13 +20,6 @@
     margin-bottom: 16px;
 }
 
-.wrapper-header h2 {
-    color: #fff;
-    font-size: 20px;
-    font-weight: 500;
-    margin: 0;
-}
-
 .wrapper-box {
     width: 100%;
     background: rgba(30, 35, 45, 0.8);
