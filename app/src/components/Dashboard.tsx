@@ -34,7 +34,7 @@ const Dashboard: FC = () => {
   const navigate = useNavigate();
   const { tab } = useParams();
   const [currentTab, setCurrentTab] = useState(() => {
-    return tab && ['amm', 'guide', 'swap', 'farm', 'lenderPool', 'borrowerPool', 'liquidate'].includes(tab)
+    return tab && ['amm', 'guide', 'swap', 'farm', 'lend', 'borrow', 'liquidate'].includes(tab)
       ? tab
       : 'guide';
   });
@@ -84,15 +84,15 @@ const Dashboard: FC = () => {
         />
         
         <TabButton 
-          isActive={currentTab === 'lenderPool'} 
-          onClick={() => handleTabChange('lenderPool')}
+          isActive={currentTab === 'lend'} 
+          onClick={() => handleTabChange('lend')}
           icon="💰"
           label="Lend"
         />
         
         <TabButton 
-          isActive={currentTab === 'borrowerPool'} 
-          onClick={() => handleTabChange('borrowerPool')}
+          isActive={currentTab === 'borrow'} 
+          onClick={() => handleTabChange('borrow')}
           icon="🏦"
           label="Borrow"
         />
@@ -112,9 +112,9 @@ const Dashboard: FC = () => {
           <Guide />
         ) : currentTab === 'swap' ? (
           <SwapForm onSuccess={() => {}} />
-        ) : currentTab === 'lenderPool' ? (
+        ) : currentTab === 'lend' ? (
           <LenderPoolList />
-        ) : currentTab === 'borrowerPool' ? (
+        ) : currentTab === 'borrow' ? (
           <BorrowerPoolList />
         ) : currentTab === 'liquidate' ? (
           <LiquidateForm />
