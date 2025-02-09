@@ -23,20 +23,18 @@ pub struct DepositLiquidity<'info> {
     #[account(
         mut,
         seeds = [
-            pool.amm.as_ref(),
-            pool.mint_a.key().as_ref(),
-            pool.mint_b.key().as_ref(),
+            amm.key().as_ref(),
+            mint_a.key().as_ref(),
+            mint_b.key().as_ref(),
         ],
         bump,
-        has_one = mint_a,
-        has_one = mint_b,
     )]
     pub pool: Box<Account<'info, Pool>>,
 
     /// CHECK: Read only authority
     #[account(
         seeds = [
-            pool.amm.as_ref(),
+            amm.key().as_ref(),
             mint_a.key().as_ref(),
             mint_b.key().as_ref(),
             AUTHORITY_SEED,
@@ -52,8 +50,7 @@ pub struct DepositLiquidity<'info> {
     pub depositor: Signer<'info>,
 
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         seeds = [
             pool.key().as_ref(),
             LIQUIDITY_SEED,
@@ -107,8 +104,7 @@ pub struct DepositLiquidity<'info> {
     pub admin: AccountInfo<'info>,
 
     #[account(
-        init_if_needed,
-        payer = payer,
+        mut,
         associated_token::mint = liquidity_mint,
         associated_token::authority = admin,  // Now using the admin AccountInfo
     )]
@@ -125,11 +121,7 @@ pub struct DepositLiquidity<'info> {
 }
 
 
-pub fn deposit_liquidity(
-    ctx: Context<DepositLiquidity>,
-    amount_a: u64,
-    amount_b: u64,
-) -> Result<()> {
+pub fn deposit_liquidity(ctx: Context<DepositLiquidity>,amount_a: u64,amount_b: u64,) -> Result<()> {
     // Prevent depositing assets the depositor does not own
     let mut amount_a: u64 = if amount_a > ctx.accounts.depositor_account_a.amount {
         ctx.accounts.depositor_account_a.amount
@@ -177,9 +169,7 @@ pub fn deposit_liquidity(
 
     // Lock some minimum liquidity on the first deposit
     if pool_creation {
-        if liquidity < MINIMUM_LIQUIDITY {
-            return err!(DepositError::DepositTooSmall);
-        }
+        require!(MINIMUM_LIQUIDITY < liquidity, DepositError::DepositTooSmall);
         liquidity -= MINIMUM_LIQUIDITY;
     }
 
@@ -252,7 +242,7 @@ pub fn deposit_liquidity(
                 MintTo {
                     mint: ctx.accounts.liquidity_mint.to_account_info(),
                     to: ctx.accounts.admin_fee_account.to_account_info(),
-                    authority: ctx.accounts.admin.to_account_info(),
+                    authority: ctx.accounts.pool_authority.to_account_info(),
                 },
                 signer_seeds,
             ),

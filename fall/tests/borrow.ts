@@ -59,7 +59,7 @@ describe('test borrow', () => {
       amount: 10**5,
     });
 
-    await program.methods.createPool(values.fee)
+    await program.methods.createPool()
       .accounts({
         amm: values.ammKey,
         pool: values.poolKey,
@@ -73,6 +73,7 @@ describe('test borrow', () => {
       .rpc();
 
     await program.methods.depositLiquidity(new BN(10000), new BN(10000)).accounts({
+      amm: values.ammKey,
       pool: values.poolKey,
       poolAuthority: values.poolAuthority,
       depositor: values.user1Key,

@@ -40,7 +40,7 @@ const App: FC = () => {
             <div className="wrapper">
               <img src={logo} alt="Fall Logo" className="connect-logo" />
               <h2 className="section-title">Welcome to Fall</h2>
-              <p className="body-text">Please connect your wallet to continue</p>
+              <p className="section-title">Connect your wallet to continue</p>
             </div>
           </div>
         ) : (

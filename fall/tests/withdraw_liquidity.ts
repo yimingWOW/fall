@@ -39,7 +39,7 @@ describe('Withdraw liquidity', () => {
         amount: 10**3,
       });
 
-    await program.methods.createPool(values.fee).accounts({
+    await program.methods.createPool().accounts({
         amm: values.ammKey,
         pool: values.poolKey,
         poolAuthority: values.poolAuthority,

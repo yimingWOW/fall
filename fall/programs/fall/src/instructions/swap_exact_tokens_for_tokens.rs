@@ -170,7 +170,7 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                     authority: ctx.accounts.trader.to_account_info(),
                 },
             ),
-            taxed_input,
+            input,
         )?;
         token::transfer(
             CpiContext::new_with_signer(
@@ -187,11 +187,11 @@ pub fn swap_exact_tokens_for_tokens<'info>(
         // Verify the invariant still holds
         // Reload accounts because of the CPIs
         // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount+taxed_input) * (ctx.accounts.pool_account_b.amount-output) {
+        if invariant > (ctx.accounts.pool_account_a.amount+input) * (ctx.accounts.pool_account_b.amount-output) {
             return err!(SwapError::InvariantViolated);
         }
         ctx.accounts.pool.token_a_amount = ctx.accounts.pool.token_a_amount
-            .checked_add(taxed_input)
+            .checked_add(input)
             .ok_or(SwapError::MathOverflow)?;
         ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount
             .checked_sub(output)
@@ -218,12 +218,12 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                     authority: ctx.accounts.trader.to_account_info(),
                 },
             ),
-            taxed_input,
+            input,
         )?;
         // Verify the invariant still holds
         // Reload accounts because of the CPIs
         // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount-output) * (ctx.accounts.pool_account_b.amount+taxed_input) {
+        if invariant > (ctx.accounts.pool_account_a.amount-output) * (ctx.accounts.pool_account_b.amount+input) {
             return err!(SwapError::InvariantViolated);
         }
         // 更新池子状态
@@ -231,7 +231,7 @@ pub fn swap_exact_tokens_for_tokens<'info>(
             .checked_sub(output)
             .ok_or(SwapError::MathOverflow)?;
         ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount
-            .checked_add(taxed_input)
+            .checked_add(input)
             .ok_or(SwapError::MathOverflow)?;
     }
     

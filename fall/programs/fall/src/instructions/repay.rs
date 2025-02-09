@@ -222,7 +222,7 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
     )?;
 
     // 扣除利息后，将剩余抵押物转给borrower
-    let interest_pay_with_token_b = ctx.accounts.pool.calculate_interest(record_block_height, borrowed_amount)?;
+    let interest_pay_with_token_b = calculate_interest(record_block_height, borrowed_amount)?;
     if collateral_amount>interest_pay_with_token_b{
         let collateral_to_return: u64 = collateral_amount.checked_sub(interest_pay_with_token_b).ok_or(RepayError::CalculationError)?;
         if ctx.accounts.lending_pool_token_b.amount >= collateral_to_return{
@@ -248,4 +248,23 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
 pub enum RepayError {
     #[msg("Calculation error")]
     CalculationError,
+}
+
+//  计算利息
+#[inline(never)]  // 强制不内联
+fn calculate_interest(record_block_height: u64, borrowed_amount: u64,) -> Result<u64> {
+    // 计算区块增长数
+    let blocks_passed = Clock::get()?.slot
+    .checked_sub(record_block_height)
+    .ok_or(StateError::CalculationError)?;
+        
+    // 计算lending pool实际累积利息: 区块数 * 基础利率  * 借出资金数
+    let interest = blocks_passed
+    .checked_mul(borrowed_amount)
+    .ok_or(StateError::CalculationError)?
+    .checked_mul(BASE_INTEREST_RATE)
+    .ok_or(StateError::CalculationError)?
+    .checked_div(PERCENT_BASE)
+    .ok_or(StateError::CalculationError)?;
+    Ok(interest)
 }

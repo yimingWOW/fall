@@ -43,7 +43,7 @@ describe('Create lending pool', () => {
       amount: 10**5,
     });
 
-    await program.methods.createPool(values.fee)
+    await program.methods.createPool()
       .accounts({
         amm: values.ammKey,
         pool: values.poolKey,

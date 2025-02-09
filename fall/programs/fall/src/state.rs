@@ -4,7 +4,7 @@ use crate::constants::{BASE_INTEREST_RATE, PERCENT_BASE, MIN_COLLATERAL_RATIO};
 #[account]
 #[derive(Default)]
 pub struct Amm {
-    /// The primary key of the AMM
+    /// Primary key of the AMM
     pub id: Pubkey,
 
     /// Account that has admin authority over the AMM
@@ -34,7 +34,6 @@ pub struct Pool {
     /// Mint of token B
     pub mint_b: Pubkey,
 
-
     /// 借贷池中token a的数量
     pub token_a_amount :u64,
     /// 借贷池中token b的数量
@@ -55,20 +54,18 @@ impl Pool {
     pub const LEN: usize = 8 + 32 + 32 + 32 + 8 + 8 + 8 + 8 + 8 + 8 + 8;
 
     // 计算 token A 的价值，返回token A等价于token B的数量
-    #[inline(never)]  // 强制不内联
-    pub fn calculate_token_a_value(
-        &mut self,
-        amount_a: u64,
-    ) -> Result<u64> {
-        msg!("token_a_amount: {}", self.token_a_amount);
-        msg!("token_b_amount: {}", self.token_b_amount);
+    #[inline(never)]
+    pub fn calculate_token_a_value(&mut self, amount_a: u64) -> Result<u64> {
         // 计算价值: value = amount_b * pool_a_amount / pool_b_amount
         let token_a_value = (amount_a as u128)
         .checked_mul(self.token_a_amount as u128)
-        .ok_or(StateError::CalculationError)?
-        .checked_div(self.token_b_amount as u128)
+        .ok_or(StateError::CalculationError)?;
+        if token_a_value > u64::MAX as u128 {
+            return Err(StateError::CalculationError1.into());
+        }
+        let res=token_a_value.checked_div(self.token_b_amount as u128)
         .ok_or(StateError::CalculationError1)?;
-        Ok(token_a_value as u64)
+        Ok(res as u64)
     }
 
     // 计算 token B 的价值，返回token B等价于token A的数量
@@ -80,10 +77,13 @@ impl Pool {
         // 计算价值: value = amount_b * pool_a_amount / pool_b_amount
         let token_b_value = (amount_b as u128)
         .checked_mul(self.token_a_amount as u128)
-        .ok_or(StateError::CalculationError)?
-        .checked_div(self.token_b_amount as u128)
+        .ok_or(StateError::CalculationError)?;
+        if token_b_value > u64::MAX as u128 {
+            return Err(StateError::CalculationError1.into());
+        }
+        let res=token_b_value.checked_div(self.token_b_amount as u128)
         .ok_or(StateError::CalculationError1)?;
-        Ok(token_b_value as u64)
+        Ok(res as u64)
     }   
 
     // 更新借贷池的累计利息 （基于区块高度和基础利率和借出资金计算lendingpool的实际累积利息）
@@ -92,19 +92,24 @@ impl Pool {
         let current_block_height = Clock::get()?.slot;
         let blocks_passed = calculate_blocks_passed(self.borrow_interest_accumulator_block_height, current_block_height)?;
         
+        // todo: 计算interest_increase过程中的溢出问题
         // 计算lending pool实际累积利息: 区块数* 借出资金数 * 基础利率  
-        let interest_increase = blocks_passed
-            .checked_mul(current_borrowed)
+        let interest_increase = (blocks_passed as u128)
+            .checked_mul(current_borrowed as u128)
             .ok_or(ProgramError::ArithmeticOverflow)?
-            .checked_mul(BASE_INTEREST_RATE)
+            .checked_mul(BASE_INTEREST_RATE as u128)
             .ok_or(ProgramError::ArithmeticOverflow)?
-            .checked_div(PERCENT_BASE)
+            .checked_div(PERCENT_BASE as u128)
             .ok_or(ProgramError::ArithmeticOverflow)?;
         // 更新区块高度和累计利息
         self.borrow_interest_accumulator_block_height = current_block_height;
-        self.borrow_interest_accumulator = self.borrow_interest_accumulator
-            .checked_add(interest_increase)
-            .ok_or(ProgramError::ArithmeticOverflow)?;
+        if (self.borrow_interest_accumulator as u128).checked_add(interest_increase).ok_or(ProgramError::ArithmeticOverflow)? > u64::MAX as u128 {
+            self.borrow_interest_accumulator=u64::MAX;
+        }else{
+            self.borrow_interest_accumulator = self.borrow_interest_accumulator
+                .checked_add(interest_increase as u64)
+                .ok_or(ProgramError::ArithmeticOverflow)?;
+        }
         Ok(())
     }
 
@@ -114,10 +119,9 @@ impl Pool {
         let current_block_height = Clock::get()?.slot;
     
         // 计算区块增长数
-        let blocks_passed = current_block_height
-            .checked_sub(self.share_lending_block_height)
-            .ok_or(ProgramError::ArithmeticOverflow)?;
-        
+        let blocks_passed = calculate_blocks_passed(self.share_lending_block_height, current_block_height)?;
+
+        // todo: 计算 interest_lending_amount 过程中的溢出问题
         // 计算lending pool实际累积资金时间成本: 区块数 * lending资金数
         let interest_lending_amount = blocks_passed
             .checked_mul(current_lending_receipt_amount)
@@ -125,9 +129,13 @@ impl Pool {
         
         // 更新区块高度和累计借出资金时间成本
         self.share_lending_block_height = current_block_height;
-        self.share_lending_accumulator = self.share_lending_accumulator
-            .checked_add(interest_lending_amount)
-            .ok_or(ProgramError::ArithmeticOverflow)?;
+        if (self.share_lending_accumulator as u128).checked_add(interest_lending_amount as u128).ok_or(ProgramError::ArithmeticOverflow)? > u64::MAX as u128 {   
+            self.share_lending_accumulator=u64::MAX;
+        }else{
+            self.share_lending_accumulator = self.share_lending_accumulator
+                .checked_add(interest_lending_amount)
+                .ok_or(ProgramError::ArithmeticOverflow)?;
+        }
     
         // 返回更新后的值
         Ok(self.share_lending_accumulator)
@@ -135,37 +143,19 @@ impl Pool {
 
     #[inline(never)]  // 强制不内联
     pub fn reduce_share_lending_accumulator(&mut self,  lender_redeem_lending_accumulator_amount: u64) -> Result<()> {
-        self.share_lending_accumulator = self.share_lending_accumulator
-            .checked_sub(lender_redeem_lending_accumulator_amount)
-            .ok_or(ProgramError::ArithmeticOverflow)?;
+        if (self.share_lending_accumulator as u128)<(lender_redeem_lending_accumulator_amount as u128) {
+            self.share_lending_accumulator=0;
+        }else{
+            self.share_lending_accumulator = self.share_lending_accumulator
+                .checked_sub(lender_redeem_lending_accumulator_amount)
+                .ok_or(ProgramError::ArithmeticOverflow)?;
+        }
 
         Ok(())
     }
 
-    //  计算利息
-    #[inline(never)]  // 强制不内联
-    pub fn calculate_interest(&mut self, record_block_height: u64, borrowed_amount: u64,) -> Result<u64> {
-        // 计算区块增长数
-        let blocks_passed = Clock::get()?.slot
-        .checked_sub(record_block_height)
-        .ok_or(StateError::CalculationError)?;
-            
-        // 计算lending pool实际累积利息: 区块数 * 基础利率  * 借出资金数
-        let mut interest = blocks_passed
-        .checked_mul(borrowed_amount)
-        .ok_or(StateError::CalculationError)?
-        .checked_mul(BASE_INTEREST_RATE)
-        .ok_or(StateError::CalculationError)?
-        .checked_div(PERCENT_BASE)
-        .ok_or(StateError::CalculationError)?;
-        if interest==0{
-            interest = 1;
-        }
-        Ok(interest)
-    }
-
     // 检查抵押率,返回是否满足抵押率,满足返回true,不满足返回false
-    #[inline(never)]  // 强制不内联
+    #[inline(never)]
     pub fn check_collateral_ratio(
         &mut self, 
         collateral_value_in_token_a: u64,
@@ -176,8 +166,6 @@ impl Pool {
             .ok_or(StateError::CalculationError)?
             .checked_div(PERCENT_BASE as u128)
             .ok_or(StateError::CalculationError)? as u64;
-        msg!("required_collateral: {}", required_collateral);
-        msg!("collateral_value_in_token_a: {}", collateral_value_in_token_a);
         Ok(collateral_value_in_token_a >= required_collateral)
     }
 }

@@ -4,13 +4,12 @@ use anchor_spl::{
     token::{Mint, Token, TokenAccount},
 };
 use crate::{
-    constants::AUTHORITY_SEED,
+    constants::{AUTHORITY_SEED,LIQUIDITY_SEED},
     state::{Amm, Pool},
 };
 
 #[derive(Accounts)]
-#[instruction( fee: u16)]
-pub struct CreatePool<'info> {
+pub struct CreatePool2<'info> {
     #[account(
         seeds = [
             amm.id.as_ref()
@@ -23,9 +22,7 @@ pub struct CreatePool<'info> {
     pub mint_b: Box<Account<'info, Mint>>,
     
     #[account(
-        init,
-        payer = payer,
-        space = Pool::LEN,
+        mut,
         seeds = [
             amm.key().as_ref(),
             mint_a.key().as_ref(),
@@ -50,18 +47,29 @@ pub struct CreatePool<'info> {
     #[account(
         init,
         payer = payer,
-        associated_token::mint = mint_a,
-        associated_token::authority = pool_authority,
+        seeds = [
+            pool.key().as_ref(),
+            LIQUIDITY_SEED,
+        ],
+        bump,
+        mint::decimals = 6,
+        mint::authority = pool_authority,
     )]
-    pub pool_account_a: Box<Account<'info, TokenAccount>>,
+    pub liquidity_mint: Box<Account<'info, Mint>>,
+    
+    /// CHECK: Admin account from AMM state
+    #[account(
+        constraint = admin.key() == amm.admin
+    )]
+    pub admin: AccountInfo<'info>,
 
     #[account(
         init,
         payer = payer,
-        associated_token::mint = mint_b,
-        associated_token::authority = pool_authority,
+        associated_token::mint = liquidity_mint,
+        associated_token::authority = admin,  // Now using the admin AccountInfo
     )]
-    pub pool_account_b: Box<Account<'info, TokenAccount>>,
+    pub admin_fee_account: Box<Account<'info, TokenAccount>>,
     
     #[account(mut)]
     pub payer: Signer<'info>,
@@ -72,18 +80,7 @@ pub struct CreatePool<'info> {
 }
 
 
-pub fn create_pool(ctx: Context<CreatePool>, fee: u16) -> Result<()> {
-    require!(fee <= 10000, PoolError::InvalidFee);
-
-    let pool = &mut ctx.accounts.pool;
-    pool.amm = ctx.accounts.amm.key();
-    pool.mint_a = ctx.accounts.mint_a.key();
-    pool.mint_b = ctx.accounts.mint_b.key();
-    pool.borrow_interest_accumulator_block_height = Clock::get()?.slot;
-    pool.borrow_interest_accumulator = 0;
-    pool.share_lending_block_height = Clock::get()?.slot;
-    pool.share_lending_accumulator = 0;
-
+pub fn create_pool_2(_ctx: Context<CreatePool2>) -> Result<()> {
     Ok(())
 }
 

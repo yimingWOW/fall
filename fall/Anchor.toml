@@ -5,8 +5,8 @@ anchor_version = "0.30.1"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-fall = "C8sj5h7nejVHeyWvq6aCwrFWY5Q5QGuZDPqVwVHPxNLm"
+[programs.devnet]
+fall = "ER5MQJBiygFkq5Sm7QH19wajvQRnTpkpvvEVJNJez8VW"
 
 [registry]
 url = "https://api.apr.dev"

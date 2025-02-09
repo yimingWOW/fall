@@ -1,5 +1,6 @@
 mod create_amm;
-mod create_pool;
+mod create_pool_1;
+mod create_pool_2;
 mod deposit_liquidity;
 mod withdraw_liquidity;
 mod swap_exact_tokens_for_tokens;
@@ -15,8 +16,9 @@ mod init_lending_pool_3;
 mod utils;
 mod deposit_collateral;
 
-pub use create_amm::*;
-pub use create_pool::*;
+pub use create_amm::*;  
+pub use create_pool_1::*;
+pub use create_pool_2::*;
 pub use deposit_liquidity::*;
 pub use withdraw_liquidity::*;
 pub use swap_exact_tokens_for_tokens::*;

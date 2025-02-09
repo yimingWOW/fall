@@ -5,7 +5,7 @@ mod constants;
 mod instructions;
 mod state;
 
-declare_id!("C8sj5h7nejVHeyWvq6aCwrFWY5Q5QGuZDPqVwVHPxNLm");
+declare_id!("ER5MQJBiygFkq5Sm7QH19wajvQRnTpkpvvEVJNJez8VW");
 
 
 #[program]
@@ -17,8 +17,12 @@ pub mod fall {
         instructions::create_amm(ctx, id)
     }
 
-    pub fn create_pool(ctx: Context<CreatePool>, fee: u16) -> Result<()> {
-        instructions::create_pool(ctx, fee)
+    pub fn create_pool_1(ctx: Context<CreatePool1>) -> Result<()> {
+        instructions::create_pool_1(ctx)
+    }
+
+    pub fn create_pool_2(ctx: Context<CreatePool2>) -> Result<()> {
+        instructions::create_pool_2(ctx)
     }
 
     pub fn deposit_liquidity(

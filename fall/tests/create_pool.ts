@@ -33,7 +33,7 @@ describe('Create pool', () => {
       const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
           units: 500_000 
       });
-      await program.methods.createPool(values.fee).accounts({
+      await program.methods.createPool().accounts({
             amm: values.ammKey,
             pool: values.poolKey,
             poolAuthority: values.poolAuthority,
