@@ -10,7 +10,7 @@ import { PoolStatus } from '../Farm/PoolStatus';
 import { BASE_RATE, MIN_COLLATERAL_RATIO } from '../../utils/constants';
 import '../../style/Theme.css';
 import '../../style/Typography.css';
-import { shortenAddress } from '../../utils/string';
+import { CopyableAddress } from '../utils/copyableaddress';
 import defaultTokenIcon from '../../assets/default-token.png';
 import { shouldInitializePool } from '../utils/pool';
 
@@ -26,7 +26,6 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isPriceReversed, setIsPriceReversed] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
 
   const fetchDetails = async () => {
     try {
@@ -49,16 +48,6 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
   useEffect(() => {
     fetchDetails();
   }, [pool, connection, walletPublicKey]);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(pool.poolPk.toString());
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  };
 
   return (
     <div className={`card-container`}>
@@ -95,10 +84,8 @@ export const BorrowerPoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
                         />
                       </div>
                       <span className="body-text">Pool Address:</span>
-                      <span className="code-text" title={pool.poolPk.toString()}>{shortenAddress(pool.poolPk.toString())}</span>
-                      <button className="secondary-button" onClick={handleCopy} title={copySuccess ? "Copied!" : "Copy address"}>
-                        <div className={`copy-icon ${copySuccess ? 'copied' : ''}`} />
-                      </button>
+                      <CopyableAddress address={pool.poolPk.toString()} />
+                      <span className="body-text">Price</span>
                       <span className="body-text">Price</span>
                       {!isPriceReversed ? (<span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
                       ) : (<span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>)}

@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PoolInfo } from '../../utils/getPoolList';
 import '../../style/Theme.css';
+import '../../style/segment.css';
 import { useAnchorWallet } from '@solana/wallet-adapter-react';
 import { createPool } from '../../utils/createPool';
 import { PoolStatusInfo } from '../../utils/getPoolDetail';
@@ -16,6 +17,20 @@ export const PoolStatus: FC<PoolStatusProps> = ({ pool, onTxSuccess, poolStatus 
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [isLoading, setIsLoading] = useState(false);
+
+  if (poolStatus === null) {
+    return (
+      <div className="wrapper">
+        <div className="card-container">
+          <div className="wrapper-box">
+            <div className="align-center">
+              Loading pool status...
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isPoolSetupComplete = poolStatus && 
   poolStatus.createPool1 && 
@@ -47,10 +62,11 @@ export const PoolStatus: FC<PoolStatusProps> = ({ pool, onTxSuccess, poolStatus 
   };
 
   return (
-    <div className="section">
+    <div className="wrapper">
+      <div className="card-container">
       {!isPoolSetupComplete && (
-        <div className="section">
-          <div className="section">
+        <div className="wrapper-box">
+          <div className="align-center">
             <div className="segmented-progress-bar">
               <div className={`segment ${poolStatus?.createPool1 ? 'completed' : 'pending'}`} 
                   title="Create Pool 1" />
@@ -64,20 +80,21 @@ export const PoolStatus: FC<PoolStatusProps> = ({ pool, onTxSuccess, poolStatus 
                   title="Init Lending Pool 3" />
             </div>
           </div>
-          <div className="section">
+          <div className="step">
             <p>This pool has not initialized completely yet. Click the button below to initialize it.</p>
           </div>
-          <div className="section">
-            <button 
-              className="button btn-primary" 
-              onClick={handleCreatePool}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Initializing Pool...' : 'Initialize Pool'}
-            </button>
+          <div className="align-center">
+          <button
+            className="button btn-primary" 
+            onClick={handleCreatePool}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Initializing Pool...' : 'Initialize Pool'}
+          </button>
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

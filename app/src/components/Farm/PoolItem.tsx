@@ -13,10 +13,9 @@ import '../../style/Typography.css';
 
 interface PoolItemProps {
   pool: PoolInfo;
-  onTxSuccess: (signature: string) => void;
 }
 
-export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
+export const PoolItem: FC<PoolItemProps> = ({ pool }) => {
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
   const { publicKey: walletPublicKey } = useWallet();
@@ -53,7 +52,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           <PoolStatus
             pool={pool}
             poolStatus={details?.poolStatus || null}
-            onTxSuccess={onTxSuccess}
+            onTxSuccess={fetchDetails}
           />
         </div>
       ) : (
@@ -95,10 +94,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
           )}
           <DepositLiquidityForm 
             pool={pool}
-            onSuccess={(signature) => {
-              onTxSuccess(signature);
-              fetchDetails();
-            }}
+            onSuccess={fetchDetails}
           />
           <div className="wrapper"></div>
             {isLoadingDetails ? (
@@ -109,10 +105,7 @@ export const PoolItem: FC<PoolItemProps> = ({ pool, onTxSuccess }) => {
               <WithdrawLiquidityForm
                 pool={pool}
                 amount={parseFloat(details.userAssets.liquidityAmount)}
-                onSuccess={(signature) => {
-                  onTxSuccess(signature);
-                  fetchDetails();
-                }}
+                onSuccess={fetchDetails}
               />
             ) : (
               <div className="error-state">

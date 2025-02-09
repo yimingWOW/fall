@@ -68,19 +68,18 @@ export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess 
 
   return (
     <div className="wrapper">
+        <div className="back-button-container">
+          <button 
+            className="button btn-primary"
+            onClick={() => onShowForm(false)}
+            style={{ marginBottom: 'var(--spacing-md)' }}
+          >
+            Back
+          </button>
+        </div>
       <div className="wrapper-container">
-      <div className="back-button-container">
-        <button 
-          className="button btn-primary"
-          onClick={() => onShowForm(false)}
-          style={{ marginBottom: 'var(--spacing-md)' }}
-        >
-          Back
-        </button>
-      </div>
-
-      <div className="section">
-        <h2 className="section-title">Create New Pool</h2>
+      <div className="wrapper-box">
+        <div className="section-title">Create New Pool</div>
         {error && (
           <div className="code-text" style={{ color: 'var(--error)' }}>
             {error}
@@ -103,7 +102,7 @@ export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess 
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <div className="card-container">
+          <div className="wrapper-box">
             <span className="sub-title">AMM Pubkey</span>
             <input
               className="input"
@@ -113,7 +112,7 @@ export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess 
               disabled
             />
           </div>
-          <div className="card-container">
+          <div className="wrapper-box">
             <span className="sub-title">Token A Mint Address</span>
             <input
               className="input"
@@ -125,7 +124,7 @@ export const CreatePoolForm: FC<CreatePoolFormProps> = ({ onShowForm, onSuccess 
               disabled={isLoading}
             />
           </div>
-          <div className="card-container">
+          <div className="wrapper-box">
             <span className="sub-title">Token B Mint Address</span>
             <input
               className="input"
