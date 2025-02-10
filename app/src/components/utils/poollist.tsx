@@ -69,7 +69,7 @@ export const PoolList: FC<PoolListProps> = ({
                 key={pool.poolPk.toString()}
                 className="step"
               >
-                <div className="info-row">
+                <div className="row-align-center">
                   <div className="token-pair-container">
                     <img
                       src={pool.tokenAIcon || defaultTokenIcon}

@@ -9,6 +9,7 @@ import {
 } from './constants';
 import { Idl } from '@coral-xyz/anchor';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
+import defaultTokenIcon from '../assets/default-token.png';
 
 export interface PoolStatusInfo {
   createPool1: boolean;
@@ -210,6 +211,10 @@ export async function getPoolDetail(
         adminFeeAmount: Number(adminFeeAmount),
         aToB,
         bToA,
+        tokenASymbol: "A",
+        tokenBSymbol: "B",
+        tokenAIcon: defaultTokenIcon,
+        tokenBIcon: defaultTokenIcon,
         tokenAAmount: Number(poolAccountAInfo),
         tokenBAmount: Number(poolAccountBInfo),
       },

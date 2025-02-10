@@ -10,6 +10,7 @@ import { shouldInitializePool } from '../utils/pool';
 import '../../style/button.css';
 import '../../style/Typography.css';
 import { useParams, useNavigate } from 'react-router-dom';
+import { PriceDisplay } from '../utils/PriceDisplay';
 
 export const PoolItem: FC = () => {
   const { connection } = useConnection();
@@ -19,7 +20,6 @@ export const PoolItem: FC = () => {
   const { publicKey: walletPublicKey } = useWallet();
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [isPriceReversed, setIsPriceReversed] = useState(false);
 
   const fetchDetails = async () => {
     try {
@@ -73,22 +73,17 @@ export const PoolItem: FC = () => {
               <div className="align-center">
                 <div className="step" >
                   <div className="info-row">
-                    <span className="body-text">Price</span>
-                    <button className="swap-direction-toggle" onClick={() => setIsPriceReversed(!isPriceReversed)}></button>
-                    {!isPriceReversed ? (
-                      <span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
-                    ) : (
-                      <span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>
-                    )}
+                    <PriceDisplay 
+                      aToB={details.poolInfo.aToB}
+                      bToA={details.poolInfo.bToA}
+                      tokenASymbol={details.poolInfo.tokenASymbol}
+                      tokenBSymbol={details.poolInfo.tokenBSymbol}
+                    />
+                    <span className="body-text">Pool TokenA Amount:</span>
+                    <span className="code-text">{details?.poolInfo.tokenAAmount.toFixed(6)}</span>
+                    <span className="body-text">Pool TokenB Amount:</span>
+                    <span className="code-text">{details?.poolInfo.tokenBAmount.toFixed(6)}</span>
                   </div>
-                </div>
-              </div>
-              <div className="step" >
-                <div className="info-row">
-                  <span className="body-text">Pool TokenA Amount:</span>
-                  <span className="code-text">{details?.poolInfo.tokenAAmount.toFixed(6)}</span>
-                  <span className="body-text">Pool TokenB Amount:</span>
-                  <span className="code-text">{details?.poolInfo.tokenBAmount.toFixed(6)}</span>
                 </div>
               </div>
             </>

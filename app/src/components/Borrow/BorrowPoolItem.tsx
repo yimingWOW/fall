@@ -9,11 +9,11 @@ import { PoolStatus } from '../Farm/PoolStatus';
 import { BASE_RATE, MIN_COLLATERAL_RATIO } from '../../utils/constants';
 import '../../style/Theme.css';
 import '../../style/Typography.css';
-import { CopyableAddress } from '../utils/copyableaddress';
-import defaultTokenIcon from '../../assets/default-token.png';
 import { shouldInitializePool } from '../utils/pool';
 import { useParams, useNavigate } from 'react-router-dom';
-
+import { PriceDisplay } from '../utils/PriceDisplay';
+import { TokenPairDisplay } from '../utils/TokenPairDisplay';
+import { AddressLabel } from '../utils/AddressLabel';
 export const BorrowerPoolItem: FC = () => {
   const { connection } = useConnection();
   const { publicKey: walletPublicKey } = useWallet();
@@ -22,7 +22,6 @@ export const BorrowerPoolItem: FC = () => {
   const navigate = useNavigate();
   const [details, setDetails] = useState<PoolDetailInfo | null>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [isPriceReversed, setIsPriceReversed] = useState(false);
 
   const fetchDetails = async () => {
     try {
@@ -72,67 +71,56 @@ export const BorrowerPoolItem: FC = () => {
                 <div className="section">
                   <div className="step">
                     <div className="info-row">
-                      <div className="token-pair-container">
-                        <img 
-                          src={details?.poolInfo.tokenAIcon || defaultTokenIcon} 
-                          alt={details?.poolInfo.tokenASymbol || 'Token A'} 
-                          className="token-icon"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = defaultTokenIcon;
-                          }}
-                        />
-                        <img 
-                          src={details?.poolInfo.tokenBIcon || defaultTokenIcon} 
-                          alt={details?.poolInfo.tokenBSymbol || 'Token B'} 
-                          className="token-icon"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = defaultTokenIcon;
-                          }}
-                        />
-                      </div>
-                      <span className="body-text">Pool Address:</span>
-                      <CopyableAddress address={poolAddress || ''} />
-                      <span className="body-text">Price</span>
-                      <span className="body-text">Price</span>
-                      {!isPriceReversed ? (<span className="code-text">1 A = {details.poolInfo.aToB.toFixed(6)} B</span>
-                      ) : (<span className="code-text">1 B = {details.poolInfo.bToA.toFixed(6)} A</span>)}
-                      <div className="body-text">
-                        <button className="swap-direction-toggle" onClick={() => setIsPriceReversed(!isPriceReversed)}/>
-                      </div>
+                      <TokenPairDisplay poolInfo={details.poolInfo} />
+                      <PriceDisplay 
+                        aToB={details.poolInfo.aToB || 0}
+                        bToA={details.poolInfo.bToA || 0}
+                        tokenASymbol={details.poolInfo.tokenASymbol || ''}
+                        tokenBSymbol={details.poolInfo.tokenBSymbol || ''}
+                      />
                   </div>
                   </div>
                   <div className="step">
                     <div className="info-row">
-                    <span className="body-text">Current Collateral Ratio(Min: {MIN_COLLATERAL_RATIO/BASE_RATE*100}%)</span>
-                      <span className="code-text">{Number(details.userAssets.borrowReceiptAmount)*details.poolInfo.aToB /Number(details.userAssets.collateralReceiptAmount)*100}%</span>
-                      <span className="body-text">Available TokenA Amount</span>
-                      <span className="code-text">{details.lendingPoolInfo.tokenAAmount.toFixed(6)}</span>
+                      <AddressLabel 
+                        label={`Current Collateral Ratio(Min: ${(MIN_COLLATERAL_RATIO/BASE_RATE*100).toFixed(2)}%)`}
+                        address={`${((Number(details.userAssets.borrowReceiptAmount) * 
+                          details.poolInfo.aToB / 
+                          Number(details.userAssets.collateralReceiptAmount)) * 100).toFixed(2)}%`}
+                      />
+                      <AddressLabel 
+                        label="Available TokenA Amount"
+                        address={details.lendingPoolInfo.tokenAAmount.toFixed(6)}
+                      />
                     </div>
-                  </div>
-                  <div className="step">
                     <div className="info-row">
-                      <span className="body-text">You have borrowed tokenA</span>
-                      <span className="code-text">{details.userAssets.borrowReceiptAmount}</span>
-                      <span className="body-text">You have collateral tokenB</span>
-                      <span className="code-text">{details.userAssets.collateralReceiptAmount}</span>                    </div>
-                    <div className="note-text" style={{ marginBottom: 'var(--spacing-md)' }}>
+                      <AddressLabel 
+                        label="You have borrowed tokenA"
+                        address={details.userAssets.borrowReceiptAmount}
+                      />
+                      <AddressLabel 
+                        label="You have collateral tokenB"
+                        address={details.userAssets.collateralReceiptAmount}
+                      />
+                    </div>
+                    <div className="note-text">
                       Note: Please ensure you provide sufficient collateral based on the minimum collateral ratio.
                     </div>
                   </div>
                 </div>
                 <div className="step">
-                  <div className="info-row">
-                    <BorrowForm pool={details?.poolInfo} details={details} onSuccess={() => {fetchDetails();}}/>
-                    <DepositCollateralForm pool={details?.poolInfo} onSuccess={() => {fetchDetails();}}/>
-                  </div>
-                  {Number(details.userAssets.borrowReceiptAmount) != 0 || Number(details.userAssets.collateralReceiptAmount) != 0 ? (
-                    <div className="step">
-                      <RepayForm pool={details?.poolInfo} onSuccess={() => {fetchDetails();}}/>
+                    <div className="row-align-center">
+                      <BorrowForm pool={details?.poolInfo} details={details} onSuccess={() => {fetchDetails();}}/>
+                      <DepositCollateralForm pool={details?.poolInfo} onSuccess={() => {fetchDetails();}}/>
                     </div>
-                  ) : (
-                    <div className="secondary-text"></div>
-                  )}
-                </div>
+                    {Number(details.userAssets.borrowReceiptAmount) != 0 || Number(details.userAssets.collateralReceiptAmount) != 0 ? (
+                      <div className="step">
+                        <RepayForm pool={details?.poolInfo} onSuccess={() => {fetchDetails();}}/>
+                      </div>
+                    ) : (
+                      <div className="secondary-text"></div>
+                    )}
+                  </div>
               </div>) : (<div className="secondary-text">Failed to load prices</div>)}
           </div>  
         </>

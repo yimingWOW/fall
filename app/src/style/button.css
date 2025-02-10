@@ -81,3 +81,11 @@
   justify-content: flex-end; 
   min-width: 800px;
 }
+
+.combine-text {
+  display: flex;
+  align-items: center;
+  gap: 1px;  /* 调整这个值可以控制文本和按钮之间的间距 */
+  margin-bottom: 1px;
+  width: fit-content;
+}

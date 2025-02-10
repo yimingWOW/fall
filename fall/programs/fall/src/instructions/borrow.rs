@@ -8,6 +8,7 @@ use crate::state::Pool;
 use crate::instructions::utils::mint_and_freeze_token;
 
 #[derive(Accounts)]
+#[instruction(borrow_amount: u64)]  
 pub struct Borrow<'info> {
     #[account(
         seeds = [
@@ -18,6 +19,9 @@ pub struct Borrow<'info> {
         bump,
     )]
     pub pool: Box<Account<'info, Pool>>,
+
+    pub mint_a: Box<Account<'info, Mint>>,
+    pub mint_b: Box<Account<'info, Mint>>,
 
     /// CHECK: Read only authority
     #[account(
@@ -69,15 +73,17 @@ pub struct Borrow<'info> {
     pub borrower: Signer<'info>,
 
     #[account(
-        mut,
-        associated_token::mint = pool.mint_a,
+        init_if_needed,
+        payer = payer,
+        associated_token::mint = mint_a,
         associated_token::authority = borrower,
     )]
     pub borrower_token_a: Box<Account<'info, TokenAccount>>,
     
     #[account(
-        mut,
-        associated_token::mint = pool.mint_b,
+        init_if_needed,
+        payer = payer,
+        associated_token::mint = mint_b,
         associated_token::authority = borrower,
     )]
     pub borrower_token_b: Box<Account<'info, TokenAccount>>,

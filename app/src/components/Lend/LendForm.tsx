@@ -24,7 +24,7 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
     setError("");
     setIsLoading(true);
 
-    if (!wallet) {
+    if (!wallet) {34  
       setError("Please connect your wallet first");
       setIsLoading(false);
       return;
@@ -57,9 +57,6 @@ export const LendForm: FC<LendFormProps> = ({ pool, onSuccess }) => {
 
   return (
     <div className="wrapper">
-      <div className="body-text">
-        Note: By lending tokens, you'll receive interest based on the pool's lending rate.
-      </div>
       <form onSubmit={handleSubmit}>
         <div className="wrapper-container">
           <div className="wrapper-header">
