@@ -52,13 +52,11 @@ export const WrapSolForm: FC<WrapSolFormProps> = ({ onSuccess }) => {
   return (
     <div className="wrapper">
       <h3 className="section-title">Wrap SOL</h3>
-      
       {error && (
         <div className="secondary-text" style={{ color: 'var(--error)' }}>
           {error}
         </div>
       )}
-
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 'var(--spacing-md)' }}>
           <input
