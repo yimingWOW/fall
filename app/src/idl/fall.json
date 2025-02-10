@@ -1,5 +1,5 @@
 {
-  "address": "ER5MQJBiygFkq5Sm7QH19wajvQRnTpkpvvEVJNJez8VW",
+  "address": "HDAKXySmaRi8bydeCewKJV5yUCrGQWEZGW2YpRVmZQ4q",
   "metadata": {
     "name": "fall",
     "version": "0.1.0",
@@ -41,6 +41,12 @@
               }
             ]
           }
+        },
+        {
+          "name": "mint_a"
+        },
+        {
+          "name": "mint_b"
         },
         {
           "name": "lending_pool_authority",
@@ -256,8 +262,7 @@
               },
               {
                 "kind": "account",
-                "path": "pool.mint_a",
-                "account": "Pool"
+                "path": "mint_a"
               }
             ],
             "program": {
@@ -347,8 +352,7 @@
               },
               {
                 "kind": "account",
-                "path": "pool.mint_b",
-                "account": "Pool"
+                "path": "mint_b"
               }
             ],
             "program": {
