@@ -20,9 +20,6 @@ pub struct Borrow<'info> {
     )]
     pub pool: Box<Account<'info, Pool>>,
 
-    pub mint_a: Box<Account<'info, Mint>>,
-    pub mint_b: Box<Account<'info, Mint>>,
-
     /// CHECK: Read only authority
     #[account(
         seeds = [
@@ -73,20 +70,11 @@ pub struct Borrow<'info> {
     pub borrower: Signer<'info>,
 
     #[account(
-        init_if_needed,
-        payer = payer,
-        associated_token::mint = mint_a,
+        mut,
+        associated_token::mint = pool.mint_a,
         associated_token::authority = borrower,
     )]
     pub borrower_token_a: Box<Account<'info, TokenAccount>>,
-    
-    #[account(
-        init_if_needed,
-        payer = payer,
-        associated_token::mint = mint_b,
-        associated_token::authority = borrower,
-    )]
-    pub borrower_token_b: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: Read only authority
     #[account(

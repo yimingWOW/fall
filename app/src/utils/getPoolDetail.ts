@@ -50,13 +50,11 @@ export async function getPoolDetail(
   poolPk: PublicKey,
   walletPublicKey: PublicKey  
 ): Promise<PoolDetailInfo> {
-  console.log("poolPk", poolPk);
-
   try {
     const provider = new anchor.AnchorProvider(
       connection,
       wallet,
-      { 
+      {
         commitment: "confirmed",
         preflightCommitment: "confirmed" 
       }
@@ -66,11 +64,14 @@ export async function getPoolDetail(
       provider
     ) as any;
 
-    console.log("poolPk", poolPk);
     const pool = await program.account.pool.fetch(poolPk);
-    console.log("pool", pool);
-    const amm = await program.account.amm.fetch(pool.amm);
-    console.log("amm", amm);
+    let amm: any;
+    try{
+      amm = await program.account.amm.fetch(pool.amm);
+      console.log("amm", amm);
+    }catch(e){
+      console.log("amm", e);
+    }
 
     const mintA = new PublicKey(pool.mintA);
     const mintB = new PublicKey(pool.mintB);
@@ -137,15 +138,24 @@ export async function getPoolDetail(
       [poolPk.toBuffer(), Buffer.from(LENDER_LENDING_BLOCK_HEIGHT_TOKEN_SEED)],
       program.programId
     );
-    const lendingPoolAccountA = await anchor.utils.token.associatedAddress({
-      mint: mintA,
-      owner: lendingPoolAuthorityPda
-    });
+    console.log("lendingPoolAuthorityPda", lendingPoolAuthorityPda);
+    let lendingPoolAccountA: PublicKey;
+    let initLendingPool1: boolean;
+    try {
+      lendingPoolAccountA = await anchor.utils.token.associatedAddress({
+        mint: mintA,
+        owner: lendingPoolAuthorityPda
+      });
+      initLendingPool1=await accountExists(connection, lendingPoolAccountA).catch(() => false);
+    } catch (error) {
+      console.error('Error getting lendingPoolAccountA:', error);
+      initLendingPool1=false;
+    }
+    console.log("lendingPoolAccountA", initLendingPool1);
 
     const [
       createPool1,
       createPool2,
-      initLendingPool1,
       initLendingPool2,
       initLendingPool3,
       poolAccountAInfo,
@@ -162,32 +172,28 @@ export async function getPoolDetail(
       userLiquidityAmount,
       userLendingReceiptAmount,
       userBorrowReceiptAmount,
-      userCollateralReceiptAmount
+      userCollateralReceiptAmount,
     ] = await Promise.all([
-      accountExists(connection, poolPk),
-      accountExists(connection, liquidityMintPda),
-      accountExists(connection, lendingPoolAccountA),
-      accountExists(connection, lendingReceiptTokenMint),
-      accountExists(connection, lenderLendingBlockHeightMint),
-      getUserTokenAmount(connection, poolAuthority, pool.mintA),
-      getUserTokenAmount(connection, poolAuthority, pool.mintB),
-      getUserTokenAmount(connection, amm.admin, liquidityMint),
-      getUserTokenAmount(connection, lendingPoolAuthority, pool.mintA),
-      getUserTokenAmount(connection, lendingPoolAuthority, pool.mintB),
+      accountExists(connection, poolPk).catch(() => false),
+      accountExists(connection, liquidityMintPda).catch(() => false),
+      accountExists(connection, lendingReceiptTokenMint).catch(() => false),
+      accountExists(connection, lenderLendingBlockHeightMint).catch(() => false),
+      getUserTokenAmount(connection, poolAuthority, pool.mintA).catch(() => 0),
+      getUserTokenAmount(connection, poolAuthority, pool.mintB).catch(() => 0),
+      getUserTokenAmount(connection, amm.admin, liquidityMint).catch(() => 0),
+      getUserTokenAmount(connection, lendingPoolAuthority, pool.mintA).catch(() => 0),
+      getUserTokenAmount(connection, lendingPoolAuthority, pool.mintB).catch(() => 0),
       getMint(connection, liquidityMint).catch(() => ({ supply: 0 })),
       getMint(connection, lendingReceiptMint).catch(() => ({ supply: 0 })),
       getMint(connection, borrowReceiptMint).catch(() => ({ supply: 0 })),
       getMint(connection, collateralReceiptMint).catch(() => ({ supply: 0 })),
-      getUserTokenAmount(connection, walletPublicKey, mintA),
-      getUserTokenAmount(connection, walletPublicKey, mintB),
-      getUserTokenAmount(connection, walletPublicKey, liquidityMint),
-      getUserTokenAmount(connection, borrowerAuthority, lendingReceiptMint),
-      getUserTokenAmount(connection, borrowerAuthority, borrowReceiptMint),
-      getUserTokenAmount(connection, borrowerAuthority, collateralReceiptMint)
+      getUserTokenAmount(connection, walletPublicKey, mintA).catch(() => 0),
+      getUserTokenAmount(connection, walletPublicKey, mintB).catch(() => 0),
+      getUserTokenAmount(connection, walletPublicKey, liquidityMint).catch(() => 0),
+      getUserTokenAmount(connection, borrowerAuthority, lendingReceiptMint).catch(() => 0),
+      getUserTokenAmount(connection, borrowerAuthority, borrowReceiptMint).catch(() => 0),
+      getUserTokenAmount(connection, borrowerAuthority, collateralReceiptMint).catch(() => 0),
     ]);
-    console.log("userLiquidityAmount", userLiquidityAmount);
-    console.log("liquidityMintInfo", liquidityMintInfo);
-    console.log("adminFeeAmount", adminFeeAmount);
 
     // 避免除以零的情况
     const aToB = poolAccountAInfo === 0 ? 0 : Number(poolAccountBInfo) / Number(poolAccountAInfo);
@@ -297,8 +303,9 @@ async function getUserTokenAmount (connection: Connection, walletPublicKey: Publ
   }
 }
 
-
 async function accountExists(connection: Connection, publicKey: PublicKey): Promise<boolean> {
   const account = await connection.getAccountInfo(publicKey);
   return account !== null;
 }
+
+

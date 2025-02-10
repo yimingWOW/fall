@@ -5,7 +5,7 @@ mod constants;
 mod instructions;
 mod state;
 
-declare_id!("HDAKXySmaRi8bydeCewKJV5yUCrGQWEZGW2YpRVmZQ4q");
+declare_id!("HBK2QZCoQz5rZec2kLk2LDfDq3x98bieyZeMdewiQdUY");
 
 
 #[program]

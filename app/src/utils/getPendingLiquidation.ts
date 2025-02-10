@@ -10,13 +10,15 @@ import { BASE_RATE, MIN_COLLATERAL_RATIO } from './constants';
 
 export interface PendingLiquidation {
     userAuthorityPda: PublicKey;
+    collateralReceiptTokenAmount: number;
+    borrowReceiptTokenAmount: number;
 }
 
 export async function getPendingLiquidation(
   wallet: any,
   poolPda: PublicKey,
   connection: Connection
-): Promise<PublicKey[]> {
+): Promise<PendingLiquidation[]> {
   try {
     const provider = new anchor.AnchorProvider(
       connection,
@@ -29,19 +31,10 @@ export async function getPendingLiquidation(
     ) as any;
     
     const pool = await program.account.pool.fetch(poolPda);
-    const mintA = pool.mintA;
-    const mintB = pool.mintB;
-    const poolInfo = {
-      poolPk: poolPda,    
-      amm: new PublicKey(pool.amm), 
-      mintA: new PublicKey(mintA), 
-      mintB: new PublicKey(mintB),
-      fee: pool.fee,
-      minCollateralRatio: pool.minCollateralRatio,
-      tokenAAmount: pool.tokenAAmount,
-      tokenBAmount: pool.tokenBAmount,
+    if (!pool) {
+      throw new Error('Pool account not found');
     }
-    const poolDetail = await getPoolDetail(wallet, connection, poolInfo as any, wallet.publicKey);
+    const poolDetail = await getPoolDetail(wallet, connection, poolPda, wallet.publicKey);
     const [borrowReceiptTokenMint] = PublicKey.findProgramAddressSync(
         [
           poolPda.toBuffer(),
@@ -55,27 +48,44 @@ export async function getPendingLiquidation(
     );
 
     const accounts = await getAccountsByInstruction(connection, program.programId.toString());
+    if (!accounts || accounts.length === 0) {
+      console.log('No accounts found for the program');
+      return [];
+    }
 
-    const pendingLiquidation: PublicKey[] = [];
+    const pendingLiquidation: PendingLiquidation[] = [];
     for (const account of accounts) {
-      console.log('Signer:', account.toString());
-      const [borrowerAuthority] = PublicKey.findProgramAddressSync(
-        [
-          poolPda.toBuffer(),
-          account.toBuffer(),
-          Buffer.from(BORROWER_AUTHORITY_SEED)
-        ],
-        new PublicKey(fallIdl.address)
-      );
-      const borrowReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, borrowReceiptTokenMint);
-      const collateralReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, collateralReceiptTokenMint);
-      if (collateralReceiptTokenAmount < borrowReceiptTokenAmount *poolDetail.poolInfo.aToB* MIN_COLLATERAL_RATIO/BASE_RATE) {
-        pendingLiquidation.push(account);
+      try {
+        console.log('Processing account:', account.toString());
+        const [borrowerAuthority] = PublicKey.findProgramAddressSync(
+          [
+            poolPda.toBuffer(),
+            account.toBuffer(),
+            Buffer.from(BORROWER_AUTHORITY_SEED)
+          ],
+          new PublicKey(fallIdl.address)
+        );
+        const borrowReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, borrowReceiptTokenMint);
+        const collateralReceiptTokenAmount = await getUserTokenAmount(connection, borrowerAuthority, collateralReceiptTokenMint);
+        if (collateralReceiptTokenAmount < borrowReceiptTokenAmount *poolDetail.poolInfo.aToB* MIN_COLLATERAL_RATIO/BASE_RATE) {
+          pendingLiquidation.push({
+            userAuthorityPda: account,
+            collateralReceiptTokenAmount: collateralReceiptTokenAmount,
+            borrowReceiptTokenAmount: borrowReceiptTokenAmount
+          });
+        }
+      } catch (err) {
+        console.error('Error processing account:', account.toString(), err);
+        continue; // 跳过出错的账户，继续处理下一个
       }
     }
     return pendingLiquidation;
   } catch (error) {
     console.error('Error fetching pool accounts:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+      console.error('Stack trace:', error.stack);
+    }
     throw error;
   }
 } 

@@ -2,17 +2,18 @@ import { FC, useState } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { liquidate } from '../../utils/liquidate';
-import { getPendingLiquidation } from '../../utils/getPendingLiquidation';
+import { getPendingLiquidation, PendingLiquidation } from '../../utils/getPendingLiquidation';
 import '../../style/Theme.css';
+import { AddressLabel } from '../utils/AddressLabel';
 import '../../style/Typography.css';
 
 export const LiquidateForm: FC = () => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
-  const [poolAddress, setPoolAddress] = useState<string>("");
+  const [poolAddress, setPoolAddress] = useState<PublicKey>();
   const [lastTxSignature, setLastTxSignature] = useState<string>("");
-  const [pendingLiquidations, setPendingLiquidations] = useState<PublicKey[]>([]);
+  const [pendingLiquidations, setPendingLiquidations] = useState<PendingLiquidation[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [processingLiquidation, setProcessingLiquidation] = useState<string | null>(null);
 
@@ -26,7 +27,7 @@ export const LiquidateForm: FC = () => {
     try {
       setError("");
       setIsLoadingList(true);
-      const liquidations = await getPendingLiquidation(wallet,new PublicKey(poolAddress),connection);
+      const liquidations = await getPendingLiquidation(wallet,poolAddress,connection);
       console.log(liquidations);
       setPendingLiquidations(liquidations);
     } catch (err) {
@@ -48,10 +49,7 @@ export const LiquidateForm: FC = () => {
       return;
     }
 
-    let poolKey: PublicKey;
-    try {
-      poolKey = new PublicKey(poolAddress);
-    } catch (err) {
+    if (!poolAddress) {
       setError("Invalid pool address");
       setProcessingLiquidation(null);
       return;
@@ -61,7 +59,7 @@ export const LiquidateForm: FC = () => {
       const result = await liquidate(
         wallet,
         connection,
-        poolKey,
+        poolAddress,
         borrowerKey,
       );
       
@@ -111,8 +109,8 @@ export const LiquidateForm: FC = () => {
               <input
                 className="input"
                 type="text"
-                value={poolAddress}
-                onChange={(e) => setPoolAddress(e.target.value)}
+                value={poolAddress?.toString()}
+                onChange={(e) => setPoolAddress(new PublicKey(e.target.value))}
                 placeholder="Enter pool address"
               />
               <button 
@@ -141,18 +139,22 @@ export const LiquidateForm: FC = () => {
               </span>
             </div>
           ) : (
-            <div className="step">
-              <h3 className="body-text">Pending Bankrupts</h3>
+            <div className="section">
               {pendingLiquidations.map((item, index) => (
                 <div key={index} className="step">
-                  <div className="code-text" style={{ marginBottom: 'var(--spacing-sm)' }}> {item.toString()} </div>
-                  <div className="align-center">
+                  <div className="info-row">
+                    <AddressLabel 
+                      label="Bankrupt Address"
+                      address={item.userAuthorityPda.toString()}
+                    />
+                    <span className="body-text">Borrow/Collateral:</span>
+                    <span className="code-text">{item.borrowReceiptTokenAmount.toString()}/{item.collateralReceiptTokenAmount.toString()}</span>
                     <button
-                      onClick={() => handleLiquidatePosition(item)}
-                      disabled={processingLiquidation === item.toString()}
+                      onClick={() => handleLiquidatePosition(item.userAuthorityPda)}
+                      disabled={processingLiquidation === item.userAuthorityPda.toString()}
                       className="button btn-primary"
                       >
-                      {processingLiquidation === item.toString() ? 'Processing...' : 'Liquidate to earn'}
+                      {processingLiquidation === item.userAuthorityPda.toString() ? 'Processing...' : 'Liquidate and earn'}
                     </button>
                   </div>
                 </div>

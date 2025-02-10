@@ -12,6 +12,8 @@ import {
   BORROWER_BORROW_BLOCK_HEIGHT_TOKEN_SEED,
   BORROWER_AUTHORITY_SEED,
 } from '../utils/constants';
+import { initTokenAccount } from './initTokenAccount';
+import { getAssociatedTokenAddress } from '@solana/spl-token';
 
 export async function borrow(
   wallet: any,
@@ -131,6 +133,11 @@ export async function borrow(
       owner: borrowerAuthority
     });
 
+    const hasTokenAAccount=await checkTokenAccount(connection, provider.wallet.publicKey, mintA)
+    if (!hasTokenAAccount) {
+      await initTokenAccount(connection, provider.wallet, mintA);
+    }
+
     console.log('Sending borrow transaction...');
     const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ 
       units: 1_000_000  
@@ -172,5 +179,16 @@ export async function borrow(
       });
     }
     throw error;
+  }
+}
+
+async function checkTokenAccount(connection: Connection, walletPublicKey: PublicKey, tokenMint: PublicKey): Promise<boolean> {
+  try {
+    const tokenAccount = await getAssociatedTokenAddress(tokenMint, walletPublicKey, true);
+    const account = await connection.getAccountInfo(tokenAccount);
+    return account !== null;
+  } catch (e) {
+    console.log("checkTokenAccount error:", e);
+    return false;
   }
 }

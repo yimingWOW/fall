@@ -173,14 +173,14 @@ pub fn deposit_liquidity(ctx: Context<DepositLiquidity>,amount_a: u64,amount_b: 
         liquidity -= MINIMUM_LIQUIDITY;
     }
 
-    // Calculate protocol fee
-    let protocol_fee = (liquidity as u128)
-        .checked_mul(ctx.accounts.amm.protocol_fee_percentage as u128)
+    // Calculate protocol fee - 修改这部分逻辑
+    let user_liquidity = (liquidity as u64)
+        .checked_mul((PERCENT_BASE - ctx.accounts.amm.protocol_fee_percentage as u64) as u64)
         .ok_or(DepositError::NumberOverflow)?
-        .checked_div(PERCENT_BASE as u128)
+        .checked_div(PERCENT_BASE as u64)
         .ok_or(DepositError::NumberOverflow)? as u64;
     
-    let user_liquidity = liquidity.checked_sub(protocol_fee).ok_or(DepositError::NumberOverflow)?;
+    let protocol_fee = liquidity.checked_sub(user_liquidity).ok_or(DepositError::NumberOverflow)?;
 
     // Transfer tokens to the pool
     token::transfer(

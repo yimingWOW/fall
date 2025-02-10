@@ -250,6 +250,7 @@ pub enum RepayError {
     CalculationError,
 }
 
+// todo: 小数==0的问题
 //  计算利息
 #[inline(never)]  // 强制不内联
 fn calculate_interest(record_block_height: u64, borrowed_amount: u64,) -> Result<u64> {
