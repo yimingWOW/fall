@@ -11,20 +11,12 @@ export const Guide: FC = () => {
         <section className="section">
           <h2>Prerequisites</h2>
           <div className="step">
-            <h3>1. Get Devnet SOL</h3>
+            <h3>1. Get Devnet Token</h3>
             <p>Request Devnet SOL from the <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer">Solana Faucet</a></p>
-          </div>
-          
-          <div className="step">
-            <h3>2. Get Test USDT</h3>
             <p>Obtain test USDT tokens from the <a href="https://spl-token-faucet.com/?token-name=USDT" target="_blank" rel="noopener noreferrer">SPL Token Faucet</a></p>
           </div>
-        </section>
-
-        <section className="section">
-          <h2>Setup Instructions</h2>
           <div className="step">
-            <h3>Convert SOL to WSOL for trading in Wsol-USDT Pool</h3>
+            <h3>2. Convert SOL to WSOL for trading in Wsol-USDT Pool</h3>
             <WrapSolForm onSuccess={() => {}} />
           </div>
         </section>
@@ -36,25 +28,25 @@ export const Guide: FC = () => {
             <p>Use the "Connect Wallet" button in the top right corner</p>
           </div>
           <div className="step">
-            <h3>2. Add Liquidity</h3>
-            <p>Deposit your WSOL and USDT into the liquidity pool to start earning fees</p>
+            <h3>2. Start Trading</h3>
+            <p>Once you have funds in the pool, you can trade on the swap page</p>
           </div>
           <div className="step">
-            <h3>3. Start Trading</h3>
-            <p>Once you have funds in the pool, you can begin trading on the platform</p>
+            <h3>3. Be a Farmer</h3>
+            <p>Deposit your Token into the liquidity pool to start earning fees</p>
           </div>
           <div className="step">
-            <h3>4. Become a Lender</h3>
-            <p>Visit the Lend page to lend out your meme tokens and earn yields. This is a great way to generate passive income from your meme token holdings.</p>
+            <h3>4. Long-term bullish on a meme</h3>
+            <p>Visit the Lend page to lend your meme tokens and earn yields. Forget about it, and one day look back and it might have been to the moon</p>
           </div>
           <div className="step">
-            <h3>5. Become a Borrower</h3>
-            <p>Head to the Borrow page where you can:</p>
+            <h3>5. Short worthless memes</h3>
+            <p>Go to the Borrow page and short those Shittcoins!</p>
             <ul className="feature-list">
               <li>Deposit stablecoins as collateral</li>
-              <li>Borrow meme tokens you're interested in</li>
-              <li>Implement short-selling strategies by selling borrowed tokens when prices are high</li>
-              <li>Buy back tokens at lower prices to profit from price decreases</li>
+              <li>Borrow meme tokens</li>
+              <li>Sell borrowed meme when prices are high</li>
+              <li>Buy back meme at lower prices, repay the borrowed meme and have a leisurely glass of Coke</li>
             </ul>
           </div>
         </section>
