@@ -100,6 +100,15 @@ export const LenderPoolItem: FC = () => {
                   address={details?.lendingPoolInfo.tokenBAmount.toFixed(6)}
                 />
               </div>
+              <div className="note-text">
+                Note: Profit sharing is based on time and capital contribution among lenders.
+              </div>
+              <div className="note-text">
+                Lent funds in the lending pool earn 0.05% profit per block, paid from borrowers' collateral.
+              </div>
+              <div className="note-text">
+                In case of mass liquidation events, lenders may not recover their full assets but receive a combination of lent assets and borrower collateral. Withdrawals follow a first-come-first-served principle.
+              </div>
             </div>
           </div>
       

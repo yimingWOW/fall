@@ -222,9 +222,11 @@ pub fn repay(ctx: Context<Repay>) -> Result<()> {
     )?;
 
     // 扣除利息后，将剩余抵押物转给borrower
-    let interest_pay_with_token_b = calculate_interest(record_block_height, borrowed_amount)?;
-    if collateral_amount>interest_pay_with_token_b{
-        let collateral_to_return: u64 = collateral_amount.checked_sub(interest_pay_with_token_b).ok_or(RepayError::CalculationError)?;
+    let interest_token_a_amount = calculate_interest(record_block_height, borrowed_amount)?;
+    let interest_token_b_amount = ctx.accounts.pool.calculate_token_a_value(interest_token_a_amount)?;
+
+    if collateral_amount>interest_token_b_amount{
+        let collateral_to_return: u64 = collateral_amount.checked_sub(interest_token_b_amount).ok_or(RepayError::CalculationError)?;
         if ctx.accounts.lending_pool_token_b.amount >= collateral_to_return{
             token::transfer(
                 CpiContext::new_with_signer(

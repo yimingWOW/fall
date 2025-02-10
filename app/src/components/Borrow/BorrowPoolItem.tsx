@@ -106,6 +106,9 @@ export const BorrowerPoolItem: FC = () => {
                     <div className="note-text">
                       Note: Please ensure you provide sufficient collateral based on the minimum collateral ratio.
                     </div>
+                    <div className="note-text">
+                      Your asset liquidation price is derived solely from Fall's liquidity pools and is independent of any other DEX or CEX.
+                    </div>
                   </div>
                 </div>
                 <div className="step">
