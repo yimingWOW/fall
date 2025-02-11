@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { liquidate } from '../../utils/liquidate';
@@ -6,16 +6,27 @@ import { getPendingLiquidation, PendingLiquidation } from '../../utils/getPendin
 import '../../style/Theme.css';
 import { AddressLabel } from '../utils/AddressLabel';
 import '../../style/Typography.css';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export const LiquidateForm: FC = () => {
+  const navigate = useNavigate();
+  const { poolAddress: poolAddressParam } = useParams<{ poolAddress?: string }>();
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [error, setError] = useState<string>("");
-  const [poolAddress, setPoolAddress] = useState<PublicKey>();
+  const [poolAddress, setPoolAddress] = useState<PublicKey | undefined>(
+    poolAddressParam ? new PublicKey(poolAddressParam) : undefined
+  );
   const [lastTxSignature, setLastTxSignature] = useState<string>("");
   const [pendingLiquidations, setPendingLiquidations] = useState<PendingLiquidation[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
   const [processingLiquidation, setProcessingLiquidation] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (poolAddressParam && wallet) {
+      handleSearch(new Event('submit') as any);
+    }
+  }, [poolAddressParam, wallet]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,10 +35,15 @@ export const LiquidateForm: FC = () => {
       return;
     }
 
+    // Update URL if pool address was manually entered
+    if (!poolAddressParam) {
+      navigate(`/liquidate/${poolAddress.toString()}`);
+    }
+
     try {
       setError("");
       setIsLoadingList(true);
-      const liquidations = await getPendingLiquidation(wallet,poolAddress,connection);
+      const liquidations = await getPendingLiquidation(wallet, poolAddress, connection);
       console.log(liquidations);
       setPendingLiquidations(liquidations);
     } catch (err) {
@@ -99,29 +115,33 @@ export const LiquidateForm: FC = () => {
             </div>
           )}
           <div className="section">
-            <div className="code-text">
-              <span className="body-text">
-                Pool PublicKey (Could get from Lend page)
-              </span>
-            </div>
-            
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-md)' }}>
-              <input
-                className="input"
-                type="text"
-                value={poolAddress?.toString()}
-                onChange={(e) => setPoolAddress(new PublicKey(e.target.value))}
-                placeholder="Enter pool address"
-              />
-              <button 
-                onClick={handleSearch}
-                disabled={isLoadingList || !wallet || !poolAddress}
-                className="button btn-primary"
-                style={{ minWidth: 'auto' }}
-              >
-                {isLoadingList ? 'Searching...' : 'Search'}
-              </button>
-            </div>
+            {!poolAddressParam && (
+              <>
+                <div className="code-text">
+                  <span className="body-text">
+                    Pool PublicKey (Could get from Lend page)
+                  </span>
+                </div>
+                
+                <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-md)' }}>
+                  <input
+                    className="input"
+                    type="text"
+                    value={poolAddress?.toString()}
+                    onChange={(e) => setPoolAddress(new PublicKey(e.target.value))}
+                    placeholder="Enter pool address"
+                  />
+                  <button 
+                    onClick={handleSearch}
+                    disabled={isLoadingList || !wallet || !poolAddress}
+                    className="button btn-primary"
+                    style={{ minWidth: 'auto' }}
+                  >
+                    {isLoadingList ? 'Searching...' : 'Search'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
         <div className="section">        

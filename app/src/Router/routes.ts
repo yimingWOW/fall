@@ -74,6 +74,11 @@ export const routes: RouteConfig[] = [
         component: LiquidateForm,
         meta: { title: 'Liquidate' }
       },
+      {
+        path: 'liquidate/:poolAddress',
+        component: LiquidateForm,
+        meta: { title: 'Liquidate' }
+      },
     ]
   }
 ]; 
