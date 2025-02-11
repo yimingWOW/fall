@@ -139,9 +139,6 @@ export const LenderPoolItem: FC = () => {
           ) : (
             <div className="secondary-text">Failed to load credit pool details</div>
           )}
-          <div className="note-text">
-            Note: By lending tokens, you'll receive interest based on the pool's lending rate.
-          </div>
         </> 
       )}
     </div>
