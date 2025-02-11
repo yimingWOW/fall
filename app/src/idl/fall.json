@@ -1,5 +1,5 @@
 {
-  "address": "HBK2QZCoQz5rZec2kLk2LDfDq3x98bieyZeMdewiQdUY",
+  "address": "3LNS7W9YTtUWmRJC4BnJ59wZyYQ1UyuDTMHcHQAfDSuN",
   "metadata": {
     "name": "fall",
     "version": "0.1.0",
@@ -3591,6 +3591,96 @@
           }
         },
         {
+          "name": "lending_pool_token_b",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "lending_pool_authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint_b"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "borrow_receipt_token_mint",
           "writable": true,
           "pda": {
@@ -6851,18 +6941,38 @@
   "errors": [
     {
       "code": 6000,
-      "name": "CalculationError",
-      "msg": "Calculation error"
+      "name": "OutputTooSmall",
+      "msg": "Output too small"
     },
     {
       "code": 6001,
-      "name": "CalculationError1",
-      "msg": "Calculation error"
+      "name": "InvariantViolated",
+      "msg": "Invariant violated"
     },
     {
       "code": 6002,
-      "name": "InvalidFee",
-      "msg": "Invalid fee"
+      "name": "InvalidInput",
+      "msg": "Invalid input amount"
+    },
+    {
+      "code": 6003,
+      "name": "EmptyPool",
+      "msg": "Pool is empty"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient balance"
+    },
+    {
+      "code": 6005,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    },
+    {
+      "code": 6006,
+      "name": "ExcessiveSlippage",
+      "msg": "Slippage tolerance exceeded"
     }
   ],
   "types": [

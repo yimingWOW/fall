@@ -76,6 +76,7 @@ export const CreatePoolForm: FC = () => {
       <div className="wrapper-container">
         <div className="wrapper-box">
           <div className="section-title">Create New Pool</div>
+          <div className="note-text">Note: Init pool need sign 5 times</div>
           {error && (
             <div className="code-text" style={{ color: 'var(--error)' }}>
               {error}

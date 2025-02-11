@@ -10,11 +10,8 @@ import '../../style/input.css';
 import '../../style/Typography.css';
 import '../../style/search.css';
 import '../../style/icon.css';
-interface SwapFormProps {
-  onSuccess: (signature: string) => void;
-}
 
-export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
+export const SwapForm: FC = () => {
   const wallet = useAnchorWallet();
   const { connection } = useConnection();
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +26,7 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
     minOutputAmount: '',
   });
   const [slippage, setSlippage] = useState('1.0');
+  const [error, setError] = useState<string | ''>('');
 
   // 获取池子详情
   const fetchPoolDetails = async () => {
@@ -93,7 +91,8 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
     const price = swapAtoB ? poolDetails.poolInfo.aToB : poolDetails.poolInfo.bToA;
     const outputAmount = inputAmount * price;
     
-    return outputAmount.toFixed(6);
+    // 确保返回整数字符串
+    return Math.round(outputAmount).toString();
   };
 
   // 更新处理输入变化的函数
@@ -139,12 +138,17 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
     if (!wallet || !formData.inputAmount || !selectedPool) return;
 
     setIsLoading(true);
+    setError('');
+    
     try {
-      // 计算考虑滑点的最小输出金额
       const slippageMultiplier = (100 - parseFloat(slippage)) / 100;
-      const minOutputWithSlippage = parseFloat(formData.minOutputAmount) * slippageMultiplier;
+      // 确保所有数值都被转换为整数
+      const inputAmount = Math.round(parseFloat(formData.inputAmount));
+      const minOutputAmount = Math.round(
+        parseFloat(formData.minOutputAmount) * slippageMultiplier
+      );
 
-      const signature = await swap(
+      await swap(
         wallet,
         connection,
         new PublicKey(selectedPool.poolPk),
@@ -152,13 +156,15 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
         new PublicKey(selectedPool.mintA),
         new PublicKey(selectedPool.mintB),
         swapAtoB,
-        parseFloat(formData.inputAmount),
-        minOutputWithSlippage
+        inputAmount,
+        minOutputAmount
       );
-      onSuccess(signature);
+      
       setFormData({ inputAmount: '', minOutputAmount: '' });
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || 'An unknown error occurred';
       console.error('Swap error:', error);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -254,6 +260,17 @@ export const SwapForm: FC<SwapFormProps> = ({ onSuccess }) => {
                 <div className="token-selector">%</div>
                 </div>
               </div>
+              {error && (
+                <div className="error-message" style={{
+                  color: 'red',
+                  marginTop: '10px',
+                  padding: '10px',
+                  backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                  borderRadius: '4px'
+                }}>
+                  {error}
+                </div>
+              )}
               <button 
                 type="submit"
                 className="button btn-primary"

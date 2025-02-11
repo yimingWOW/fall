@@ -156,10 +156,7 @@ impl Pool {
 
     // 检查抵押率,返回是否满足抵押率,满足返回true,不满足返回false
     #[inline(never)]
-    pub fn check_collateral_ratio(
-        &mut self, 
-        collateral_value_in_token_a: u64,
-        borrow_amount: u64,
+    pub fn check_collateral_ratio(&mut self, collateral_value_in_token_a: u64,borrow_amount: u64,
     ) -> Result<bool> {
         let required_collateral = (borrow_amount as u128)
             .checked_mul(MIN_COLLATERAL_RATIO as u128)

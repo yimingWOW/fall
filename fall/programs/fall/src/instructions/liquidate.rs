@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{self, Mint, Token, TokenAccount, Burn},
+    token::{self, Mint, Token, TokenAccount, Burn, Transfer},
 };
 use crate::constants::BORROW_TOKEN_SEED;
 use crate::constants::COLLATERAL_TOKEN_SEED;
@@ -18,45 +18,63 @@ pub fn liquidate(ctx: Context<Liquidate>) -> Result<()> {
     let collateral_value = ctx.accounts.pool.calculate_token_b_value(
         ctx.accounts.borrower_collateral_receipt_token.amount
     )?;
-    if !ctx.accounts.pool.check_collateral_ratio(
-        collateral_value,  ctx.accounts.borrower_borrow_receipt_token.amount)?{
-        // 5. 执行清算：销毁 receipt tokens
-        // 5.1 销毁 borrow receipt token
-        let borrower_authority_seeds = &[
-            &ctx.accounts.pool.key().to_bytes(),
-            &ctx.accounts.borrower.key().to_bytes(),
-            BORROWER_AUTHORITY_SEED,
-            &[ctx.bumps.borrower_authority],
-        ];
-        let borrower_signer_seeds = &[&borrower_authority_seeds[..]];
-        token::burn(            
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                Burn {
-                    mint: ctx.accounts.borrow_receipt_token_mint.to_account_info(),
-                    from: ctx.accounts.borrower_borrow_receipt_token.to_account_info(),
-                    authority: ctx.accounts.borrower_authority.to_account_info(),
-                },
-                borrower_signer_seeds,
-            ),      
-            ctx.accounts.borrower_borrow_receipt_token.amount,          
-        )?;
-        // 5.2 销毁 collateral receipt token
-        token::burn(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                Burn {
-                    mint: ctx.accounts.collateral_receipt_token_mint.to_account_info(),
-                    from: ctx.accounts.borrower_collateral_receipt_token.to_account_info(),
-                    authority: ctx.accounts.borrower_authority.to_account_info(),
-                },
-                borrower_signer_seeds,
-            ),
-            ctx.accounts.borrower_collateral_receipt_token.amount,
-        )?;
-        // 5. 更新pool_interest和 
-        ctx.accounts.pool.update_borrow_interest_accumulator(ctx.accounts.borrow_receipt_token_mint.supply)?;
-    }       
+    require!(collateral_value >= ctx.accounts.borrower_borrow_receipt_token.amount, FallError::InsufficientCollateral);
+
+    let rewards = ctx.accounts.borrower_collateral_receipt_token.amount.checked_div(100).ok_or(FallError::CalculationError1)?;
+
+    let authority_seeds = &[
+        &ctx.accounts.pool.key().to_bytes(),
+        LENDING_AUTHORITY_SEED,
+        &[ctx.bumps.lending_pool_authority],
+    ];
+    let signer_seeds = &[&authority_seeds[..]];
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.lending_pool_token_b.to_account_info(),
+                to: ctx.accounts.trader_account_b.to_account_info(),
+                authority: ctx.accounts.lending_pool_authority.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        rewards,
+    )?;
+    
+    let borrower_authority_seeds = &[
+        &ctx.accounts.pool.key().to_bytes(),
+        &ctx.accounts.borrower.key().to_bytes(),
+        BORROWER_AUTHORITY_SEED,
+        &[ctx.bumps.borrower_authority],
+    ];
+    let borrower_signer_seeds = &[&borrower_authority_seeds[..]];
+    token::burn(            
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Burn {
+                mint: ctx.accounts.borrow_receipt_token_mint.to_account_info(),
+                from: ctx.accounts.borrower_borrow_receipt_token.to_account_info(),
+                authority: ctx.accounts.borrower_authority.to_account_info(),
+            },
+            borrower_signer_seeds,
+        ),      
+        ctx.accounts.borrower_borrow_receipt_token.amount,          
+    )?;
+    token::burn(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Burn {
+                mint: ctx.accounts.collateral_receipt_token_mint.to_account_info(),
+                from: ctx.accounts.borrower_collateral_receipt_token.to_account_info(),
+                authority: ctx.accounts.borrower_authority.to_account_info(),
+            },
+            borrower_signer_seeds,
+        ),
+        ctx.accounts.borrower_collateral_receipt_token.amount,
+    )?;
+
+    // 更新pool_interest
+    ctx.accounts.pool.update_borrow_interest_accumulator(ctx.accounts.borrow_receipt_token_mint.supply)?;
     
     Ok(())
 }
@@ -116,6 +134,13 @@ pub struct Liquidate<'info> {
         bump,
     )]
     pub lending_pool_authority: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint_b,
+        associated_token::authority = lending_pool_authority,
+    )]
+    pub lending_pool_token_b: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
@@ -184,3 +209,11 @@ pub struct Liquidate<'info> {
     pub system_program: Program<'info, System>,
 }
 
+
+#[error_code]
+pub enum FallError {
+    #[msg("Insufficient collateral")]
+    InsufficientCollateral,
+    #[msg("Calculation error")]
+    CalculationError1,
+}

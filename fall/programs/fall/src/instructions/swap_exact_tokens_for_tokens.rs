@@ -101,56 +101,56 @@ pub fn swap_exact_tokens_for_tokens<'info>(
     );
 
     // Prevent depositing assets the depositor does not own
-    let input = if swap_a {
+    if swap_a {
         require!(ctx.accounts.trader_account_a.amount >= input_amount, SwapError::InsufficientBalance);
-        input_amount
     } else {
         require!(ctx.accounts.trader_account_b.amount >= input_amount, SwapError::InsufficientBalance);
-        input_amount
-    };
-
-    // Apply trading fee with overflow protection
-    let fee_amount = input
-        .checked_mul(ctx.accounts.amm.liquidity_fee as u64)
-        .ok_or(SwapError::MathOverflow)?
-        .checked_div(PERCENT_BASE)
-        .ok_or(SwapError::MathOverflow)?;
-    let taxed_input = input.checked_sub(fee_amount).ok_or(SwapError::MathOverflow)?;
+    }
 
     let pool_a = &ctx.accounts.pool_account_a;
     let pool_b = &ctx.accounts.pool_account_b;
 
-    // Calculate output amount using u128 for better precision
-    let output = if swap_a {
+    // Calculate raw output amount using u128 for better precision
+    let raw_output = if swap_a {
         let new_pool_a: u128 = (pool_a.amount as u128)
-            .checked_add(taxed_input as u128)
+            .checked_add(input_amount as u128)
             .ok_or(SwapError::MathOverflow)?;
         let k = (pool_a.amount as u128)
             .checked_mul(pool_b.amount as u128)
             .ok_or(SwapError::MathOverflow)?;
-        let output = (pool_b.amount as u128)
+        (pool_b.amount as u128)
             .checked_sub(k.checked_div(new_pool_a).ok_or(SwapError::MathOverflow)?)
-            .ok_or(SwapError::MathOverflow)?;
-        output as u64
+            .ok_or(SwapError::MathOverflow)?
     } else {
         let new_pool_b: u128 = (pool_b.amount as u128)
-            .checked_add(taxed_input as u128)
+            .checked_add(input_amount as u128)
             .ok_or(SwapError::MathOverflow)?;
         let k = (pool_a.amount as u128)
             .checked_mul(pool_b.amount as u128)
             .ok_or(SwapError::MathOverflow)?;
-        let output = (pool_a.amount as u128)
+        (pool_a.amount as u128)
             .checked_sub(k.checked_div(new_pool_b).ok_or(SwapError::MathOverflow)?)
-            .ok_or(SwapError::MathOverflow)?;
-        output as u64
+            .ok_or(SwapError::MathOverflow)?
     };
+
+    // Apply fee on output amount
+    let fee_amount = raw_output
+        .checked_mul(ctx.accounts.amm.liquidity_fee as u128)
+        .ok_or(SwapError::MathOverflow)?
+        .checked_div(PERCENT_BASE as u128)
+        .ok_or(SwapError::MathOverflow)?;
+    let output = raw_output
+        .checked_sub(fee_amount)
+        .ok_or(SwapError::MathOverflow)?;
+
+    // Check output bounds
+    require!(output <= u64::MAX as u128, SwapError::MathOverflow);
+    let output = output as u64;
 
     // Slippage check
     require!(output >= min_output_amount, SwapError::ExcessiveSlippage);
 
-    // Compute the invariant before the trade
-    let invariant: u64 = pool_a.amount * pool_b.amount;
-    // Transfer tokens to the pool
+    // Transfer tokens
     let authority_bump = ctx.bumps.pool_authority;
     let authority_seeds = &[
         &ctx.accounts.pool.amm.to_bytes(),
@@ -160,6 +160,10 @@ pub fn swap_exact_tokens_for_tokens<'info>(
         &[authority_bump],
     ];
     let signer_seeds = &[&authority_seeds[..]];
+
+    // Compute the invariant before the trade
+    let old_invariant = (pool_a.amount as u128) * (pool_b.amount as u128);
+
     if swap_a {
         token::transfer(
             CpiContext::new(
@@ -170,7 +174,7 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                     authority: ctx.accounts.trader.to_account_info(),
                 },
             ),
-            input,
+            input_amount,
         )?;
         token::transfer(
             CpiContext::new_with_signer(
@@ -184,14 +188,10 @@ pub fn swap_exact_tokens_for_tokens<'info>(
             ),
             output,
         )?;
-        // Verify the invariant still holds
-        // Reload accounts because of the CPIs
-        // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount+input) * (ctx.accounts.pool_account_b.amount-output) {
-            return err!(SwapError::InvariantViolated);
-        }
+
+        // Update pool state
         ctx.accounts.pool.token_a_amount = ctx.accounts.pool.token_a_amount
-            .checked_add(input)
+            .checked_add(input_amount)
             .ok_or(SwapError::MathOverflow)?;
         ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount
             .checked_sub(output)
@@ -218,22 +218,31 @@ pub fn swap_exact_tokens_for_tokens<'info>(
                     authority: ctx.accounts.trader.to_account_info(),
                 },
             ),
-            input,
+            input_amount,
         )?;
-        // Verify the invariant still holds
-        // Reload accounts because of the CPIs
-        // We tolerate if the new invariant is higher because it means a rounding error for LPs
-        if invariant > (ctx.accounts.pool_account_a.amount-output) * (ctx.accounts.pool_account_b.amount+input) {
-            return err!(SwapError::InvariantViolated);
-        }
-        // 更新池子状态
+
+        // Update pool state
         ctx.accounts.pool.token_a_amount = ctx.accounts.pool.token_a_amount
             .checked_sub(output)
             .ok_or(SwapError::MathOverflow)?;
         ctx.accounts.pool.token_b_amount = ctx.accounts.pool.token_b_amount
-            .checked_add(input)
+            .checked_add(input_amount)
             .ok_or(SwapError::MathOverflow)?;
     }
+
+    // Verify the invariant
+    let new_invariant = if swap_a {
+        ((ctx.accounts.pool_account_a.amount + input_amount) as u128)
+            .checked_mul((ctx.accounts.pool_account_b.amount - output) as u128)
+            .ok_or(SwapError::MathOverflow)?
+    } else {
+        ((ctx.accounts.pool_account_a.amount - output) as u128)
+            .checked_mul((ctx.accounts.pool_account_b.amount + input_amount) as u128)
+            .ok_or(SwapError::MathOverflow)?
+    };
+
+    // New invariant should be less than old invariant (because of fees)
+    require!(new_invariant <= old_invariant, SwapError::InvariantViolated);
     
     Ok(())
 }

@@ -83,24 +83,23 @@ export const BorrowerPoolItem: FC = () => {
                   <div className="step">
                     <div className="info-row">
                       <AddressLabel 
-                        label={`Current Collateral Ratio(Min: ${(MIN_COLLATERAL_RATIO/BASE_RATE*100).toFixed(2)}%)`}
-                        address={`${((Number(details.userAssets.borrowReceiptAmount) * 
-                          details.poolInfo.aToB / 
-                          Number(details.userAssets.collateralReceiptAmount)) * 100).toFixed(2)}%`}
-                      />
-                      <AddressLabel 
                         label="Available TokenA Amount"
                         address={details.lendingPoolInfo.tokenAAmount.toFixed(6)}
                       />
-                    </div>
-                    <div className="info-row">
                       <AddressLabel 
                         label="You have borrowed tokenA"
                         address={details.userAssets.borrowReceiptAmount}
                       />
+                    </div>
+                    <div className="info-row">
                       <AddressLabel 
                         label="You have collateral tokenB"
                         address={details.userAssets.collateralReceiptAmount}
+                      />
+                      <AddressLabel 
+                        label={`Current Collateral Ratio(Min: ${(MIN_COLLATERAL_RATIO/BASE_RATE*100).toFixed(2)}%)`}
+                        address={`${(Number(details.userAssets.collateralReceiptAmount)  / 
+                          (Number(details.userAssets.borrowReceiptAmount)* details.poolInfo.aToB) * 100).toFixed(2)}%`}
                       />
                     </div>
                     <div className="note-text">

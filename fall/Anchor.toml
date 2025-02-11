@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-fall = "HBK2QZCoQz5rZec2kLk2LDfDq3x98bieyZeMdewiQdUY"
+fall = "3LNS7W9YTtUWmRJC4BnJ59wZyYQ1UyuDTMHcHQAfDSuN"
 
 [registry]
 url = "https://api.apr.dev"

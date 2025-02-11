@@ -117,18 +117,14 @@ pub struct Borrow<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn borrow(
-    ctx: Context<Borrow>,
-    borrow_amount: u64,      // 要借的 token A 数量
-) -> Result<()> {
+pub fn borrow(ctx: Context<Borrow>,borrow_amount: u64) -> Result<()> {
     // 1. 计算抵押品等价于token A的数量,检查抵押率,要求抵押品等价于token A的数量大于等于借出金额的min_collateral_ratio
-    let collateral_value = ctx.accounts.pool.calculate_token_b_value(
-        ctx.accounts.borrower_collateral_receipt_token.amount )?;
-    require!(
-        ctx.accounts.pool.check_collateral_ratio(
-        collateral_value, borrow_amount)?,
-        BorowError::Error10
-    );
+    let collateral_value = ctx.accounts.pool.calculate_token_b_value(ctx.accounts.borrower_collateral_receipt_token.amount )?;
+    
+    require!(ctx.accounts.pool.check_collateral_ratio(collateral_value, borrow_amount)?,BorowError::Error10);
+
+    require!(borrow_amount <= ctx.accounts.lending_pool_token_a.amount , BorowError::Error11);
+    require!(borrow_amount <= ctx.accounts.pool.token_a_amount , BorowError::Error11);
 
     // 4 更新pool_interest和铸造 borrow token 铸造 borrower_borrow_block_height_mint receipt_token
     let authority_seeds = &[
@@ -177,4 +173,6 @@ pub fn borrow(
 pub enum BorowError {
     #[msg("Invalid collateral ratio")]
     Error10,
+    #[msg("Insufficient borrow amount")]
+    Error11,
 }

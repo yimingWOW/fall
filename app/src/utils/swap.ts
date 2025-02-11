@@ -66,14 +66,15 @@ export async function swap(
       wallet.publicKey,
       true
     );
+    console.log(poolAccountA,poolAccountB,traderAccountA,traderAccountB);
+    console.log("swapAtoB",swapAtoB);
 
-    const tx = await program.methods
-      .swapExactTokensForTokens(
-        swapAtoB,
-        new BN(inputAmount),
-        new BN(minOutputAmount)
-      )
-      .accounts({
+    const inputAmountBN = new BN(Math.floor(inputAmount));
+    const minOutputAmountBN = new BN(Math.floor(minOutputAmount));
+    console.log("inputAmountBN",inputAmountBN);
+    console.log("minOutputAmountBN",minOutputAmountBN);
+
+    const tx = await program.methods.swapExactTokensForTokens(swapAtoB,inputAmountBN,minOutputAmountBN).accounts({
         amm,
         pool,
         poolAuthority,
@@ -89,6 +90,7 @@ export async function swap(
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       }).rpc();
+      console.log("tx",tx);
 
     return tx;
   } catch (error) {
