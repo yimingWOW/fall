@@ -29,7 +29,7 @@ export const Guide: FC = () => {
           </div>
           <div className="step">
             <h3>2. Start Trading</h3>
-            <p>Once you have funds in the pool, you can trade on the swap page</p>
+            <p>You can trade on the swap page and you can influence the price then liquidate the borrower's position</p>
           </div>
           <div className="step">
             <h3>3. Be a Farmer</h3>
