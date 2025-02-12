@@ -92,12 +92,22 @@ export const LenderPoolItem: FC = () => {
               </div>
               <div className="info-row">
                 <AddressLabel 
-                  label="Pool TokenA Amount"
+                  label="Lending Pool TokenA Amount"
                   address={details?.lendingPoolInfo.tokenAAmount.toFixed(6)}
                 />
                 <AddressLabel 
-                  label="Pool TokenB Amount"
+                  label="Lending Pool TokenB Amount"
                   address={details?.lendingPoolInfo.tokenBAmount.toFixed(6)}
+                />
+              </div>
+              <div className="info-row">
+                <AddressLabel 
+                  label="Loaned TokenA Amount"
+                  address={details?.lendingPoolInfo.borrowReceiptSupply.toFixed(6)}
+                />
+                <AddressLabel 
+                  label="Collateral TokenB Amount"
+                  address={details?.lendingPoolInfo.collateralReceiptSupply.toFixed(6)}
                 />
               </div>
               <div className="note-text">

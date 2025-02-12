@@ -1,5 +1,5 @@
 {
-  "address": "3LNS7W9YTtUWmRJC4BnJ59wZyYQ1UyuDTMHcHQAfDSuN",
+  "address": "HRrJFxxQzPijk2VbF2ttqBtDUKQXVkytAf1cB5GzJuYB",
   "metadata": {
     "name": "fall",
     "version": "0.1.0",
@@ -4614,6 +4614,24 @@
           }
         },
         {
+          "name": "collateral_receipt_token_mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  104
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "lender_lending_block_height_mint",
           "writable": true,
           "pda": {
@@ -6941,38 +6959,18 @@
   "errors": [
     {
       "code": 6000,
-      "name": "OutputTooSmall",
-      "msg": "Output too small"
+      "name": "CalculationError",
+      "msg": "Calculation error"
     },
     {
       "code": 6001,
-      "name": "InvariantViolated",
-      "msg": "Invariant violated"
+      "name": "CalculationError1",
+      "msg": "Calculation error"
     },
     {
       "code": 6002,
-      "name": "InvalidInput",
-      "msg": "Invalid input amount"
-    },
-    {
-      "code": 6003,
-      "name": "EmptyPool",
-      "msg": "Pool is empty"
-    },
-    {
-      "code": 6004,
-      "name": "InsufficientBalance",
-      "msg": "Insufficient balance"
-    },
-    {
-      "code": 6005,
-      "name": "MathOverflow",
-      "msg": "Math overflow"
-    },
-    {
-      "code": 6006,
-      "name": "ExcessiveSlippage",
-      "msg": "Slippage tolerance exceeded"
+      "name": "InvalidFee",
+      "msg": "Invalid fee"
     }
   ],
   "types": [

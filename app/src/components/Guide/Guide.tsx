@@ -12,8 +12,8 @@ export const Guide: FC = () => {
           <h2>Prerequisites</h2>
           <div className="step">
             <h3>1. Get Devnet Token</h3>
-            <p>Request Devnet SOL from the <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer">Solana Faucet</a></p>
-            <p>Obtain test USDT tokens from the <a href="https://spl-token-faucet.com/?token-name=USDT" target="_blank" rel="noopener noreferrer">SPL Token Faucet</a></p>
+            <p>Obtain Devnet SOL from the <a className="text-link" href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer">Solana Faucet</a></p>
+            <p>Obtain Devnet USDT tokens from the <a className="text-link" href="https://spl-token-faucet.com/?token-name=USDT" target="_blank" rel="noopener noreferrer">SPL Token Faucet</a></p>
           </div>
           <div className="step">
             <h3>2. Convert SOL to WSOL for trading in Wsol-USDT Pool</h3>
