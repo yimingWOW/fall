@@ -54,7 +54,7 @@ const Dashboard: FC = () => {
           isActive={currentTab === 'swap'} 
           onClick={() => handleTabChange('swap')}
           icon="↔️"
-          label="Swap"
+          label="Long/Short"
         />
         <TabButton 
           isActive={currentTab === 'farm'} 
