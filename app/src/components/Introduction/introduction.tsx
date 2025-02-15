@@ -27,8 +27,12 @@ export const Introduction: FC = () => {
         </div>
 
         <div className="feature">
-          <h3>🎮 Meme Coin Trading</h3>
-          <p>Specialized tools for meme coin market participants, enabling both long and short positions.</p>
+          <h3>🎮 Meme Coin Shorting/Longing</h3>
+          <p>Fall supports both USDC-based shorting and token-based longing strategies:</p>
+          <ul className="feature-list">
+            <li><strong>USDC-based Shorting (MEME-USDC Pool):</strong> Deposit USDC as collateral, borrow MEME tokens, sell them, and buy back at a lower price to profit.</li>
+            <li><strong>Token-based Longing (USDC-MEME Pool):</strong> Deposit MEME tokens as collateral, borrow USDC to buy more MEME, and sell at a higher price for profit.</li>
+          </ul>
         </div>
 
         <div className="feature">
