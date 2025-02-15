@@ -2,7 +2,8 @@ import { FC } from 'react';
 import { WrapSolForm } from './wrapSolForm';
 import '../../style/Typography.css';
 import '../../style/Theme.css';
-
+import guidePic1 from '../../assets/guide_pic_1.png';
+import '../../style/guide.css';
 export const Guide: FC = () => {
   return (
     <div className="card-container">
@@ -13,7 +14,7 @@ export const Guide: FC = () => {
           <div className="step">
             <h3>1. Enable Devnet in Phantom Wallet</h3>
             <p>Open Phantom wallet settings → Developer Settings → Open Testnet Mode</p>
-            <img src={require('../../assets/guide_pic_1.png')} alt="Enable Devnet in Phantom" className="guide-image" />
+            <img src={guidePic1} alt="Enable Devnet in Phantom" className="guide-image" />
           </div>
           <div className="step">
             <h3>2. Get Devnet Token</h3>
