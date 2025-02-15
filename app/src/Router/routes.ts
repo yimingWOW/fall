@@ -11,7 +11,7 @@ import { LenderPoolItem } from '../components/Lend/LendPoolItem';
 import { BorrowerPoolItem } from '../components/Borrow/BorrowPoolItem';
 import { PoolItem } from '../components/Farm/PoolItem';
 import { CreatePoolForm } from '../components/Farm/CreatePoolForm';
-
+import { Introduction } from '../components/Introduction/introduction';
 export const routes: RouteConfig[] = [
   {
     path: '/',
@@ -20,6 +20,11 @@ export const routes: RouteConfig[] = [
       {
         path: '',
         component: Guide,
+      },
+      {
+        path: 'introduction',
+        component: Introduction,
+        meta: { title: 'Introduction' }
       },
       {
         path: 'guide',

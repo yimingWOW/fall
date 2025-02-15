@@ -45,9 +45,15 @@ const Dashboard: FC = () => {
           />
         )}
         <TabButton 
+          isActive={currentTab === 'introduction'} 
+          onClick={() => handleTabChange('introduction')}
+          icon="📖"
+          label="Introduction"
+        />
+        <TabButton 
           isActive={currentTab === 'guide'} 
           onClick={() => handleTabChange('guide')}
-          icon="🧭"
+          icon="📚"
           label="Guide"
         />
         <TabButton 

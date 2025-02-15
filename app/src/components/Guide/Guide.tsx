@@ -55,6 +55,10 @@ export const Guide: FC = () => {
               <li>Buy back meme at lower prices, repay the borrowed meme and have a leisurely glass of Coke</li>
             </ul>
           </div>
+          <div className="step">
+            <h3>6. Liquidate the borrower's position</h3>
+            <p>Visit the Liquidate page to liquidate the borrower's position</p>
+          </div>
         </section>
     </div>
   );
