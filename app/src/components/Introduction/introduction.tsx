@@ -17,8 +17,9 @@ export const Introduction: FC = () => {
         <h2>Key Features</h2>
         
         <div className="feature">
-          <h3>🎯 Oracle-Free Design</h3>
+          <h3>🎯 Open Liquidations</h3>
           <p>Our unique oracle-free architecture ensures maximum security and reliability.</p>
+          <p>Anyone can participate in the liquidation process and earn rewards. Simply spot liquidatable positions and click to claim your rewards!</p>
         </div>
 
         <div className="feature">
@@ -35,10 +36,6 @@ export const Introduction: FC = () => {
           </ul>
         </div>
 
-        <div className="feature">
-          <h3>💰 Open Liquidations</h3>
-          <p>Anyone can participate in the liquidation process and earn rewards. Simply spot liquidatable positions and click to claim your rewards!</p>
-        </div>
       </section>
 
       <section className="section">
