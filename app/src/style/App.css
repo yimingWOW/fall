@@ -1,0 +1,166 @@
+.app-container {
+  min-height: 100vh;
+  background: #1C1C28;
+  color: white;
+  position: relative; /* 添加这行 */
+  overflow-x: hidden; /* 防止水平滚动 */
+  padding-top: 72px; /* 添加这行，为固定导航栏留出空间 */
+}
+
+.app-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  padding: 0 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-logo {
+  height: 64px;
+  width: auto;
+  display: block;
+}
+
+/* 主内容区域 */
+.app-main {
+    padding-top: 72px;
+    min-height: calc(100vh - 72px);
+    width: 100%;
+}
+
+/* 连接钱包提示 */
+.connect-wallet {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 72px);
+}
+
+.connect-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 3rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.connect-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.connect-card h2 {
+  margin: 1rem 0;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.connect-card p {
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .nav-content {
+    padding: 1rem;
+  }
+  
+  .nav-right {
+    gap: 0.5rem;
+  }
+  
+  .network-select {
+    padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  }
+  
+  .wallet-button {
+    padding: 0.5rem 1rem !important;
+  }
+  
+  .connect-card {
+    padding: 2rem 1rem;
+    margin: 1rem;
+  }
+} 
+
+.connect-logo {
+  width: 64px; /* 调整大小 */
+  height: auto;
+  margin-bottom: 20px;
+} 
+
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1rem;
+}
+
+.social-icon {
+  color: #ffffff;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.social-icon:hover {
+  color: #9945FF;
+} 
+
+.social-links-corner {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 1rem;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.social-icon {
+  color: #ffffff;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.social-icon:hover {
+  color: #9945FF;
+} 
+
+.fall-title {
+  margin: 0;
+  line-height: 1;
+} 
+
+/* 添加内容区域样式 */
+.dashboard-content {
+  margin-top: 140px; /* 72px (nav) + 约68px (tab-nav高度) */
+  width: 100%;
+  padding: var(--spacing-md);
+}

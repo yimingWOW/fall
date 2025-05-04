@@ -1,0 +1,227 @@
+.title {
+  font-size: 2.5rem;
+  text-align: center;
+  background: linear-gradient(45deg, #9945FF, #14F195);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+  
+.card-container {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.section {
+  position: relative;
+  margin-bottom: 20px;
+  min-width: 860px;
+}
+  
+.section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #14F195;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.step {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.step h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #9945FF;
+}
+  
+.step p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.step ul {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem 1rem 1rem 2.5rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.step .info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.step .row-align-center {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.step .body-text {
+  flex: 0 0 auto;
+  text-align: right;
+  white-space: nowrap;
+  margin-bottom: 0;
+}
+    
+.step .code-text {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0;
+  max-width: 200px;
+}
+  
+.step .address-pair {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 12px;
+  max-width: 100px;    /* 限制最大宽度，可以根据需要调整 */
+}
+
+.sub-title {
+  font-size: 1.3rem;
+  color: #9945FF;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+/* 正文样式 */
+.body-text {
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+  
+/* 次要文字样式 */
+.secondary-text {
+  color: #8f90a0;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+/* 链接样式 */
+.text-link {
+  color: #14F195;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.text-link:hover {
+  color: #45ff7a;
+}
+
+.feature-list {
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.feature-list li {
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.feature-list li::before {
+  content: "•";
+  color: #14F195;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+  
+/* 强调文字 */
+.highlight-text {
+  color: #9945FF;
+  font-weight: 500;
+}
+  
+  /* 代码文字 */
+.code-text {
+  font-family: 'Courier New', Courier, monospace;
+  color: #14F195;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  line-height: 1.6;
+  font-size: 1rem; 
+  font-weight: 500;
+  overflow: visible;
+}
+  
+  /* 注释文字 */
+.note-text {
+  font-size: 0.9rem;
+  color: #888;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.code-text.column {  /* 添加新的类用于需要垂直布局的情况 */
+    flex-direction: column;
+    text-align: center;
+}
+  
+.copyable-address {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.address-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 400px;
+}
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .sub-title {
+    font-size: 1.2rem;
+  }
+  .guide-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  .section h2 {
+    font-size: 1.5rem;
+  }
+  .step h3 {
+    font-size: 1.2rem;
+  }
+} 
+
+

@@ -1,0 +1,34 @@
+.pool-select {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(40, 45, 55, 0.5);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  max-width: 560px;
+}
+  
+.pool-select .placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.pool-option {
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #fff;
+}
+
+.pool-option:hover {
+  background-color: rgba(50, 55, 65, 0.8);
+}
+
+.no-results {
+  padding: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
