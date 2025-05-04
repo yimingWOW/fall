@@ -24,5 +24,8 @@ By creating two opposing lending pools, users can go long or short on any token 
 
 ![Fall](https://github.com/yimingWOW/fall/blob/main/images/fall.002.png)
 
+--------------------------------
+### Try the devnet demo
 
+You can try the Devnet demo here: https://yimingwow.github.io/fall/
 
