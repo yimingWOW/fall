@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: |
+          cd app
+          npm install
+          npm install --save buffer
+          npm install --save @solana/spl-token
+          npm install --save @project-serum/anchor
+          npm install --save @types/bn.js
+          npm install --save vite-plugin-node-polyfills
+
+      - name: Build
+        run: |
+          cd app
+          npm run build
+          cp public/404.html dist/
+        env:
+          CI: false
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: app/dist
+          branch: gh-pages
+          token: ${{ secrets.ACCESS_TOKEN }}
