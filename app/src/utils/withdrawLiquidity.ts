@@ -7,6 +7,7 @@ import {
 } from '@solana/spl-token';
 import { Idl } from '@coral-xyz/anchor';
 import fallIdl from '../idl/fall.json';
+import BN from 'bn.js';
 import { AUTHORITY_SEED, LIQUIDITY_SEED } from './constants';
 
 export async function withdrawLiquidity(
@@ -19,6 +20,15 @@ export async function withdrawLiquidity(
   amount: number,
 ) {
   try {
+    console.log('Input parameters:', {
+      wallet: wallet?.publicKey?.toString(),
+      pool: pool.toString(),
+      amm: amm.toString(),
+      mintA: mintA.toString(),
+      mintB: mintB.toString(),
+      amount
+    });
+
     const provider = new anchor.AnchorProvider(
       connection,
       wallet,
@@ -40,6 +50,11 @@ export async function withdrawLiquidity(
       program.programId
     );
 
+    console.log('Derived addresses:', {
+      poolAuthority: poolAuthority.toString(),
+      programId: program.programId.toString()
+    });
+
     const [mintLiquidity] = PublicKey.findProgramAddressSync(
       [
         pool.toBuffer(),
@@ -47,6 +62,8 @@ export async function withdrawLiquidity(
       ],
       program.programId
     );
+
+    console.log('Mint liquidity:', mintLiquidity.toString());
 
     const poolAccountA = await getAssociatedTokenAddress(
       mintA,
@@ -78,7 +95,15 @@ export async function withdrawLiquidity(
       true
     );
 
-    const tx = await program.methods.withdrawLiquidity(amount).accounts({
+    console.log('Token accounts:', {
+      poolAccountA: poolAccountA.toString(),
+      poolAccountB: poolAccountB.toString(),
+      depositorAccountA: depositorAccountA.toString(),
+      depositorAccountB: depositorAccountB.toString(),
+      depositorAccountLiquidity: depositorAccountLiquidity.toString()
+    });
+
+    const tx = await program.methods.withdrawLiquidity(new BN(amount)).accounts({
         pool,
         poolAuthority,
         depositor: wallet.publicKey,
@@ -101,7 +126,7 @@ export async function withdrawLiquidity(
         });
     return tx;
   } catch (error) {
-    console.error('Error in depositLiquidity:', error);
+    console.error('Error in withdrawLiquidity:', error);
     throw error;
   }
 } 

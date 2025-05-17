@@ -38,6 +38,11 @@ export async function getPoolList(
     ) as any;
 
     const accounts = await program.account.pool.all();
+    for (const account of accounts) {
+      console.log(account.publicKey.toString());
+      console.log(account.account.mintA.toString());
+      console.log(account.account.mintB.toString());
+    }
 
     return accounts.map((account: any) => ({
       poolPk: new PublicKey(account.publicKey.toString()),

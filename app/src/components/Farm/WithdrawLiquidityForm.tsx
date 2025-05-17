@@ -29,6 +29,18 @@ export const WithdrawLiquidityForm: FC<WithdrawLiquidityFormProps> = ({
     setIsLoading(true);
 
     try {
+      if (!pool?.poolPk || !pool?.amm || !pool?.mintA || !pool?.mintB) {
+        throw new Error("Invalid pool information");
+      }
+
+      console.log("Withdraw parameters:", {
+        poolPk: pool.poolPk,
+        amm: pool.amm,
+        mintA: pool.mintA,
+        mintB: pool.mintB,
+        amount
+      });
+
       const signature = await withdrawLiquidity(
         wallet,
         connection,
@@ -36,13 +48,13 @@ export const WithdrawLiquidityForm: FC<WithdrawLiquidityFormProps> = ({
         new PublicKey(pool.amm),
         new PublicKey(pool.mintA),
         new PublicKey(pool.mintB),
-        amount,
+        amount
       );
 
       onSuccess(signature);
     } catch (err) {
-      console.error("Error depositing liquidity:", err);
-      setError(err instanceof Error ? err.message : "Failed to deposit liquidity");
+      console.error("Error WithdrawLiquidityForm:", err);
+      setError(err instanceof Error ? err.message : "Failed to withdraw liquidity");
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +75,7 @@ export const WithdrawLiquidityForm: FC<WithdrawLiquidityFormProps> = ({
         <button 
           type="submit" 
           className="button btn-primary"
-          disabled={isLoading || !wallet|| !amount}
+          disabled={isLoading || !wallet || !amount || !pool?.poolPk || !pool?.amm || !pool?.mintA || !pool?.mintB}
         >
           {!wallet 
             ? 'Connect Wallet' 
